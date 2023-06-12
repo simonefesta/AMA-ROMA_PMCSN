@@ -9,3 +9,7 @@ https://www.amaroma.it/media/news/4750-arrivati-13-nuovi-compattatori-per-potenz
 https://www.eraslazio.it/impianti/rocca-cencia-roma
 
 https://www.fanpage.it/roma/perche-e-stato-chiuso-il-tmb-di-rocca-cencia-e-cosa-significa-nuova-emergenza-rifiuti-a-roma/
+
+NOTE MIGLIORATIVE
+- cerca di mettere coda con priorità (csl hanno più rilevanza rispetto a mezzi leggeri)
+- sarebbe interessante modellare i camion fermi come 'perdite' economiche, oltre i vari Qos.
