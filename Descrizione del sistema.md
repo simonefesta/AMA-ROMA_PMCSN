@@ -23,3 +23,28 @@ L'azienda di rifiuti dispone di un tot di automezzi, suddivisi per capienza. Ipo
   - con probabilità $q_3$ il mezzo richiede di essere sanificato.
   
   - con probabilità $q_4$ il mezzo non ha il rifornimento necessario per essere di nuovo disponibile, e quindi si mette in coda per fare rifornimento.
+
+
+
+## Nomenclatura:
+
+- Gommista: cambia le gomme
+
+- Carrozzeria: estetica del mezzo
+
+- Stazione di servizio: rifornimento.
+
+- Elettrauto: parte circuiteria del mezzo.
+
+- Meccanica: parte meccanica dl mezzo.
+
+- Carpenteria meccanica: parte posteriore (dove c'è il carico).
+
+## Obiettivi
+
+- Minimizzare la quantità di tempo nel sistema...
+
+- Il numero di mezzi nel sistema non può superare una certa soglia.
+
+- Smaltire una certa quantità di rifiuti, leggasi "deve esserci un certo numero di ingressi di camion nel sistema" (throughput giornaliero).
+  
