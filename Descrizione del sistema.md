@@ -24,8 +24,6 @@ L'azienda di rifiuti dispone di un tot di automezzi, suddivisi per capienza. Ipo
   
   - con probabilità $q_4$ il mezzo non ha il rifornimento necessario per essere di nuovo disponibile, e quindi si mette in coda per fare rifornimento.
 
-
-
 ## Nomenclatura:
 
 - Gommista: cambia le gomme
@@ -47,4 +45,3 @@ L'azienda di rifiuti dispone di un tot di automezzi, suddivisi per capienza. Ipo
 - Il numero di mezzi nel sistema non può superare una certa soglia.
 
 - Smaltire una certa quantità di rifiuti, leggasi "deve esserci un certo numero di ingressi di camion nel sistema" (throughput giornaliero).
-  
