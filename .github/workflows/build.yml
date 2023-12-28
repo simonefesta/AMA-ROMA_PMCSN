@@ -1,0 +1,24 @@
+name: Build e Test con Maven
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout del codice sorgente
+      uses: actions/checkout@v2
+      with:
+        path: codice/pmcsn  # Specifica la sottocartella in cui fare il checkout del codice
+
+    - name: Setup Java JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+
+    - name: Esegui build con Maven
+      run: mvn -f codice/pmcsn/pom.xml clean install
