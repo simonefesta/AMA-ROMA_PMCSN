@@ -4,7 +4,7 @@ package model;
 public class Constants {
 
     public static double START   = 0.0;            /* inizio lavoro giornaliero       */
-    public static double STOP    = 86400;        /*  terminazione lavoro giornaliero (24 ore in secondi) */
+    public static double STOP    = 86400.0;        /*  terminazione lavoro giornaliero (24 ore in secondi) */
     public static int    SERVERS_SCARICO = 5;
     public static int    SERVERS_ACCETTAZIONE = 4;
     public static int    SERVERS_GOMMISTA = 2;

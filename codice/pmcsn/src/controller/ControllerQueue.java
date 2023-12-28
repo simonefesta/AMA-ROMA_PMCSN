@@ -141,29 +141,28 @@ class Msq {
 
             if (e == EVENT_ARRIVE_ACCETTAZIONE - 1) {  /* process an arrival in accettazione*/
 
-                numberAccettazione++;
+                numberAccettazione++;                   /* numeri di job nell'accettazione*/
                 event[0].t = m.getArrival(r);
                 if (event[0].t > STOP)
-                    if (event[0].t > STOP)
                         event[0].x = 0;
                 if (numberAccettazione <= SERVERS_ACCETTAZIONE) {
 
                     service = m.getService(r,accettazione_SR);
-                    s = m.findOneOfficina(event,SERVERS_ACCETTAZIONE); //da fixare
+                    s = m.findOneOfficina(event,SERVERS_ACCETTAZIONE);
                     sum[s].service += service;
                     sum[s].served++;
                     event[s].t = t.current + service;
                     event[s].x = 1; //eleggibile per next event
                 }
-            } else if (e == ALL_EVENTS_ACCETTAZIONE) {      /* process a departure (i.e. arrival to one of the workshops) */
+            } else if (e == ALL_EVENTS_ACCETTAZIONE) {      /*uscita dall'accettazione -> entrata in una certa officina */
 
                 event[ALL_EVENTS_ACCETTAZIONE].x = 0;
                 int indexTypeOfficina = -1;
                 boolean prob = false;
                 while (!prob) { //qui, tramite probabilità, stabilisco l'officina in cui andrà il mezzo uscente dall'accettazione. Finchè non trova un'officina, continua la ricerca.
-                    for (int i = 0; i < Percentuali_OFFICINA.length - 1; i++) {
+                    for (int i = 0; i < Percentuali_OFFICINA.length; i++) {
                         prob = generateProbability(r, streamIndex, Percentuali_OFFICINA[i]);
-                        if (prob) {
+                        if (prob) { //ho trovato true, associato ad una certa officina di indice 'i'.
                             indexTypeOfficina = i;
                             break;
                         }
@@ -216,8 +215,8 @@ class Msq {
                     }
                 }
                 else if (indexTypeOfficina == 5) { //caso meccanica
-                    numberElettrauti++;
-                    if (numberElettrauti <= SERVERS_MECCANICA) {   // if false, there's queue
+                    numberMeccanica++;
+                    if (numberMeccanica <= SERVERS_MECCANICA) {   // if false, there's queue
                         service = m.getService(r, riparazione_SR);
                         s = m.findOneOfficina(event, SERVERS_MECCANICA);
                         sum[s].service += service;
