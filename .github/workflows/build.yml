@@ -12,8 +12,6 @@ jobs:
     steps:
     - name: Checkout del codice sorgente
       uses: actions/checkout@v2
-      with:
-        path: codice/pmcsn  # Specifica la sottocartella in cui fare il checkout del codice
 
     - name: Setup Java JDK
       uses: actions/setup-java@v3
