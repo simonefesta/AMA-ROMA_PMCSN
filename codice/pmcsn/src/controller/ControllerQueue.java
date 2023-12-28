@@ -13,14 +13,10 @@ package controller;
  * -------------------------------------------------------------------------
  */
 
-import java.lang.*;
-import java.text.*;
-import java.util.ArrayList;
-import java.util.List;
 
-//import libraries.*;
-import model.*;
 import utils.Rngs;
+
+import java.text.DecimalFormat;
 
 import static model.Constants.*;
 import static model.Events.*;
@@ -60,29 +56,50 @@ class Msq {
     static double sarrival = START;
 
     public static void main(String[] args) {
+        int streamIndex = 1;
+        long number = 0;   /* number nel sistema   */
+        long numberAccettazione = 0;  /* number in 'Accettazione'   */
+        long numberGommista = 0;
+        long numberCarrozzeria = 0;
+        long numberElettrauti = 0;
+        long numberCarpenteria = 0;
+        long numberMeccanica = 0;
+        long numberScarico = 0;
+        long numberCheckout = 0;
+        int e;                      /* next event index                    */
+        int s;                      /* server index
+                          */
+        long indexAccettazione = 0;             /* used to count processed jobs        */
+        long indexGommista = 0;             /* used to count processed jobs        */
+        long indexCarrozzeria = 0;             /* used to count processed jobs        */
+        long indexElettrauti = 0;             /* used to count processed jobs        */
+        long indexCarpenteria = 0;             /* used to count processed jobs        */
+        long indexMeccanica = 0;             /* used to count processed jobs        */
+        long indexScarico = 0;             /* used to count processed jobs        */
+        long indexCheckout = 0;             /* used to count processed jobs        */
 
-        long   number             = 0;   /* number nel sistema   */
-        long   numberAccettazione = 0;  /* number in 'Accettazione'   */
-        long   numberOfficina     = 0;
-        long   numberScarico      = 0;
-        long   numberCheckout     = 0;
-        int    e;                      /* next event index                    */
-        int    s;                      /* server index                        */
-        long   index  = 0;             /* used to count processed jobs        */
 
         /*
         aree per il calcolo dell'integrale
          */
         double area = 0.0;
-        double areaAccettazione  = 0.0;           /* time integrated number in the node */
-        double areaScarico   = 0.0;           /* time integrated number in the node */
+        double areaAccettazione = 0.0;           /* time integrated number in the node */
+        double areaGommista = 0;
+        double areaCarrozzeria = 0;
+        double areaElettrauti = 0;
+        double areaCarpenteria = 0;
+        double areaMeccanica = 0;
+        double areaScarico = 0.0;           /* time integrated number in the node */
         double areaCheckout = 0.0;
-        double areaOfficina = 0.0;
 
-        double areaAccettazioneQueue  = 0.0;           /* time integrated number in the node */
-        double areaScaricoQueue   = 0.0;           /* time integrated number in the node */
+        double areaAccettazioneQueue = 0.0;           /* time integrated number in the node */
+        double areaGommistaQueue = 0;
+        double areaCarrozzeriaQueue = 0;
+        double areaElettrautiQueue = 0;
+        double areaCarpenteriaQueue = 0;
+        double areaMeccanicaQueue = 0;
+        double areaScaricoQueue = 0.0;           /* time integrated number in the node */
         double areaCheckoutQueue = 0.0;
-        double areaOfficinaQueue = 0.0;
         double service;
 
         Msq m = new Msq();
@@ -90,89 +107,166 @@ class Msq {
         r.plantSeeds(0);
 
 
-
-        MsqEvent [] event = new MsqEvent [ALL_EVENTS_ACCETTAZIONE+ALL_EVENTS_GOMMISTA+ALL_EVENTS_CARROZZERIA+ALL_EVENTS_ELETTRAUTI+ALL_EVENTS_CARPENTERIA+ALL_EVENTS_MECCANICA+ALL_EVENTS_SCARICO+ALL_EVENTS_CHECKOUT];
-        MsqSum [] sum = new MsqSum [ALL_EVENTS_ACCETTAZIONE+ALL_EVENTS_GOMMISTA+ALL_EVENTS_CARROZZERIA+ALL_EVENTS_ELETTRAUTI+ALL_EVENTS_CARPENTERIA+ALL_EVENTS_MECCANICA+ALL_EVENTS_SCARICO+ALL_EVENTS_CHECKOUT];
-        for (s = 0; s < ALL_EVENTS_ACCETTAZIONE+ALL_EVENTS_GOMMISTA+ALL_EVENTS_CARROZZERIA+ALL_EVENTS_ELETTRAUTI+ALL_EVENTS_CARPENTERIA+ALL_EVENTS_MECCANICA+ALL_EVENTS_SCARICO+ALL_EVENTS_CHECKOUT; s++) {
+        MsqEvent[] event = new MsqEvent[ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA + ALL_EVENTS_CARROZZERIA + ALL_EVENTS_ELETTRAUTI + ALL_EVENTS_CARPENTERIA + ALL_EVENTS_MECCANICA + ALL_EVENTS_SCARICO + ALL_EVENTS_CHECKOUT];
+        MsqSum[] sum = new MsqSum[ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA + ALL_EVENTS_CARROZZERIA + ALL_EVENTS_ELETTRAUTI + ALL_EVENTS_CARPENTERIA + ALL_EVENTS_MECCANICA + ALL_EVENTS_SCARICO + ALL_EVENTS_CHECKOUT];
+        for (s = 0; s < ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA + ALL_EVENTS_CARROZZERIA + ALL_EVENTS_ELETTRAUTI + ALL_EVENTS_CARPENTERIA + ALL_EVENTS_MECCANICA + ALL_EVENTS_SCARICO + ALL_EVENTS_CHECKOUT; s++) {
             event[s] = new MsqEvent();
-            sum [s]  = new MsqSum();
+            sum[s] = new MsqSum();
         }
 
         MsqT t = new MsqT();
 
-        t.current    = START;
-        event[0].t   = m.getArrival(r);
-        event[0].x   = 1;
-        for (s = 1; s < ALL_EVENTS_ACCETTAZIONE+ALL_EVENTS_GOMMISTA+ALL_EVENTS_CARROZZERIA+ALL_EVENTS_ELETTRAUTI+ALL_EVENTS_CARPENTERIA+ALL_EVENTS_MECCANICA+ALL_EVENTS_SCARICO+ALL_EVENTS_CHECKOUT; s++) {
-            event[s].t     = START;          /* this value is arbitrary because */
-            event[s].x     = 0;              /* all servers are initially idle  */
+        t.current = START;
+        event[0].t = m.getArrival(r);
+        event[0].x = 1;
+        for (s = 1; s < ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA + ALL_EVENTS_CARROZZERIA + ALL_EVENTS_ELETTRAUTI + ALL_EVENTS_CARPENTERIA + ALL_EVENTS_MECCANICA + ALL_EVENTS_SCARICO + ALL_EVENTS_CHECKOUT; s++) {
+            event[s].t = START;          /* this value is arbitrary because */
+            event[s].x = 0;              /* all servers are initially idle  */
             sum[s].service = 0.0;
-            sum[s].served  = 0;
+            sum[s].served = 0;
         }
-        while ((event[0].x != 0) || (number + numberAccettazione + numberOfficina +numberOfficina + numberScarico +numberCheckout != 0)) {
-            e         = m.nextEvent(event);                /* next event index */
-            t.next    = event[e].t;                        /* next event time  */
-            areaAccettazione     += (t.next - t.current) * numberAccettazione;     /* update integral  */
+        while ((event[0].x != 0) || (number + numberAccettazione + numberGommista + numberCarrozzeria + numberElettrauti + numberCarpenteria + numberMeccanica + numberScarico + numberCheckout != 0)) {
+            e = m.nextEvent(event);                /* next event index */
+            t.next = event[e].t;                        /* next event time  */
+            areaAccettazione += (t.next - t.current) * numberAccettazione;     /* update integral  */
+            areaGommista += (t.next - t.current) * numberGommista;
+            areaCarrozzeria += (t.next - t.current) * numberCarrozzeria;
+            areaElettrauti += (t.next - t.current) * numberElettrauti;
+            areaCarpenteria += (t.next - t.current) * numberCarpenteria;
+            areaMeccanica += (t.next - t.current) * numberMeccanica;
+            areaScarico += (t.next - t.current) * numberScarico;
             areaCheckout += (t.next - t.current) * numberCheckout;     /* update integral  */
-            areaOfficina += (t.next - t.current) * numberOfficina;
-            areaScarico += (t.next - t.current) *numberScarico;
 
             t.current = t.next;                            /* advance the clock*/
 
-            if (e == EVENT_ARRIVE_SISTEMA-1) {                                  /* process an arrival*/
-                number++;
-                event[0].t        = m.getArrival(r);
+            if (e == EVENT_ARRIVE_ACCETTAZIONE - 1) {  /* process an arrival in accettazione*/
+
+                numberAccettazione++;
+                event[0].t = m.getArrival(r);
                 if (event[0].t > STOP)
-                    event[0].x      = 0;
-                if (number <= SERVERS) {
+                    if (event[0].t > STOP)
+                        event[0].x = 0;
+                if (numberAccettazione <= SERVERS_ACCETTAZIONE) {
 
-                    service         = m.getService(r);
-                    s               = m.findOne(event);
+                    service = m.getService(r,accettazione_SR);
+                    s = m.findOneOfficina(event,SERVERS_ACCETTAZIONE); //da fixare
                     sum[s].service += service;
                     sum[s].served++;
-                    event[s].t      = t.current + service;
-                    event[s].x      = 1; //eleggibile per next event
+                    event[s].t = t.current + service;
+                    event[s].x = 1; //eleggibile per next event
                 }
-            }
-            // todo modella il servizio del biglietto e gli abbandoni con gen. random
-            else {                                         /* process a departure */
-                index++;                                     /* from server s       */
-                number--;
-                s                 = e;
-                if (number >= SERVERS) {
-                    service         = m.getService(r);
+            } else if (e == ALL_EVENTS_ACCETTAZIONE) {      /* process a departure (i.e. arrival to one of the workshops) */
+
+                event[ALL_EVENTS_ACCETTAZIONE].x = 0;
+                int indexTypeOfficina = -1;
+                boolean prob = false;
+                while (!prob) { //qui, tramite probabilità, stabilisco l'officina in cui andrà il mezzo uscente dall'accettazione. Finchè non trova un'officina, continua la ricerca.
+                    for (int i = 0; i < Percentuali_OFFICINA.length - 1; i++) {
+                        prob = generateProbability(r, streamIndex, Percentuali_OFFICINA[i]);
+                        if (prob) {
+                            indexTypeOfficina = i;
+                            break;
+                        }
+                    }
+
+                }
+                if (indexTypeOfficina == 1) { //caso gommista
+
+                    numberGommista++;
+                    if (numberGommista <= SERVERS_GOMMISTA) {   // if false, there's queue
+                        service = m.getService(r, riparazione_SR);
+                        s = m.findOneOfficina(event, SERVERS_GOMMISTA);
+                        sum[s].service += service;
+                        sum[s].served++;
+                        event[s].t = t.current + service;
+                        event[s].x = 1;
+                    }
+                } else if (indexTypeOfficina == 2) { //caso carrozzeria
+                    numberCarrozzeria++;
+                    if (numberCarrozzeria <= SERVERS_GOMMISTA) {   // if false, there's queue
+                        service = m.getService(r, riparazione_SR);
+                        s = m.findOneOfficina(event, SERVERS_CARROZZERIA);
+                        sum[s].service += service;
+                        sum[s].served++;
+                        event[s].t = t.current + service;
+                        event[s].x = 1;
+                    }
+                }
+                else if (indexTypeOfficina == 3) { //caso elettrauti
+                    numberElettrauti++;
+                    if (numberElettrauti <= SERVERS_GOMMISTA) {   // if false, there's queue
+                        service = m.getService(r, riparazione_SR);
+                        s = m.findOneOfficina(event, SERVERS_ELETTRAUTI);
+                        sum[s].service += service;
+                        sum[s].served++;
+                        event[s].t = t.current + service;
+                        event[s].x = 1;
+                    }
+                }
+
+                else if (indexTypeOfficina == 4) { //caso carpenteria
+                    numberCarpenteria++;
+                    if (numberElettrauti <= SERVERS_CARPENTERIA) {   // if false, there's queue
+                        service = m.getService(r, riparazione_SR);
+                        s = m.findOneOfficina(event, SERVERS_CARPENTERIA);
+                        sum[s].service += service;
+                        sum[s].served++;
+                        event[s].t = t.current + service;
+                        event[s].x = 1;
+                    }
+                }
+                else if (indexTypeOfficina == 5) { //caso meccanica
+                    numberElettrauti++;
+                    if (numberElettrauti <= SERVERS_MECCANICA) {   // if false, there's queue
+                        service = m.getService(r, riparazione_SR);
+                        s = m.findOneOfficina(event, SERVERS_MECCANICA);
+                        sum[s].service += service;
+                        sum[s].served++;
+                        event[s].t = t.current + service;
+                        event[s].x = 1;
+                    }
+                }
+            }  //Il mezzo passa alla fase di scarico rifiuti
+            else if ((e == ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA) || (e == ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_CARROZZERIA) || (e == ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_ELETTRAUTI) || (e == ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_CARPENTERIA) || (e == ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_MECCANICA)){
+                numberScarico++;
+                if (numberElettrauti <= SERVERS_SCARICO) {   // if false, there's queue
+                    service = m.getService(r, scarico_SR);
+                    s = m.findOneOfficina(event, SERVERS_SCARICO);
                     sum[s].service += service;
                     sum[s].served++;
-                    event[s].t      = t.current + service;
+                    event[s].t = t.current + service;
+                    event[s].x = 1;
                 }
-                else
-                    event[s].x      = 0;
             }
+
+            DecimalFormat f = new DecimalFormat("###0.00");
+            DecimalFormat g = new DecimalFormat("###0.000");
+
+            /* ACCETTAZIONE */
+
+            System.out.println("\nfor " + indexAccettazione + " jobs the service node statistics are:\n");
+            System.out.println("  avg interarrivals .. =   " + f.format(event[EVENT_ARRIVE_ACCETTAZIONE - 1].t / indexAccettazione));
+            System.out.println("  avg wait (resp time)......... =   " + f.format(areaAccettazione / indexAccettazione));
+            System.out.println("  avg # in node ...... =   " + f.format(areaAccettazione / t.current));
+
+            for (s = 1; s <= SERVERS_ACCETTAZIONE; s++)          /* adjust area to calculate */
+                area -= sum[s].service;              /* averages for the queue   */
+
+            System.out.println("  avg delay .......... =   " + f.format(areaAccettazione / indexAccettazione));
+            System.out.println("  avg # in queue ..... =   " + f.format(areaAccettazione / t.current));
+            System.out.println("\nthe server statistics are:\n");
+            System.out.println("    server     utilization     avg service      share");
+            for (s = 1; s <= SERVERS_ACCETTAZIONE; s++) {
+                System.out.print("       " + s + "          " + g.format(sum[s].service / t.current) + "            ");
+                System.out.println(f.format(sum[s].service / sum[s].served) + "         " + g.format(sum[s].served / (double) indexAccettazione));
+            }
+
+            System.out.println("");
+
+
+
         }
-
-        DecimalFormat f = new DecimalFormat("###0.00");
-        DecimalFormat g = new DecimalFormat("###0.000");
-
-        System.out.println("\nfor " + index + " jobs the service node statistics are:\n");
-        System.out.println("  avg interarrivals .. =   " + f.format(event[0].t / index));
-        System.out.println("  avg wait ........... =   " + f.format(area / index));
-        System.out.println("  avg # in node ...... =   " + f.format(area / t.current));
-
-        for (s = 1; s <= SERVERS; s++)          /* adjust area to calculate */
-            area -= sum[s].service;              /* averages for the queue   */
-
-        System.out.println("  avg delay .......... =   " + f.format(area / index));
-        System.out.println("  avg # in queue ..... =   " + f.format(area / t.current));
-        System.out.println("\nthe server statistics are:\n");
-        System.out.println("    server     utilization     avg service      share");
-        for (s = 1; s <= SERVERS; s++) {
-            System.out.print("       " + s + "          " + g.format(sum[s].service / t.current) + "            ");
-            System.out.println(f.format(sum[s].service / sum[s].served) + "         " + g.format(sum[s].served / (double)index));
-        }
-
-        System.out.println("");
     }
-
 
     double exponential(double m, Rngs r) {
         /* ---------------------------------------------------
@@ -201,16 +295,16 @@ class Msq {
     }
 
 
-    double getService(Rngs r) {
+    double getService(Rngs r, double serviceTime) {
         /* ------------------------------
          * generate the next service time, with rate 1/6
          * ------------------------------
          */
         r.selectStream(1);
-        return (uniform(2.0, 10.0, r));
+        return (exponential(serviceTime, r));
     }
 
-    int nextEvent(MsqEvent [] event) {
+    private int nextEvent(MsqEvent [] event) {
         /* ---------------------------------------
          * return the index of the next event type
          * ---------------------------------------
@@ -229,7 +323,7 @@ class Msq {
         return (e);
     }
 
-    int findOne(MsqEvent [] event) {
+    int findOneOfficina(MsqEvent [] event, double nServer) {
         /* -----------------------------------------------------
          * return the index of the available server idle longest
          * -----------------------------------------------------
@@ -240,8 +334,7 @@ class Msq {
         while (event[i].x == 1)       /* find the index of the first available */
             i++;                        /* (idle) server                         */
         s = i;
-        //todo why +1, why i starts from 1?
-        while (i < SERVERS+1) {         /* now, check the others to find which   */
+        while (i < nServer+1) {         /* now, check the others to find which   */
             i++;                        /* has been idle longest                 */
             if ((event[i].x == 0) && (event[i].t < event[s].t))
                 s = i;
@@ -249,4 +342,14 @@ class Msq {
         return (s);
     }
 
+
+    static public boolean generateProbability(Rngs rngs, int streamIndex, double percentage) {
+        rngs.selectStream(1 + streamIndex);
+        return rngs.random() <= percentage;
+    }
+
+
+
+
 }
+

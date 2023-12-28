@@ -4,7 +4,7 @@ package model;
 public class Constants {
 
     public static double START   = 0.0;            /* inizio lavoro giornaliero       */
-    public static double STOP    = 1440;        /*  terminazione lavoro giornaliero (24 ore in minuti) */
+    public static double STOP    = 86400;        /*  terminazione lavoro giornaliero (24 ore in secondi) */
     public static int    SERVERS_SCARICO = 5;
     public static int    SERVERS_ACCETTAZIONE = 4;
     public static int    SERVERS_GOMMISTA = 2;
@@ -20,7 +20,7 @@ public class Constants {
 
     public static final double P1 = 0.64;
 
-    // probabilità guasto da identificate
+    // probabilità guasto da identificare
     public static final double Q1 = 0.36; //1-P1
 
     /*
@@ -29,6 +29,7 @@ public class Constants {
 
     // probabilità mezzo non riparabile
     public static final double Q2 = 0.02;
+
 
     // probabilità difetto tipologia "gommista"
     public static final double P2 = 0.3;
@@ -46,6 +47,9 @@ public class Constants {
     // probabilità difetto tipologia "meccanica"
     public static final double P6 = 0.3;
 
+    public static final double [] Percentuali_OFFICINA = {Q2,  P2,  P3,  P4,  P5,  P6};
+
+
     /*
        Zona CHECKOUT
      */
@@ -57,15 +61,17 @@ public class Constants {
     public static final double Q7 = 0.3;
 
 
-    // ---- ARRIVAL RATES [req/min]----
+    // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.11; // 135 mezzi in 1440 minuti. (?) DA VEDERE
+    public static final double LAMBDA = 0.3; // ad ora è a caso, bisogna ragionarci su!
 
 
-    // ---- SERVICE RATES  [min] ----
-    // smaltimento
-    public static final double smaltimento_SR = 15;
-    public static final double riparazione_SR = 2*60; //per tutte le officine (2 ore?)
+    // ---- SERVICE RATES  [sec] ----
+    public static final double accettazione_SR = 10*60;
+    public static final double scarico_SR = 15*60;
+    public static final double riparazione_SR = 2*3600; //per tutte le officine (2 ore?)
+
+    public static final double checkout_SR = 20*60;
 
 
 
