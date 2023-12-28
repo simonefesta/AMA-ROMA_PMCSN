@@ -104,7 +104,7 @@ class Msq {
 
         Msq m = new Msq();
         Rngs r = new Rngs();
-        r.plantSeeds(0);
+        r.plantSeeds(123456789);
 
 
         MsqEvent[] event = new MsqEvent[ALL_EVENTS_ACCETTAZIONE + ALL_EVENTS_GOMMISTA + ALL_EVENTS_CARROZZERIA + ALL_EVENTS_ELETTRAUTI + ALL_EVENTS_CARPENTERIA + ALL_EVENTS_MECCANICA + ALL_EVENTS_SCARICO + ALL_EVENTS_CHECKOUT];
@@ -155,7 +155,8 @@ class Msq {
                     event[s].x = 1; //eleggibile per next event
                 }
             } else if (e == ALL_EVENTS_ACCETTAZIONE) {      /*uscita dall'accettazione -> entrata in una certa officina */
-
+                indexAccettazione++;
+                numberAccettazione--;
                 event[ALL_EVENTS_ACCETTAZIONE].x = 0;
                 int indexTypeOfficina = -1;
                 boolean prob = false;
