@@ -16,9 +16,10 @@ jobs:
         path: codice/pmcsn  # Specifica la sottocartella in cui fare il checkout del codice
 
     - name: Setup Java JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: '11'
+        distribution: 'zulu'
 
     - name: Esegui build con Maven
-      run: mvn -f codice/pmcsn/pom.xml clean install
+      run: mvn -f codice/pmcsn/pom.xml clean install exec:java
