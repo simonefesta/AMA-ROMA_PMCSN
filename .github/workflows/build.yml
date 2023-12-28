@@ -22,4 +22,4 @@ jobs:
         distribution: 'zulu'
 
     - name: Esegui build con Maven
-      run: mvn -f codice/pmcsn/pom.xml clean install exec:java
+      run: mvn -f ${{ github.workspace }}/codice/pmcsn/pom.xml clean install exec:java
