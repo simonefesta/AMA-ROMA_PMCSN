@@ -12,7 +12,7 @@ public class Events {
     /* -- Accettazione */
     public static final int EVENT_ARRIVE_ACCETTAZIONE = 1;
     public static final int EVENT_DEPARTURE_ACCETTAZIONE = 1;
-    public static final int EVENT_BROKEN_ACCETTAZIONE = 1; //mezzo non riparabile.
+    public static final int EVENT_BROKEN_ACCETTAZIONE = 0; //mezzo non riparabile. (Da impostare ad 1 quando si implementa l'abbandono (se si implementa).
 
     public static final int ALL_EVENTS_ACCETTAZIONE = EVENT_ARRIVE_ACCETTAZIONE + EVENT_DEPARTURE_ACCETTAZIONE + EVENT_BROKEN_ACCETTAZIONE;
 
@@ -25,27 +25,34 @@ public class Events {
     public static final int ALL_EVENTS_GOMMISTA = EVENT_ARRIVE_GOMMISTA + EVENT_DEPARTURE_GOMMISTA;
 
     public static final int EVENT_ARRIVE_CARROZZERIA = 1;
-    public static final int EVENT_DEPARTURE_CARROZZERIA = 1;
+    public static final int EVENT_DEPARTURE_CARROZZERIA = 2;
 
     public static final int ALL_EVENTS_CARROZZERIA = EVENT_ARRIVE_CARROZZERIA + EVENT_DEPARTURE_CARROZZERIA;
 
 
     public static final int EVENT_ARRIVE_ELETTRAUTI = 1;
-    public static final int EVENT_DEPARTURE_ELETTRAUTI = 1;
+    public static final int EVENT_DEPARTURE_ELETTRAUTI = 3;
 
     public static final int ALL_EVENTS_ELETTRAUTI = EVENT_ARRIVE_ELETTRAUTI + EVENT_DEPARTURE_ELETTRAUTI;
 
 
     public static final int EVENT_ARRIVE_CARPENTERIA = 1;
-    public static final int EVENT_DEPARTURE_CARPENTERIA = 1;
+    public static final int EVENT_DEPARTURE_CARPENTERIA = 4;
 
     public static final int ALL_EVENTS_CARPENTERIA = EVENT_ARRIVE_CARPENTERIA + EVENT_DEPARTURE_CARPENTERIA;
 
 
     public static final int EVENT_ARRIVE_MECCANICA = 1;
-    public static final int EVENT_DEPARTURE_MECCANICA = 1;
+    public static final int EVENT_DEPARTURE_MECCANICA = 5;
 
     public static final int ALL_EVENTS_MECCANICA = EVENT_ARRIVE_MECCANICA + EVENT_DEPARTURE_MECCANICA;
+
+
+    /*
+    Ho introdotto questo evento perchè quando un mezzo esce dall'officina specifica, a me non interessa,
+    mi basta sapere che sia disponibile per lo scarico rifiuti, non per quale motivo sia stato riparato.
+     */
+    public static final int ALL_EVENTS_OFFICINA = 7;
 
 
 

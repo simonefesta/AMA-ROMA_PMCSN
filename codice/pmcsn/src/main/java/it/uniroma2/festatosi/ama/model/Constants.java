@@ -63,7 +63,7 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.3; // ad ora è a caso, bisogna ragionarci su!
+    public static final double LAMBDA = 0.005; // ad ora è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
