@@ -1,5 +1,11 @@
 package it.uniroma2.festatosi.ama.utils;
 
+import it.uniroma2.festatosi.ama.controller.EventHandler;
+import it.uniroma2.festatosi.ama.model.Constants;
+import it.uniroma2.festatosi.ama.model.EventListEntry;
+
+import static it.uniroma2.festatosi.ama.model.Constants.VEICOLIV1;
+import static it.uniroma2.festatosi.ama.model.Constants.VEICOLIV2;
 import static java.lang.Math.log;
 
 public class RandomDistribution {
@@ -9,6 +15,8 @@ public class RandomDistribution {
     private double serviceTime;
     //tempo di abbandono centro
     private double leaveTime;
+
+    private EventHandler eventHandler=EventHandler.getInstance();
 
     private static RandomDistribution instance=null;
 
@@ -47,6 +55,15 @@ public class RandomDistribution {
 
     public double getJobArrival() {
         rngs.selectStream(0);
+        double rnd=rngs.random();
+        if(rnd<=0.5 && eventHandler.getNumberV1()< VEICOLIV1){
+            eventHandler.incrementNumberV1();
+        }else if(rnd>0.5 && eventHandler.getNumberV2()<VEICOLIV2){
+            eventHandler.incrementNumberV2();
+        }else{
+            return Double.MAX_VALUE;
+        }
+        rngs.selectStream(2);
         arrival += Exponential(1.0);
         return arrival;
     }

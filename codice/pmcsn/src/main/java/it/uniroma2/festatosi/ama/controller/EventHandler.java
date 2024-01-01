@@ -24,9 +24,10 @@ public class EventHandler {
     private List<EventListEntry> eventsCarpenteria=new ArrayList<>(SERVERS_CARPENTERIA); /*event list della msq di carpenteria*/
     private List<EventListEntry> eventsMeccanica=new ArrayList<>(SERVERS_MECCANICA); /*event list della msq di meccanica*/
     private List<EventListEntry> eventsCheckout=new ArrayList<>(SERVERS_CHECKOUT); /*event list della msq di checkout*/
+    private int numberV1=0; /*conta i veicoli del primo tipo nel sistema*/
+    private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
 
     private EventHandler() {
-
         /*event list per i vari msq*/
         this.eventsAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE+1); /* event list della msq di accettazione*/
         this.eventsScarico = new ArrayList<>(SERVERS_SCARICO+1); /* event list della msq di scarico*/
@@ -80,5 +81,21 @@ public class EventHandler {
 
     public void setEventsAccettazione(List<EventListEntry> eventListAccettazione) {
         this.eventsAccettazione=eventListAccettazione;
+    }
+
+    public int getNumberV1() {
+        return numberV1;
+    }
+
+    public void incrementNumberV1(){
+        this.numberV1++;
+    }
+
+    public void incrementNumberV2(){
+        this.numberV2++;
+    }
+
+    public int getNumberV2() {
+        return numberV2;
     }
 }

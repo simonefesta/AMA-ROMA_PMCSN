@@ -19,25 +19,24 @@ public class ControllerAccettazione {
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
-    private long index=0;           /*contatore jobs processati*/
+    private long jobServed=0;           /*contatore jobs processati*/
     private double area=0.0;        /*time integrated number in the node*/
 
-    private EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
-    private Rngs rngs;      /*istanza della classe per creare multi-stream di numeri random*/
+    private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
 
-    private RandomDistribution rnd=RandomDistribution.getInstance();
+    private final RandomDistribution rnd=RandomDistribution.getInstance();
 
-    private List<MsqSum> sum=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
-    private MsqT time=new MsqT();
-    private List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
-    private int jobServed=0;
+    private final List<MsqSum> sum=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
+    private final MsqT time=new MsqT();
+    private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
     public ControllerAccettazione(){
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
-        this.rngs=new Rngs();
+        /*istanza della classe per creare multi-stream di numeri random*/
+        Rngs rngs = new Rngs();
         rngs.plantSeeds(123456789);
 
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -55,48 +54,69 @@ public class ControllerAccettazione {
 
     public void baseSimulation(){
         int e;
-
+        //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
+        /*
+        *il ciclo continua finchè non si verificano entrambe queste condizioni:
+        * -eventList[0].x=0 (close door),
+        * -number>0 ci sono ancora eventi nel sistema
+        */
         while((eventList.get(0).getX() !=0) || (this.number>0)){
+            //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
+            //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
             this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
             if(e==0){ // controllo se l'evento è un arrivo
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 eventList.get(0).setT(this.rnd.getJobArrival());
                 if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
-                    eventList.get(0).setX(0);
+                    eventList.get(0).setX(0); //chiusura delle porte
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
                 }
-                if(this.number<=SERVERS_ACCETTAZIONE){
-                    double service=this.rnd.getService();
-                    this.s=findOneServerIdle(eventListAccettazione);
+                if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
+                    double service=this.rnd.getService(); //ottengo tempo di servizio
+                    this.s=findOneServerIdle(eventListAccettazione); //ottengo l'indice di un server libero
+                    //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
                     sum.get(s).incrementServed();
+                    //imposta nella lista degli eventi che il server s è busy
                     eventListAccettazione.get(s).setT(this.time.getCurrent()+service);
                     eventListAccettazione.get(s).setX(1);
+                    //aggiorna la lista nell'handler
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
                 }
             }
-            else{
+            else{ //evento di fine servizio
+                //decrementa il numero di eventi nel nodo considerato
                 this.number--;
+                //aumenta il numero di job serviti
                 this.jobServed++;
-                this.s=e;
+
+                this.s=e; //il server con index e è quello che si libera
 
                 //TODO logica di routing
 
-                if(this.number>=SERVERS_ACCETTAZIONE){
+                if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
+                    //se ci sono ottengo un nuovo tempo di servizio
                     double service=this.rnd.getService();
 
+                    //incremento tempo di servizio totale e eventi totali gestiti
                     sum.get(s).incrementService(service);
                     sum.get(s).incrementServed();
 
+                    //imposta il tempo alla fine del servizio
                     eventListAccettazione.get(s).setT(this.time.getCurrent()+service);
+                    //aggiorna la lista degli eventi di accettazione
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
                 }else{
+                    //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                     eventListAccettazione.get(e).setX(0);
+                    //aggiorna la lista
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
                 }
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
@@ -104,6 +124,12 @@ public class ControllerAccettazione {
         }
     }
 
+    /**
+     * ritorna l'indice del server libero da più tempo
+     *
+     * @param eventListAccettazione lista degli eventi di accettazione
+     * @return index del server libero da più tempo
+     */
     private int findOneServerIdle(List<EventListEntry> eventListAccettazione) {
         int s;
         int i = 1;
@@ -134,7 +160,7 @@ public class ControllerAccettazione {
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
-            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + this.sum.get(i).getServed() / this.jobServed);
+            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
             // System.out.println(i+"\t");
             // System.out.println("get service" + this.sumList[i].getService() + "\n");
             // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
