@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - avoid-loop
 
 jobs:
   build:
