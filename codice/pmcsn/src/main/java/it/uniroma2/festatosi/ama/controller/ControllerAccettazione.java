@@ -7,6 +7,7 @@ import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.SERVERS_ACCETTAZIONE;
@@ -30,6 +31,8 @@ public class ControllerAccettazione {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
+    private List<EventListEntry> queueAccettazione=new LinkedList<>();
+
     public ControllerAccettazione(){
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
@@ -46,13 +49,13 @@ public class ControllerAccettazione {
 
         double firstArrival=this.rnd.getJobArrival();
 
-        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1));
+        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, rnd.getVehicleType()));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
     }
 
-    public void baseSimulation(){
+    public void baseSimulation() throws Exception {
         int e;
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
@@ -61,7 +64,9 @@ public class ControllerAccettazione {
         * -eventList[0].x=0 (close door),
         * -number>0 ci sono ancora eventi nel sistema
         */
+
         while((eventList.get(0).getX() !=0) || (this.number>0)){
+            System.out.println("loop "+this.time.getCurrent());
             //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
             //imposta il tempo del prossimo evento
@@ -71,15 +76,28 @@ public class ControllerAccettazione {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
+
             if(e==0){ // controllo se l'evento è un arrivo
+                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival());
+                int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
+                if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
+                    System.out.println("pieno");
+                    continue;
+                }
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-                eventList.get(0).setT(this.rnd.getJobArrival());
-                if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
+                System.out.println(e+" "+eventList.get(e).getT());
+
+                EventListEntry event=new EventListEntry(eventList.get(0).getT(), 0, vType);
+
+                if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
                     eventList.get(0).setX(0); //chiusura delle porte
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
+                    System.out.println("chiuse porte "+ this.number);
                 }
+                System.out.println(this.number);
                 if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                    double service=this.rnd.getService(); //ottengo tempo di servizio
+                    System.out.println("upd list");
+                    double service=this.rnd.getService(vType); //ottengo tempo di servizio
                     this.s=findOneServerIdle(eventListAccettazione); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -87,8 +105,12 @@ public class ControllerAccettazione {
                     //imposta nella lista degli eventi che il server s è busy
                     eventListAccettazione.get(s).setT(this.time.getCurrent()+service);
                     eventListAccettazione.get(s).setX(1);
+                    eventListAccettazione.get(s).setVehicleType(vType);
+
                     //aggiorna la lista nell'handler
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
+                }else{
+                    queueAccettazione.add(event);
                 }
             }
             else{ //evento di fine servizio
@@ -99,11 +121,13 @@ public class ControllerAccettazione {
 
                 this.s=e; //il server con index e è quello che si libera
 
+                System.out.println("type: "+ eventListAccettazione.get(s).getVehicleType());
+
                 //TODO logica di routing
 
                 if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
-                    double service=this.rnd.getService();
+                    double service=this.rnd.getService(queueAccettazione.get(0).getVehicleType());
 
                     //incremento tempo di servizio totale e eventi totali gestiti
                     sum.get(s).incrementService(service);
@@ -111,6 +135,8 @@ public class ControllerAccettazione {
 
                     //imposta il tempo alla fine del servizio
                     eventListAccettazione.get(s).setT(this.time.getCurrent()+service);
+                    eventListAccettazione.get(s).setVehicleType(queueAccettazione.get(0).getVehicleType());
+                    queueAccettazione.remove(0);
                     //aggiorna la lista degli eventi di accettazione
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
                 }else{

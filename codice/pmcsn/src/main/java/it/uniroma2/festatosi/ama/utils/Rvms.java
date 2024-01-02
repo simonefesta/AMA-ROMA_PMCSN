@@ -744,4 +744,24 @@ public class Rvms{
 	else
 	    return (factor * f);
     }
+
+
+	/**
+	 *
+	 * calcolo normale troncata
+	 *
+	 * @param m media della normale
+	 * @param s deviazione standard della normale
+	 * @param lowerBound lowerBound troncamento
+	 * @param upperBound upperBound troncamento
+	 * @param r valore random tra 0 e 1
+	 * @return valore tra 0 e 1 per la VA
+	 */
+	public double idfTruncatedNormal(double m, double s, int lowerBound, int upperBound, double r){
+		double a= cdfNormal(m, s, lowerBound-1);
+		double b= 1.0-cdfNormal(m, s, upperBound);
+		double u=idfUniform(a,1.0-b, r);
+		System.out.println("a: "+a+" b: "+b+" u: "+u+" rnd: "+r);
+		return idfNormal(m, s, u);
+	}
 }

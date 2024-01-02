@@ -74,7 +74,7 @@ public class Constants {
     public static final double checkout_SR = 20*60;
 
     // numero di veicoli per ogni tipo
-    public static final int VEICOLIV1=15;
-    public static final int VEICOLIV2=18;
+    public static final int VEICOLI1 =15;
+    public static final int VEICOLI2 =18;
 
 }

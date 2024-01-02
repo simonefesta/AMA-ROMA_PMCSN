@@ -1,11 +1,9 @@
 package it.uniroma2.festatosi.ama.utils;
 
 import it.uniroma2.festatosi.ama.controller.EventHandler;
-import it.uniroma2.festatosi.ama.model.Constants;
-import it.uniroma2.festatosi.ama.model.EventListEntry;
 
-import static it.uniroma2.festatosi.ama.model.Constants.VEICOLIV1;
-import static it.uniroma2.festatosi.ama.model.Constants.VEICOLIV2;
+import static it.uniroma2.festatosi.ama.model.Constants.VEICOLI1;
+import static it.uniroma2.festatosi.ama.model.Constants.VEICOLI2;
 import static java.lang.Math.log;
 
 public class RandomDistribution {
@@ -53,24 +51,57 @@ public class RandomDistribution {
         return (a + (b - a) * rngs.random());
     }
 
+    /**
+     * Funzione che torna il tempo di arrivo di un evento nel sistema
+     * Torna il double massimo nel caso in cui non possono arrivare nuovi eventi dall'esterno in modo che venga
+     * selezionato l'evento di completamento di un servente
+     */
     public double getJobArrival() {
-        rngs.selectStream(0);
-        double rnd=rngs.random();
-        if(rnd<=0.5 && eventHandler.getNumberV1()< VEICOLIV1){
-            eventHandler.incrementNumberV1();
-        }else if(rnd>0.5 && eventHandler.getNumberV2()<VEICOLIV2){
-            eventHandler.incrementNumberV2();
-        }else{
-            return Double.MAX_VALUE;
-        }
         rngs.selectStream(2);
         arrival += Exponential(1.0);
         return arrival;
     }
 
-    public double getService() {
+    public int getVehicleType(){
+        rngs.selectStream(0);
+        double rnd=rngs.random(); //si prende numero random
+        /*se il numero random scelto è minore di 0.5 o i veicoli del secondo tipo sono tutti presenti nel sistema,
+         * entra un veicolo del primo tipo
+         */
+        System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
+        if((rnd<=(double)VEICOLI1/(VEICOLI1+VEICOLI2) && eventHandler.getNumberV1()< VEICOLI1)
+                || (eventHandler.getNumberV2()==VEICOLI2 && eventHandler.getNumberV1()< VEICOLI1)){
+            eventHandler.incrementNumberV1();
+            return 1;
+        }
+        /*se il numero random scelto è maggiore di 0.5 o i veicoli del primo tipo sono tutti presenti nel sistema,
+         * entra un veicolo del secondo tipo
+         */
+        else if((rnd>(double)VEICOLI1/(VEICOLI1+VEICOLI2) && eventHandler.getNumberV2()< VEICOLI2)
+                || (eventHandler.getNumberV1()==VEICOLI1 && eventHandler.getNumberV2()< VEICOLI2)){
+            eventHandler.incrementNumberV2();
+            return 2;
+        }else{
+            //se sono finiti i veicoli all'esterno del sistema non si possono avere nuovi arrivi
+            return Integer.MAX_VALUE;
+        }
+    }
+
+    public double getService(int vt) throws Exception {
         rngs.selectStream(3);
-        return Uniform(2.0, 10.0);
+        //bisogna inserire un controllo sul tipo di veicolo che esce, per semplicità ora è un solo tipo
+        switch (vt) {
+            case 1:
+                eventHandler.decrementNumberV1();
+                break;
+            case 2:
+                eventHandler.decrementNumberV2();
+                break;
+            default:
+                throw new Exception("Tipo di veicolo non supportato dal sistema");
+        }
+        //TODO modificare valori rendere parametrico
+        return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
     }
 
 }

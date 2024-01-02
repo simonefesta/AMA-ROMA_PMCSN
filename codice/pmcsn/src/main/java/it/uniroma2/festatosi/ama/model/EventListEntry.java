@@ -13,10 +13,18 @@ import java.util.List;
 public class EventListEntry {
     private double t;
     private int x;
+    private int vehicleType;
 
     public EventListEntry(double t, int x){
         this.t=t;
         this.x=x;
+        this.vehicleType=0;
+    }
+
+    public EventListEntry(double t, int x, int vehicleType){
+        this.t=t;
+        this.x=x;
+        this.vehicleType=vehicleType;
     }
 
     public double getT() {
@@ -33,6 +41,14 @@ public class EventListEntry {
 
     public void setX(int x) {
         this.x = x;
+    }
+
+    public int getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(int vehicleType) {
+        this.vehicleType = vehicleType;
     }
 
     /**

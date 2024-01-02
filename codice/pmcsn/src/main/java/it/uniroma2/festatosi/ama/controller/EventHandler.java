@@ -95,6 +95,14 @@ public class EventHandler {
         this.numberV2++;
     }
 
+    public void decrementNumberV1(){
+        this.numberV1--;
+    }
+
+    public void decrementNumberV2(){
+        this.numberV2--;
+    }
+
     public int getNumberV2() {
         return numberV2;
     }
