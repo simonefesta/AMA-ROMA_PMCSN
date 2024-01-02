@@ -761,7 +761,6 @@ public class Rvms{
 		double a= cdfNormal(m, s, lowerBound-1);
 		double b= 1.0-cdfNormal(m, s, upperBound);
 		double u=idfUniform(a,1.0-b, r);
-		System.out.println("a: "+a+" b: "+b+" u: "+u+" rnd: "+r);
 		return idfNormal(m, s, u);
 	}
 }
