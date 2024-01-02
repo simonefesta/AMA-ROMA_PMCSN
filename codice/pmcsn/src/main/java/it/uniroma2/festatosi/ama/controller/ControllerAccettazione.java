@@ -66,7 +66,6 @@ public class ControllerAccettazione {
         */
 
         while((eventList.get(0).getX() !=0) || (this.number>0)){
-            System.out.println("loop "+this.time.getCurrent());
             //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
             //imposta il tempo del prossimo evento
@@ -85,18 +84,14 @@ public class ControllerAccettazione {
                     continue;
                 }
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-                System.out.println(e+" "+eventList.get(e).getT());
 
                 EventListEntry event=new EventListEntry(eventList.get(0).getT(), 0, vType);
 
                 if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
                     eventList.get(0).setX(0); //chiusura delle porte
                     this.eventHandler.setEventsAccettazione(eventList);
-                    System.out.println("chiuse porte "+ this.number);
                 }
-                System.out.println(this.number);
                 if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                    System.out.println("upd list");
                     double service=this.rnd.getService(vType); //ottengo tempo di servizio
                     this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
@@ -121,10 +116,7 @@ public class ControllerAccettazione {
 
                 this.s=e; //il server con index e è quello che si libera
 
-                System.out.println("type: "+ eventList.get(e).getVehicleType());
                 EventListEntry event=eventList.get(e);
-                //event.setX(1);
-                System.out.println("evento: "+e+" "+event.getT()+" "+event.getX());
 
                 //TODO logica di routing
 
@@ -132,23 +124,18 @@ public class ControllerAccettazione {
                 //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
                 if(rndRouting<=P2){
                     eventHandler.getInternalEventsGommista().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                    System.out.println(eventHandler.getInternalEventsGommista().size());
-                    System.out.println("ins gomm\nStampa coda");
                     List<EventListEntry> it=eventHandler.getInternalEventsGommista();
-                    for(EventListEntry eve:it){
-                        System.out.println("x: "+eve.getT()+" "+eve.getX());
-                    }
                 }
                 else if(rndRouting<=(P2+P3+P4)){
-                    eventHandler.getInternalEventsElettrauto().add(event);
+                    eventHandler.getInternalEventsElettrauto().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                     System.out.println("ins el");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
-                    eventHandler.getInternalEventsCarpenteria().add(event);
+                    eventHandler.getInternalEventsCarpenteria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                     System.out.println("ins carp");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5+P6)){
-                    eventHandler.getInternalEventsMeccanica().add(event);
+                    eventHandler.getInternalEventsMeccanica().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                     System.out.println("ins mecc");
                 }
                 else{
