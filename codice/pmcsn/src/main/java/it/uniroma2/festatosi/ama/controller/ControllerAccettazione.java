@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static it.uniroma2.festatosi.ama.model.Constants.SERVERS_ACCETTAZIONE;
-import static it.uniroma2.festatosi.ama.model.Constants.STOP;
+import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 /**
  * rappresenta la msq per l'accettazione
@@ -26,6 +25,7 @@ public class ControllerAccettazione {
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
 
     private final RandomDistribution rnd=RandomDistribution.getInstance();
+    private final Rngs rngs=new Rngs();
 
     private final List<MsqSum> sum=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
     private final MsqT time=new MsqT();
@@ -47,7 +47,7 @@ public class ControllerAccettazione {
             this.sum.add(s, new MsqSum());
         }
 
-        double firstArrival=this.rnd.getJobArrival();
+        double firstArrival=this.rnd.getJobArrival(1);
 
         this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, rnd.getVehicleType()));
 
@@ -78,7 +78,7 @@ public class ControllerAccettazione {
 
 
             if(e==0){ // controllo se l'evento è un arrivo
-                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival());
+                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
                 int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
                 if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                     System.out.println("pieno");
@@ -122,6 +122,7 @@ public class ControllerAccettazione {
                 this.s=e; //il server con index e è quello che si libera
 
                 System.out.println("type: "+ eventListAccettazione.get(s).getVehicleType());
+                EventListEntry event=eventListAccettazione.get(s);
 
                 //TODO logica di routing
 
@@ -144,6 +145,29 @@ public class ControllerAccettazione {
                     eventListAccettazione.get(e).setX(0);
                     //aggiorna la lista
                     this.eventHandler.setEventsAccettazione(eventListAccettazione);
+                }
+
+                double rndRouting= rngs.random();
+                //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
+                if(rndRouting<=P2){
+                    //eventHandler.getEventsGommista().set(0, event);
+                    System.out.println("ins gomm");
+                }
+                else if(rndRouting<=(P2+P3+P4)){
+                    //eventHandler.getEventsElettrauto().set(0, event);
+                    System.out.println("ins el");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5)){
+                    //eventHandler.getEventsCarpenteria().set(0, event);
+                    System.out.println("ins carp");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5+P6)){
+                    //eventHandler.getEventsMeccanica().set(0, event);
+                    System.out.println("ins mecc");
+                }
+                else{
+                    System.out.println("abbandono");
+                    //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
                 }
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
             }

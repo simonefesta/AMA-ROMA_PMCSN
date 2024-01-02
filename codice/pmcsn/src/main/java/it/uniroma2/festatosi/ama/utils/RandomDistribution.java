@@ -2,8 +2,7 @@ package it.uniroma2.festatosi.ama.utils;
 
 import it.uniroma2.festatosi.ama.controller.EventHandler;
 
-import static it.uniroma2.festatosi.ama.model.Constants.VEICOLI1;
-import static it.uniroma2.festatosi.ama.model.Constants.VEICOLI2;
+import static it.uniroma2.festatosi.ama.model.Constants.*;
 import static java.lang.Math.log;
 
 public class RandomDistribution {
@@ -55,10 +54,19 @@ public class RandomDistribution {
      * Funzione che torna il tempo di arrivo di un evento nel sistema
      * Torna il double massimo nel caso in cui non possono arrivare nuovi eventi dall'esterno in modo che venga
      * selezionato l'evento di completamento di un servente
+     * @param queueType indica la coda a cui va l'arrivo (0 scarico, 1 accettazione)
+     * @return ritorna il tempo di arrivo dell'evento
      */
-    public double getJobArrival() {
+    public double getJobArrival(int queueType) {
         rngs.selectStream(2);
-        arrival += Exponential(1.0);
+        switch (queueType) {
+            case 0: //arrivo allo scarico
+                arrival += Exponential(LAMBDA*P1);
+                break;
+            case 1: //arrivo alla accettazione
+                arrival += Exponential(LAMBDA*Q1);
+                break;
+        }
         return arrival;
     }
 
