@@ -1,0 +1,320 @@
+package it.uniroma2.festatosi.ama.controller;
+
+import it.uniroma2.festatosi.ama.model.EventListEntry;
+import it.uniroma2.festatosi.ama.model.MsqSum;
+import it.uniroma2.festatosi.ama.model.MsqT;
+import it.uniroma2.festatosi.ama.utils.RandomDistribution;
+import it.uniroma2.festatosi.ama.utils.Rngs;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static it.uniroma2.festatosi.ama.model.Constants.*;
+/*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
+/**
+ * rappresenta la msq per il sistema
+ */
+public class ControllerSistema {
+    long number =0;                 /*number in the node*/
+    int e;                          /*next event index*/
+    int s;                          /*server index*/
+    private long jobServed=0;           /*contatore jobs processati*/
+    private double area=0.0;        /*time integrated number in the node*/
+
+    private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
+
+    private final RandomDistribution rnd=RandomDistribution.getInstance();
+    private final Rngs rngs=new Rngs();
+
+    private final List<MsqSum> sum=new ArrayList<>(NODES_SISTEMA +1);
+    private final MsqT time=new MsqT();
+    private final List<EventListEntry> eventListSistema=new ArrayList<>(NODES_SISTEMA);
+
+    private List<Object> controllerList;
+
+    public ControllerSistema() throws Exception {
+
+        /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
+        this.eventHandler=EventHandler.getInstance();
+
+        /*istanza della classe per creare multi-stream di numeri random*/
+        Rngs rngs = new Rngs();
+        rngs.plantSeeds(123456789);
+
+        ControllerScarico scarico=new ControllerScarico();
+        ControllerAccettazione accettazione = new ControllerAccettazione();
+        ControllerGommista gommista=new ControllerGommista();
+        ControllerCarrozzeria carrozzeria= new ControllerCarrozzeria();
+        ControllerElettrauto elettrauto=new ControllerElettrauto();
+        ControllerCarpentiere carpenteria=new ControllerCarpentiere();
+        ControllerMeccanica meccanica=new ControllerMeccanica();
+        ControllerCheckout checkout= new ControllerCheckout();
+
+        controllerList= Arrays.asList(scarico, accettazione, gommista, carrozzeria, elettrauto, carpenteria, meccanica, checkout);
+        /*
+        * entry list
+        * 0: scarico
+        * 1: accettazione
+        * 2: gommista
+        * 3: carrozzeria
+        * 4: elettrauto
+        * 5: carpenteria
+        * 6: meccanica
+        * 7: checkout
+         */
+        //0 scarico
+        List<EventListEntry> listScarico=eventHandler.getEventsScarico();
+        int nextEventScarico=EventListEntry.getNextEvent(listScarico, SERVERS_SCARICO+1);
+        this.eventListSistema.add(0, new EventListEntry(listScarico.get(nextEventScarico).getT(),1));
+        this.sum.add(0, new MsqSum());
+        //1 accettazione
+        List<EventListEntry> listAccettazione=eventHandler.getEventsAccettazione();
+        int nextEventAccettazione=EventListEntry.getNextEvent(listAccettazione, SERVERS_ACCETTAZIONE);
+        this.eventListSistema.add(1, new EventListEntry(listAccettazione.get(nextEventAccettazione).getT(),1));
+        this.sum.add(1, new MsqSum());
+        //2 gommista
+        List<EventListEntry> listGommista=eventHandler.getEventsGommista();
+        int nextEventGommista=EventListEntry.getNextEvent(listGommista, SERVERS_GOMMISTA);
+        this.eventListSistema.add(2, new EventListEntry(listGommista.get(nextEventGommista).getT(),1));
+        this.sum.add(2, new MsqSum());
+        //3 carrozzeria
+        List<EventListEntry> listCarrozzeria=eventHandler.getEventsCarrozzeria();
+        int nextEventCarrozzeria=EventListEntry.getNextEvent(listCarrozzeria, SERVERS_CARROZZERIA);
+        this.eventListSistema.add(3, new EventListEntry(listCarrozzeria.get(nextEventCarrozzeria).getT(),1));
+        this.sum.add(3, new MsqSum());
+        //4 elettrauto
+        List<EventListEntry> listElettrauto=eventHandler.getEventsElettrauto();
+        int nextEventElettrauto=EventListEntry.getNextEvent(listElettrauto, SERVERS_ELETTRAUTO);
+        this.eventListSistema.add(4, new EventListEntry(listElettrauto.get(nextEventElettrauto).getT(),1));
+        this.sum.add(4, new MsqSum());
+        //5 carpenteria
+        List<EventListEntry> listCarpenteria=eventHandler.getEventsCarpenteria();
+        int nextEventCarpenteria=EventListEntry.getNextEvent(listCarpenteria, SERVERS_CARPENTERIA);
+        this.eventListSistema.add(5, new EventListEntry(listCarpenteria.get(nextEventCarpenteria).getT(),1));
+        this.sum.add(5, new MsqSum());  
+        //6 meccanica
+        List<EventListEntry> listMeccanica=eventHandler.getEventsMeccanica();
+        int nextEventMeccanica=EventListEntry.getNextEvent(listMeccanica, SERVERS_MECCANICA);
+        this.eventListSistema.add(6, new EventListEntry(listMeccanica.get(nextEventMeccanica).getT(),1));
+        this.sum.add(6, new MsqSum());
+        //7 checkout
+        List<EventListEntry> listCheckout=eventHandler.getEventsCheckout();
+        int nextEventCheckout=EventListEntry.getNextEvent(listCheckout, SERVERS_CHECKOUT);
+        this.eventListSistema.add(7, new EventListEntry(listCheckout.get(nextEventCheckout).getT(),1));
+        this.sum.add(7, new MsqSum());
+
+        //viene settata la lista di eventi nell'handler
+
+        for (EventListEntry ev:
+             eventListSistema) {
+            System.out.println("sys "+ev.getX()+" "+ev.getT());
+        }
+
+        this.eventHandler.setEventsSistema(eventListSistema);
+    }
+
+    public void baseSimulation() throws Exception {
+        int e;
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+        *il ciclo continua finché non si verificano entrambe queste condizioni:
+        * -eventList[0].x=0 (close door),
+        * -number>0 ci sono ancora eventi nel sistema
+        */
+
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println(eventList.size()+" "+ev.getT()+" "+ev.getX());
+        }
+        while(eventList.get(0).getX()!=0 || eventHandler.getNumber()!=0){
+            System.out.println("eventi numero "+eventHandler.getNumber());
+            //prende l'indice del primo evento nella lista
+            e=EventListEntry.getNextEvent(eventList, NODES_SISTEMA-1);
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            this.time.setCurrent(this.time.getNext());
+
+            System.out.println("ev "+e);
+
+            if(e==0){
+                ControllerScarico scarico=(ControllerScarico) controllerList.get(e);
+                scarico.baseSimulation();
+                //System.out.println(e);
+            }else if(e==1){
+                ControllerAccettazione accettazione=(ControllerAccettazione) controllerList.get(e);
+                accettazione.baseSimulation();
+                //System.out.println(e);
+            }else if(e==2) {
+                ControllerGommista gommista=(ControllerGommista) controllerList.get(e);
+                gommista.baseSimulation();
+                System.out.println("gomme");
+            }else if(e==3) {
+                ControllerCarrozzeria carrozzeria=(ControllerCarrozzeria) controllerList.get(e);
+                carrozzeria.baseSimulation();
+                System.out.println("carrozzeria");
+            }else if(e==4) {
+                ControllerElettrauto elettrauto=(ControllerElettrauto) controllerList.get(e);
+                elettrauto.baseSimulation();
+                System.out.println("elettrauto");
+            }else if(e==5) {
+                ControllerCarpentiere carpentiere=(ControllerCarpentiere) controllerList.get(e);
+                carpentiere.baseSimulation();
+                System.out.println("carpentiere");
+            }else if(e==6) {
+                ControllerMeccanica meccanica=(ControllerMeccanica) controllerList.get(e);
+                meccanica.baseSimulation();
+                System.out.println("meccanica");
+            }else{
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            System.out.println("x "+eventList.get(0).getX());
+            for (EventListEntry ev:
+                    eventListSistema) {
+                System.out.println("sys "+ev.getX()+" "+ev.getT());
+            }
+
+            eventList=eventHandler.getEventsSistema();
+
+            System.out.println(eventHandler.getNumber());
+            Thread.sleep(2000);
+
+            /*if(e==0){ // controllo se l'evento è un arrivo
+                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
+                if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
+                    System.out.println("pieno");
+                    continue;
+                }
+                this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+                EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
+
+                if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
+                    eventList.get(0).setX(0); //chiusura delle porte
+                    this.eventHandler.setEventsSistema(eventList);
+                }
+                if(this.number<= NODES_SISTEMA){ //controllo se ci sono server liberi
+                    double service=this.rnd.getService(vType); //ottengo tempo di servizio
+                    this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                    //incrementa i tempi di servizio e il numero di job serviti
+                    sum.get(s).incrementService(service);
+                    sum.get(s).incrementServed();
+                    //imposta nella lista degli eventi che il server s è busy
+                    eventList.get(s).setT(this.time.getCurrent()+service);
+                    eventList.get(s).setX(1);
+                    eventList.get(s).setVehicleType(vType);
+
+                    //aggiorna la lista nell'handler
+                    this.eventHandler.setEventsSistema(eventList);
+                }
+            }
+            else{ //evento di fine servizio
+                //decrementa il numero di eventi nel nodo considerato
+                this.number--;
+                //aumenta il numero di job serviti
+                this.jobServed++;
+
+                this.s=e; //il server con index e è quello che si libera
+
+                EventListEntry event=eventList.get(e);
+
+                //TODO logica di routing
+
+                double rndRouting= rngs.random();
+                //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
+                if(rndRouting<=P2){
+                    eventHandler.getInternalEventsGommista().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                    List<EventListEntry> it=eventHandler.getInternalEventsGommista();
+                }
+                else if(rndRouting<=(P2+P3+P4)){
+                    eventHandler.getInternalEventsElettrauto().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                    System.out.println("ins el");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5)){
+                    eventHandler.getInternalEventsCarpenteria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                    System.out.println("ins carp");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5+P6)){
+                    eventHandler.getInternalEventsMeccanica().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                    System.out.println("ins mecc");
+                }
+                else{
+                    System.out.println("abbandono");
+                    //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
+                }
+
+
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+                //aggiorna la lista
+                this.eventHandler.setEventsSistema(eventList);
+
+
+
+                //TODO gestione inserimento dell'uscita da questo centro in quello successivo
+            }*/
+        }
+
+        ((ControllerScarico) controllerList.get(0)).printStats();
+        ((ControllerAccettazione) controllerList.get(1)).printStats();
+        ((ControllerGommista) controllerList.get(2)).printStats();
+    }
+
+    /**
+     * ritorna l'indice del server libero da più tempo
+     *
+     * @param eventListSistema lista degli eventi di sistema
+     * @return index del server libero da più tempo
+     */
+    private int findOneServerIdle(List<EventListEntry> eventListSistema) {
+        int s;
+        int i = 1;
+
+        while (eventListSistema.get(i).getX() == 1)       /* find the index of the first available */
+            i++;                        /* (idle) server                         */
+        s = i;
+        while (i < NODES_SISTEMA) {         /* now, check the others to find which   */
+            i++;                        /* has been idle longest                 */
+            if ((eventListSistema.get(i).getX() == 0) && (eventListSistema.get(i).getT() < eventListSistema.get(s).getT()))
+                s = i;
+        }
+        return (s);
+    }
+
+    public void printStats() {
+        System.out.println("Sistema\n\n");
+        System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsSistema().get(0).getT() / this.jobServed);
+        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
+        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+
+        for(int i = 1; i <= NODES_SISTEMA; i++) {
+            this.area -= this.sum.get(i).getService();
+        }
+        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
+        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        System.out.println("\nthe server statistics are:\n\n");
+        System.out.println("    server     utilization     avg service        share\n");
+        for(int i = 1; i <= NODES_SISTEMA; i++) {
+            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            // System.out.println(i+"\t");
+            // System.out.println("get service" + this.sumList[i].getService() + "\n");
+            // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+            // System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+            // System.out.println("jobServiti"+this.jobServiti + "\n");
+            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
+            System.out.println("\n");
+            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
+
+        }
+        System.out.println("\n");
+    }
+
+}

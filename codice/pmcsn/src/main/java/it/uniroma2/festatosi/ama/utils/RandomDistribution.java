@@ -61,16 +61,16 @@ public class RandomDistribution {
         rngs.selectStream(2);
         switch (queueType) {
             case 0: //arrivo allo scarico
-                arrival += Exponential(LAMBDA*P1);
+                arrival += Exponential(1/(LAMBDA*P1));
                 break;
             case 1: //arrivo alla accettazione
-                arrival += Exponential(LAMBDA*Q1);
+                arrival += Exponential(1/(LAMBDA*Q1));
                 break;
         }
         return arrival;
     }
 
-    public int getVehicleType(){
+    public int getVehicleType() throws Exception {
         rngs.selectStream(0);
         double rnd=rngs.random(); //si prende numero random
         /*se il numero random scelto è minore di 0.5 o i veicoli del secondo tipo sono tutti presenti nel sistema,
@@ -95,21 +95,30 @@ public class RandomDistribution {
         }
     }
 
-    public double getService(int vt) throws Exception {
+    public double getService(){
         rngs.selectStream(3);
         //bisogna inserire un controllo sul tipo di veicolo che esce, per semplicità ora è un solo tipo
+        //TODO modificare valori rendere parametrico
+        return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
+    }
+
+    public void decrementVehicle(int vt) throws Exception {
         switch (vt) {
             case 1:
                 eventHandler.decrementNumberV1();
+                if(eventHandler.getNumberV1()<0){
+                    throw new Exception("v1 negativo");
+                }
                 break;
             case 2:
                 eventHandler.decrementNumberV2();
+                if(eventHandler.getNumberV2()<0){
+                    throw new Exception("v2 negativo");
+                }
                 break;
             default:
                 throw new Exception("Tipo di veicolo non supportato dal sistema");
         }
-        //TODO modificare valori rendere parametrico
-        return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
     }
 
 }
