@@ -66,6 +66,11 @@ public class ControllerCarpentiere {
         * -number>0 ci sono ancora eventi nel sistema
         */
 
+        for (EventListEntry event:
+                eventList) {
+            System.out.println("carp "+event.getX()+" "+event.getT());
+        }
+
         //while(eventHandler.getInternalEventsCarpenteria().size()>0 || this.number>0){
             //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_CARPENTERIA);
@@ -80,7 +85,10 @@ public class ControllerCarpentiere {
         //System.out.println("gom "+e);
         //System.out.println("size "+internalEventsCarpenteria.size());
 
+
+
         if(internalEventsCarpenteria.size()==0 && e==0) {
+            System.out.println("carp num "+this.number);
             eventHandler.getEventsSistema().get(5).setX(0);
             return;
         }
@@ -104,6 +112,8 @@ public class ControllerCarpentiere {
 
                     System.out.println("in carp");
 
+                    System.out.println("in servizio carp "+this.number+" "+service);
+
                     this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -117,6 +127,10 @@ public class ControllerCarpentiere {
                     this.eventHandler.setEventsCarpenteria(eventList);
                 }else{
                     queueCarpenteria.add(eventList.get(0));
+                }
+                //se non ci sono altri servizi nella coda metto 'off' gli arrivi
+                if(queueCarpenteria.size()==0 && internalEventsCarpenteria.size()==0){
+                    eventList.get(0).setX(0);
                 }
             }
             else{ //evento di fine servizio
