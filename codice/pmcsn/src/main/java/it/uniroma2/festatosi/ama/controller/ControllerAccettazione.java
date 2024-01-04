@@ -65,8 +65,13 @@ public class ControllerAccettazione {
         * -number>0 ci sono ancora eventi nel sistema
         */
 
-        if(eventList.get(0).getX()==0){
-            eventHandler.getEventsSistema().get(0).setT(Double.MAX_VALUE);
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println("acc "+ev.getX()+" "+ev.getT());
+        }
+
+        if(eventList.get(0).getX()==0 && this.number==0){
+            eventHandler.getEventsSistema().get(1).setX(0);
             return;
         }
     //while((eventList.get(0).getX() !=0) || (this.number>0)){: per decommentare dare un tab a tutto il ciclo
@@ -96,10 +101,9 @@ public class ControllerAccettazione {
 
             if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
                 //eventHandler.getEventsSistema().get(0).setX(0);
-                eventHandler.getEventsSistema().get(1).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
-                return;
+                //return;
             }
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(); //ottengo tempo di servizio
@@ -111,6 +115,8 @@ public class ControllerAccettazione {
                 eventList.get(s).setT(this.time.getCurrent()+service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
+
+                System.out.println("inserito actz");
 
                 //aggiorna la lista nell'handler
                 this.eventHandler.setEventsAccettazione(eventList);
@@ -174,7 +180,8 @@ public class ControllerAccettazione {
 
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
-            //System.out.println("num "+this.number);
+
+            System.out.println("uscita accettazione "+this.number);
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
                 double service=this.rnd.getService();
@@ -199,9 +206,17 @@ public class ControllerAccettazione {
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         //}
         }
+
+        if(this.number==0 && this.time.getCurrent()>STOP){
+            eventHandler.getEventsSistema().get(1).setX(0);
+            return;
+        }
+
         //System.out.println("coda size accettazione "+queueAccettazione.size()+" numero "+this.number);
         eventHandler.getEventsSistema().get(1)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE)).getT());
+
+
     }
 
     /**

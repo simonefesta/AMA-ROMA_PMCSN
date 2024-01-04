@@ -123,13 +123,6 @@ public class ControllerScarico {
                     System.out.println("interno");
                     vType=event.getVehicleType();
 
-                    if(internalEventsScarico.size()==0){
-                        eventList.get(eventList.size()-1).setX(0);
-
-                        return;
-                    }else {
-                        eventList.set(eventList.size() - 1, new EventListEntry(internalEventsScarico.get(0).getT(), 1, event.getVehicleType()));
-                    }
                 }
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
@@ -209,6 +202,10 @@ public class ControllerScarico {
 
         eventHandler.getEventsSistema().get(0)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)).getT());
+
+        if(this.number==0 && this.time.getCurrent()>STOP){
+            eventHandler.getEventsSistema().get(1).setX(0);
+        }
 
         for (EventListEntry event:
                 eventList) {
