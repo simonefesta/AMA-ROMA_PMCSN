@@ -152,7 +152,7 @@ public class Rngs {
     if (x == 0)
       while (!ok) {
         try {
-          System.out.print("\nEnter a positive integer seed (9 digits or less) >> ");
+          //System.out.print("\nEnter a positive integer seed (9 digits or less) >> ");
           String line;
           InputStreamReader r = new InputStreamReader(System.in);
           BufferedReader ReadThis = new BufferedReader(r);

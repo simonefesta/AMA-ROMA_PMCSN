@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.SERVERS_CARROZZERIA;
-import static it.uniroma2.festatosi.ama.model.Constants.STOP;
 
 /**
  * rappresenta la msq per il carrozzeria
@@ -49,7 +48,7 @@ public class ControllerCarrozzeria {
         }
 
 //        EventListEntry event= eventHandler.getInternalEventsCarrozzeria().get(0);
-        this.eventListCarrozzeria.set(0,new EventListEntry(Double.MAX_VALUE, 1));
+        this.eventListCarrozzeria.set(0,new EventListEntry(0, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsCarrozzeria(eventListCarrozzeria);
@@ -67,6 +66,11 @@ public class ControllerCarrozzeria {
         * -number>0 ci sono ancora eventi nel sistema
         */
 
+        for (EventListEntry event:
+             eventList) {
+            System.out.println("carro "+event.getT()+" "+event.getX());
+        }
+        System.out.println("num "+internalEventsCarrozzeria.size());
         //while(eventHandler.getInternalEventsCarrozzeria().size()>0 || this.number>0){
             //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_CARROZZERIA);
@@ -77,9 +81,14 @@ public class ControllerCarrozzeria {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-        System.out.println("area "+area);
-        System.out.println("gom "+e);
-        System.out.println("size "+internalEventsCarrozzeria.size());
+        //System.out.println("area "+area);
+        //System.out.println("gom "+e);
+        //System.out.println("size "+internalEventsCarrozzeria.size());
+
+        if(internalEventsCarrozzeria.size()==0 && e==0) {
+            eventHandler.getEventsSistema().get(3).setX(0);
+            return;
+        }
 
             if(e==0){ // controllo se l'evento è un arrivo
                 EventListEntry event=internalEventsCarrozzeria.get(0);
@@ -90,14 +99,14 @@ public class ControllerCarrozzeria {
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
                 //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
-                if(eventList.get(0).getT()>STOP && this.number==0){
+                /*if(eventList.get(0).getT()>STOP && this.number==0){
                     eventList.get(0).setX(0); //chiusura delle porte
                     this.eventHandler.setEventsCarrozzeria(eventList);
-                }
+                }*/
                 if(this.number<=SERVERS_CARROZZERIA){ //controllo se ci sono server liberi
                     double service=this.rnd.getService(); //ottengo tempo di servizio
                     //this.rnd.decrementVehicle(vType);
-
+                    System.out.println("in servizio "+this.number+" "+service);
                     this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -106,6 +115,8 @@ public class ControllerCarrozzeria {
                     eventList.get(s).setT(this.time.getCurrent()+service);
                     eventList.get(s).setX(1);
                     eventList.get(s).setVehicleType(vType);
+
+                    eventHandler.getEventsSistema().get(3).setT(this.time.getCurrent()+service);
 
                     //aggiorna la lista nell'handler
                     this.eventHandler.setEventsCarrozzeria(eventList);
@@ -126,8 +137,12 @@ public class ControllerCarrozzeria {
                 //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
                         .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                eventHandler.getEventsScarico().set(eventHandler.getEventsScarico().size()-1,
+                        new EventListEntry(event.getT(), 1, event.getVehicleType()));
 
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
+                eventHandler.getEventsSistema().get(0).setX(1);
+                System.out.println("inviato scarico carr");
 
                 if(this.number>=SERVERS_CARROZZERIA){ //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
@@ -151,12 +166,14 @@ public class ControllerCarrozzeria {
                     this.eventHandler.setEventsCarrozzeria(eventList);
                 }
 
-                System.out.println("aggiunta centro scarico");
+                //System.out.println("aggiunta centro scarico");
 
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
             }
+
+        System.out.println("carrozzeria "+eventHandler.getInternalEventsCarrozzeria().size());
         if(this.number==0) {
-            eventHandler.getEventsSistema().get(3).setT(Double.MAX_VALUE);
+            eventHandler.getEventsSistema().get(3).setX(0);
         }
         //}
     }
@@ -183,32 +200,32 @@ public class ControllerCarrozzeria {
     }
 
     public void printStats() {
-        System.out.println("Carrozzeria\n\n");
-        System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCarrozzeria().get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        //System.out.println("Carrozzeria\n\n");
+        //System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        //System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCarrozzeria().get(0).getT() / this.jobServed);
+        //System.out.println("  avg wait ........... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
 
         for(int i = 1; i <= SERVERS_CARROZZERIA; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
+        //System.out.println("  avg delay .......... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        //System.out.println("\nthe server statistics are:\n\n");
+        //System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_CARROZZERIA; i++) {
-            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-            // System.out.println(i+"\t");
-            // System.out.println("get service" + this.sumList[i].getService() + "\n");
-            // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            // System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            // System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
+            //System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            // //System.out.println(i+"\t");
+            // //System.out.println("get service" + this.sumList[i].getService() + "\n");
+            // //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+            // //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+            // //System.out.println("jobServiti"+this.jobServiti + "\n");
+            ////System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
+            //System.out.println("\n");
+            ////System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        System.out.println("\n");
+        //System.out.println("\n");
     }
 
 }

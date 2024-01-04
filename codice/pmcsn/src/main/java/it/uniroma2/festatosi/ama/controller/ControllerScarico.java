@@ -71,8 +71,20 @@ public class ControllerScarico {
         * -number>0 ci sono ancora eventi nel sistema
         */
 
+        System.out.println("interni scarico "+eventHandler.getInternalEventsScarico().size());
+
+        for (EventListEntry event:
+                eventList) {
+            System.out.println(event.getX()+" "+event.getT());
+        }
+
+        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().size()==0 && this.number==0){
+            eventHandler.getEventsSistema().get(0).setX(0);
+            return;
+        }
+
         //while((eventList.get(0).getX() !=0) || (this.number>0)){
-            //System.out.println("loop "+time.getCurrent());
+            ////System.out.println("loop "+time.getCurrent());
             //prende l'indice del primo evento nella lista
             e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO);
             //imposta il tempo del prossimo evento
@@ -84,15 +96,15 @@ public class ControllerScarico {
 
 
             if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
-                System.out.println("e scarico: "+e);
+                //System.out.println("e scarico: "+e);
                 int vType;
                 EventListEntry event;
                 if(e==0) {
                     eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(0));
-
-                    vType = rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
+                    System.out.println("arrivo esterno");
+                    vType = rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
                     if (vType == Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                        System.out.println("pieno");
+                        //System.out.println("pieno");
                         //continue;
                         return; //ho tolto il ciclo
                     }
@@ -100,32 +112,31 @@ public class ControllerScarico {
                     event = new EventListEntry(eventList.get(0).getT(), 1, vType);
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
 
-                    System.out.println("T "+eventList.get(0).getT());
-                    if (eventList.get(0).getT() > STOP /*&& this.number == 0*/) { //tempo maggiore della chiusura delle porte
-                        eventHandler.getEventsSistema().get(0).setX(0);
+                    //System.out.println("T "+eventList.get(0).getT());
+                    if (eventList.get(0).getT() > STOP/*&& this.number == 0*/) { //tempo maggiore della chiusura delle porte
                         eventList.get(0).setX(0); //chiusura delle porte
                         this.eventHandler.setEventsScarico(eventList);
                     }
                 }else{ //arrivo dall'interno del sistema
                     event=internalEventsScarico.get(0);
                     internalEventsScarico.remove(0);
+                    System.out.println("interno");
                     vType=event.getVehicleType();
-                    switch (vType) {
-                        case 1:
-                            eventHandler.incrementNumberV1();
-                            break;
-                        case 2:
-                            eventHandler.incrementNumberV2();
-                            break;
+
+                    if(internalEventsScarico.size()==0){
+                        eventList.get(eventList.size()-1).setX(0);
+
+                        return;
+                    }else {
+                        eventList.set(eventList.size() - 1, new EventListEntry(internalEventsScarico.get(0).getT(), 1, event.getVehicleType()));
                     }
-                    eventList.set(eventList.size()-1, new EventListEntry(event.getT(),1, event.getVehicleType()));
                 }
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
                 if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
                     double service=this.rnd.getService(); //ottengo tempo di servizio
-                    this.rnd.decrementVehicle(vType);
+                    //this.rnd.decrementVehicle(vType);
                     this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -147,26 +158,32 @@ public class ControllerScarico {
                 //aumenta il numero di job serviti
                 this.jobServed++;
 
+                System.out.println("uscita scarico");
+
                 this.s=e; //il server con index e è quello che si libera
 
                 EventListEntry event=eventList.get(e);
 
+                //System.out.println("prima "+eventHandler.getNumber());
+
                 //TODO logica di routing (per ora esce dal sistema direttamente)
                 eventHandler.decrementVType(event.getVehicleType());
+                //Thread.sleep(2000);
+                //System.out.println("decrementato "+eventHandler.getNumber());
 
                 double rndRouting= rngs.random();
                 //TODO modificare la logica di routing
                 if(rndRouting<=P2){
-                    //System.out.println("ins uscita");
+                    ////System.out.println("ins uscita");
                 }
                 else{
-                    //System.out.println("ins checkout");
+                    ////System.out.println("ins checkout");
                 }
 
                 if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
                     double service=this.rnd.getService();
-                    this.rnd.decrementVehicle(queueScarico.get(0).getVehicleType());
+                    //this.rnd.decrementVehicle(queueScarico.get(0).getVehicleType());
                     //incremento tempo di servizio totale e eventi totali gestiti
                     sum.get(s).incrementService(service);
                     sum.get(s).incrementServed();
@@ -184,15 +201,22 @@ public class ControllerScarico {
                     this.eventHandler.setEventsScarico(eventList);
                 }
 
-                eventHandler.getEventsSistema()
-                        .set(0, eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)));
-
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
             }
 
+        //System.out.println("scarico lista");
+
+
         eventHandler.getEventsSistema().get(0)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)).getT());
-        System.out.println("torno");
+
+        for (EventListEntry event:
+                eventList) {
+            //System.out.println(event.getX()+" "+event.getT());
+        }
+
+        //System.out.println("torno qunti ev "+eventHandler.getInternalEventsScarico().size()+" "+this.number);
+
         //Thread.sleep(2000);
         //}
     }

@@ -76,9 +76,9 @@ public class ControllerCheckout {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-        System.out.println("area "+area);
-        System.out.println("gom "+e);
-        System.out.println("size "+internalEventsCheckout.size());
+        //System.out.println("area "+area);
+        //System.out.println("gom "+e);
+        //System.out.println("size "+internalEventsCheckout.size());
 
             if(e==0){ // controllo se l'evento è un arrivo
                 EventListEntry event=internalEventsCheckout.get(0);
@@ -148,7 +148,7 @@ public class ControllerCheckout {
                     this.eventHandler.setEventsCheckout(eventList);
                 }
 
-                System.out.println("aggiunta centro scarico");
+                //System.out.println("aggiunta centro scarico");
 
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
             }
@@ -180,32 +180,32 @@ public class ControllerCheckout {
     }
 
     public void printStats() {
-        System.out.println("Checkout\n\n");
-        System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCheckout().get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        //System.out.println("Checkout\n\n");
+        //System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        //System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCheckout().get(0).getT() / this.jobServed);
+        //System.out.println("  avg wait ........... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
 
         for(int i = 1; i <= SERVERS_CARPENTERIA; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
+        //System.out.println("  avg delay .......... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        //System.out.println("\nthe server statistics are:\n\n");
+        //System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_CARPENTERIA; i++) {
-            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-            // System.out.println(i+"\t");
-            // System.out.println("get service" + this.sumList[i].getService() + "\n");
-            // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            // System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            // System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
+            //System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            // //System.out.println(i+"\t");
+            // //System.out.println("get service" + this.sumList[i].getService() + "\n");
+            // //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+            // //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+            // //System.out.println("jobServiti"+this.jobServiti + "\n");
+            ////System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
+            //System.out.println("\n");
+            ////System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        System.out.println("\n");
+        //System.out.println("\n");
     }
 
 }

@@ -49,7 +49,7 @@ public class ControllerMeccanica {
         }
 
 //        EventListEntry event= eventHandler.getInternalEventsMeccanica().get(0);
-        this.eventListMeccanico.set(0,new EventListEntry(Double.MAX_VALUE, 1));
+        this.eventListMeccanico.set(0,new EventListEntry(0,1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsMeccanica(eventListMeccanico);
@@ -77,12 +77,12 @@ public class ControllerMeccanica {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-        System.out.println("area "+area);
-        System.out.println("gom "+e);
-        System.out.println("size "+internalEventsMeccanico.size());
+        //System.out.println("area "+area);
+        //System.out.println("gom "+e);
+        //System.out.println("size "+internalEventsMeccanico.size());
 
         if(internalEventsMeccanico.size()==0 && e==0) {
-            eventHandler.getEventsSistema().get(6).setT(Double.MAX_VALUE);
+            eventHandler.getEventsSistema().get(6).setX(0);
             return;
         }
             if(e==0){ // controllo se l'evento è un arrivo
@@ -129,8 +129,12 @@ public class ControllerMeccanica {
                 //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
                         .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                eventHandler.getEventsScarico().set(eventHandler.getEventsScarico().size()-1,
+                        new EventListEntry(event.getT(), 1, event.getVehicleType()));
 
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
+                eventHandler.getEventsSistema().get(0).setX(1);
+                System.out.println("inviato scarico mec");
 
                 if(this.number>=SERVERS_MECCANICA){ //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
@@ -154,12 +158,12 @@ public class ControllerMeccanica {
                     this.eventHandler.setEventsMeccanica(eventList);
                 }
 
-                System.out.println("aggiunta centro scarico");
+                //System.out.println("aggiunta centro scarico");
 
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
             }
         if(this.number==0) {
-            eventHandler.getEventsSistema().get(6).setT(Double.MAX_VALUE);
+            eventHandler.getEventsSistema().get(6).setX(0);
         }
         //}
     }
@@ -186,32 +190,32 @@ public class ControllerMeccanica {
     }
 
     public void printStats() {
-        System.out.println("Meccanico\n\n");
-        System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
-        System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsMeccanica().get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        //System.out.println("Meccanico\n\n");
+        //System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        //System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsMeccanica().get(0).getT() / this.jobServed);
+        //System.out.println("  avg wait ........... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
 
         for(int i = 1; i <= SERVERS_MECCANICA; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
-        System.out.println("\nthe server statistics are:\n\n");
-        System.out.println("    server     utilization     avg service        share\n");
+        //System.out.println("  avg delay .......... = " + this.area / this.jobServed);
+        //System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        //System.out.println("\nthe server statistics are:\n\n");
+        //System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_MECCANICA; i++) {
-            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-            // System.out.println(i+"\t");
-            // System.out.println("get service" + this.sumList[i].getService() + "\n");
-            // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            // System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            // System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
+            //System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            // //System.out.println(i+"\t");
+            // //System.out.println("get service" + this.sumList[i].getService() + "\n");
+            // //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+            // //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+            // //System.out.println("jobServiti"+this.jobServiti + "\n");
+            ////System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
+            //System.out.println("\n");
+            ////System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        System.out.println("\n");
+        //System.out.println("\n");
     }
 
 }

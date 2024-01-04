@@ -70,13 +70,13 @@ public class RandomDistribution {
         return arrival;
     }
 
-    public int getVehicleType() throws Exception {
+    public int getExternalVehicleType() {
         rngs.selectStream(0);
         double rnd=rngs.random(); //si prende numero random
         /*se il numero random scelto è minore di 0.5 o i veicoli del secondo tipo sono tutti presenti nel sistema,
          * entra un veicolo del primo tipo
          */
-        System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
+        //System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
         if((rnd<=(double)VEICOLI1/(VEICOLI1+VEICOLI2) && eventHandler.getNumberV1()< VEICOLI1)
                 || (eventHandler.getNumberV2()==VEICOLI2 && eventHandler.getNumberV1()< VEICOLI1)){
             eventHandler.incrementNumberV1();

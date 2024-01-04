@@ -9,7 +9,7 @@ import it.uniroma2.festatosi.ama.controller.ControllerSistema;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) throws Exception {
-        System.out.println("START");
+        //System.out.println("START");
 
         /*ControllerAccettazione accettazione = new ControllerAccettazione();
         accettazione.baseSimulation();

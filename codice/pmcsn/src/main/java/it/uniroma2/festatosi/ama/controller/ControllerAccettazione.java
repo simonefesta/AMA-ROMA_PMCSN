@@ -82,9 +82,10 @@ public class ControllerAccettazione {
 
         if(e==0){ // controllo se l'evento è un arrivo
             eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-            int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
+            int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
+            System.out.println("arrivo accettazione ");
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                //System.out.println("pieno");
+                ////System.out.println("pieno");
                 //continue;
                 eventHandler.getEventsSistema().get(1).setT(eventList.get(0).getT());
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
@@ -94,8 +95,8 @@ public class ControllerAccettazione {
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
             if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
-                eventHandler.getEventsSistema().get(0).setX(0);
-                eventHandler.getEventsSistema().get(1).setT(Double.MAX_VALUE);
+                //eventHandler.getEventsSistema().get(0).setX(0);
+                eventHandler.getEventsSistema().get(1).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
                 return;
@@ -136,32 +137,39 @@ public class ControllerAccettazione {
                 //List<EventListEntry> it=eventHandler.getInternalEventsGommista();
                 System.out.println("ins gom "+eventHandler.getInternalEventsGommista().size());
                 eventHandler.getEventsSistema().get(2).setT(event.getT());
+                eventHandler.getEventsSistema().get(2).setX(1);
             }
             else if(rndRouting<=(P2+P3)){
                 eventHandler.getInternalEventsCarrozzeria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                System.out.println("ins el");
+                System.out.println("ins car");
                 eventHandler.getEventsSistema().get(3).setT(event.getT());
+                eventHandler.getEventsSistema().get(3).setX(1);
             }
             else if(rndRouting<=(P2+P3+P4)){
                 eventHandler.getInternalEventsElettrauto().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 System.out.println("ins el");
                 eventHandler.getEventsSistema().get(4).setT(event.getT());
+                eventHandler.getEventsSistema().get(4).setX(1);
             }
             else if(rndRouting<=(P2+P3+P4+P5)){
                 eventHandler.getInternalEventsCarpenteria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 System.out.println("ins carp");
                 eventHandler.getEventsSistema().get(5).setT(event.getT());
+                eventHandler.getEventsSistema().get(5).setX(1);
             }
             else if(rndRouting<=(P2+P3+P4+P5+P6)){
                 eventHandler.getInternalEventsMeccanica().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 System.out.println("ins mecc");
                 eventHandler.getEventsSistema().get(6).setT(event.getT());
+                eventHandler.getEventsSistema().get(6).setX(1);
             }
             else{
+                eventHandler.decrementVType(event.getVehicleType());
                 System.out.println("abbandono");
+
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
-            System.out.println("num "+this.number);
+            //System.out.println("num "+this.number);
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
                 double service=this.rnd.getService();
@@ -186,7 +194,7 @@ public class ControllerAccettazione {
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         //}
         }
-        System.out.println("coda size accettazione "+queueAccettazione.size()+" numero "+this.number);
+        //System.out.println("coda size accettazione "+queueAccettazione.size()+" numero "+this.number);
         eventHandler.getEventsSistema().get(1)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE)).getT());
     }
