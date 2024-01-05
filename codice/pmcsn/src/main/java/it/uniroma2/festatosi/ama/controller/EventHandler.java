@@ -28,13 +28,13 @@ public class EventHandler {
     private List<EventListEntry> eventsSistema; /*event list della msq di checkout*/
 
     //arrivi interni dai serventi precedenti nella rete
-    private List<EventListEntry> internalEventsGommista; /*eventi interni alla coda di gommista*/
-    private List<EventListEntry> internalEventsCarrozzeria; /*eventi interni alla coda di carrozzeria*/
-    private List<EventListEntry> internalEventsElettrauto; /*eventi interni alla coda di elettrauto*/
-    private List<EventListEntry> internalEventsCarpenteria; /*eventi interni alla coda di carpenteria*/
-    private List<EventListEntry> internalEventsMeccanica; /*eventi interni alla coda di meccanica*/
-    private List<EventListEntry> internalEventsCheckout; /*eventi interni alla coda di checkout*/
-    private List<EventListEntry> internalEventsScarico; /*eventi interni alla coda di checkout*/
+    private final List<EventListEntry> internalEventsGommista; /*eventi interni alla coda di gommista*/
+    private final List<EventListEntry> internalEventsCarrozzeria; /*eventi interni alla coda di carrozzeria*/
+    private final List<EventListEntry> internalEventsElettrauto; /*eventi interni alla coda di elettrauto*/
+    private final List<EventListEntry> internalEventsCarpenteria; /*eventi interni alla coda di carpenteria*/
+    private final List<EventListEntry> internalEventsMeccanica; /*eventi interni alla coda di meccanica*/
+    private final List<EventListEntry> internalEventsCheckout; /*eventi interni alla coda di checkout*/
+    private final List<EventListEntry> internalEventsScarico; /*eventi interni alla coda di checkout*/
 
     private int numberV1=0; /*conta i veicoli del primo tipo nel sistema*/
     private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
@@ -50,7 +50,7 @@ public class EventHandler {
         this.eventsCarpenteria = new ArrayList<>(SERVERS_CARPENTERIA+1); /* event list della msq di carpenteria*/
         this.eventsMeccanica = new ArrayList<>(SERVERS_MECCANICA+1); /* event list della msq di meccanica*/
         this.eventsCheckout = new ArrayList<>(SERVERS_CHECKOUT+1); /* event list della msq di checkout*/
-        this.eventsSistema = new ArrayList<>(NODES_SISTEMA); /* event list della msq di checkout*/
+        this.eventsSistema = new ArrayList<>(NODES_SISTEMA); /* event list della msq di sistema, tiene traccia degli eventi in tutto il sitema*/
 
         /*internal arrivals*/
         this.internalEventsGommista=new ArrayList<>();
@@ -146,59 +146,29 @@ public class EventHandler {
         return internalEventsGommista;
     }
 
-    public void setInternalEventsGommista(List<EventListEntry> internalEventsGommista) {
-        this.internalEventsGommista = internalEventsGommista;
-    }
-
     public List<EventListEntry> getInternalEventsCarrozzeria() {
         return internalEventsCarrozzeria;
-    }
-
-    public void setInternalEventsCarrozzeria(List<EventListEntry> internalEventsCarrozzeria) {
-        this.internalEventsCarrozzeria = internalEventsCarrozzeria;
     }
 
     public List<EventListEntry> getInternalEventsElettrauto() {
         return internalEventsElettrauto;
     }
 
-    public void setInternalEventsElettrauto(List<EventListEntry> internalEventsElettrauto) {
-        this.internalEventsElettrauto = internalEventsElettrauto;
-    }
-
     public List<EventListEntry> getInternalEventsCarpenteria() {
         return internalEventsCarpenteria;
-    }
-
-    public void setInternalEventsCarpenteria(List<EventListEntry> internalEventsCarpenteria) {
-        this.internalEventsCarpenteria = internalEventsCarpenteria;
     }
 
     public List<EventListEntry> getInternalEventsMeccanica() {
         return internalEventsMeccanica;
     }
 
-    public void setInternalEventsMeccanica(List<EventListEntry> internalEventsMeccanica) {
-        this.internalEventsMeccanica = internalEventsMeccanica;
-    }
-
     public List<EventListEntry> getInternalEventsCheckout() {
         return internalEventsCheckout;
-    }
-
-    public void setInternalEventsCheckout(List<EventListEntry> internalEventsCheckout) {
-        this.internalEventsCheckout = internalEventsCheckout;
     }
 
     public List<EventListEntry> getInternalEventsScarico() {
         return internalEventsScarico;
     }
-
-    public void setInternalEventsScarico(List<EventListEntry> internalEventsScarico) {
-        this.internalEventsScarico = internalEventsScarico;
-    }
-
-
 
     public void decrementVType(int vType) throws Exception {
         switch (vType) {

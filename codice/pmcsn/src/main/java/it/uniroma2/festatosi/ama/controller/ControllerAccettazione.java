@@ -99,7 +99,7 @@ public class ControllerAccettazione {
 
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
-            if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
+            if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
                 //eventHandler.getEventsSistema().get(0).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
@@ -169,7 +169,6 @@ public class ControllerAccettazione {
                 }
                 eventHandler.getEventsSistema().get(off+2).setX(1);
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
-
             }
             else{
                 eventHandler.decrementVType(event.getVehicleType());

@@ -8,7 +8,6 @@ import it.uniroma2.festatosi.ama.utils.Rngs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
@@ -20,13 +19,10 @@ public class ControllerSistema {
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
-    private long jobServed=0;           /*contatore jobs processati*/
+    private long jobServed=0;           /*contatore jobs processati*/ //TODO incrementarlo ogni volta che un evento esce dal sistema
     private double area=0.0;        /*time integrated number in the node*/
 
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
-
-    private final RandomDistribution rnd=RandomDistribution.getInstance();
-    private final Rngs rngs=new Rngs();
 
     private final List<MsqSum> sum=new ArrayList<>(NODES_SISTEMA +1);
     private final MsqT time=new MsqT();
@@ -45,11 +41,6 @@ public class ControllerSistema {
 
         ControllerScarico scarico=new ControllerScarico();
         ControllerAccettazione accettazione = new ControllerAccettazione();
-        /*ControllerGommista gommista=new ControllerGommista();
-        ControllerCarrozzeria carrozzeria= new ControllerCarrozzeria();
-        ControllerElettrauto elettrauto=new ControllerElettrauto();
-        ControllerCarpentiere carpenteria=new ControllerCarpentiere();
-        ControllerMeccanica meccanica=new ControllerMeccanica();*/
         ControllerCheckout checkout= new ControllerCheckout();
 
         controllerList.addAll(Arrays.asList(scarico, accettazione));
@@ -86,12 +77,6 @@ public class ControllerSistema {
         this.sum.add(7, new MsqSum());
 
         //viene settata la lista di eventi nell'handler
-
-        for (EventListEntry ev:
-             eventListSistema) {
-            //System.out.println("sys "+ev.getX()+" "+ev.getT());
-        }
-
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
@@ -142,21 +127,18 @@ public class ControllerSistema {
                 officina.baseSimulation();
             }
 
-            System.out.println("x "+e);
-            for (EventListEntry ev:
-                    eventListSistema) {
-                System.out.println("sys "+ev.getX()+" "+ev.getT());
-            }
 
             eventList=eventHandler.getEventsSistema();
-
-            //System.out.println(eventHandler.getNumber());
-            //Thread.sleep(2000);
         }
 
         ((ControllerScarico) controllerList.get(0)).printStats();
         ((ControllerAccettazione) controllerList.get(1)).printStats();
-//        ((ControllerGommista) controllerList.get(2)).printStats();
+        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {
+            ((ControllerOfficine) controllerList.get(i+2)).printStats();
+        }
+        ((ControllerCheckout) controllerList.get(7)).printStats();
+        System.out.println(this.eventHandler.getNumber());
+
         System.out.println("a\n"+eventHandler.getInternalEventsCarrozzeria().size());
         System.out.println(eventHandler.getInternalEventsCarpenteria().size());
         System.out.println(eventHandler.getInternalEventsMeccanica().size());
@@ -167,6 +149,11 @@ public class ControllerSistema {
         System.out.println(eventHandler.getNumber());
     }
 
+    /**
+     * seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse
+     * @param eventList lista degli eventi di tutto il sistema
+     * @return indice dell'evento da gestire all'interno della lista
+     */
     private int getNextEvent(List<EventListEntry> eventList) {
         double min=Double.MAX_VALUE;
         int e=-1;
@@ -181,57 +168,33 @@ public class ControllerSistema {
         return e;
     }
 
-
-
-    /*
-    *//**
-     * ritorna l'indice del server libero da più tempo
-     *
-     * @param eventListSistema lista degli eventi di sistema
-     * @return index del server libero da più tempo
-     *//*
-    private int findOneServerIdle(List<EventListEntry> eventListSistema) {
-        int s;
-        int i = 1;
-
-        while (eventListSistema.get(i).getX() == 1)       *//* find the index of the first available *//*
-            i++;                        *//* (idle) server                         *//*
-        s = i;
-        while (i < NODES_SISTEMA) {         *//* now, check the others to find which   *//*
-            i++;                        *//* has been idle longest                 *//*
-            if ((eventListSistema.get(i).getX() == 0) && (eventListSistema.get(i).getT() < eventListSistema.get(s).getT()))
-                s = i;
-        }
-        return (s);
-    }
-
     public void printStats() {
-        //System.out.println("Sistema\n\n");
-        //System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
-        //System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsSistema().get(0).getT() / this.jobServed);
-        //System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        //System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        System.out.println("Sistema\n\n");
+        System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsSistema().get(0).getT() / this.jobServed);
+        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
+        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
 
         for(int i = 1; i <= NODES_SISTEMA; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        //System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        //System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
-        //System.out.println("\nthe server statistics are:\n\n");
-        //System.out.println("    server     utilization     avg service        share\n");
+        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
+        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        System.out.println("\nthe server statistics are:\n\n");
+        System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= NODES_SISTEMA; i++) {
-            //System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-            // //System.out.println(i+"\t");
-            // //System.out.println("get service" + this.sumList[i].getService() + "\n");
-            // //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            // //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            // //System.out.println("jobServiti"+this.jobServiti + "\n");
-            ////System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            //System.out.println("\n");
-            ////System.out.println("jobServiti"+this.num_job_feedback + "\n");
+            System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+             //System.out.println(i+"\t");
+             //System.out.println("get service" + this.sumList[i].getService() + "\n");
+             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+             //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+             //System.out.println("jobServiti"+this.jobServiti + "\n");
+            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
+            System.out.println("\n");
+            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        //System.out.println("\n");
-    }*/
+        System.out.println("\n");
+    }
 
 }

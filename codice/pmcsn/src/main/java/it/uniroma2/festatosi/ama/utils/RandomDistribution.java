@@ -102,23 +102,4 @@ public class RandomDistribution {
         return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
     }
 
-    /*public void decrementVehicle(int vt) throws Exception {
-        switch (vt) {
-            case 1:
-                eventHandler.decrementNumberV1();
-                if(eventHandler.getNumberV1()<0){
-                    throw new Exception("v1 negativo");
-                }
-                break;
-            case 2:
-                eventHandler.decrementNumberV2();
-                if(eventHandler.getNumberV2()<0){
-                    throw new Exception("v2 negativo");
-                }
-                break;
-            default:
-                throw new Exception("Tipo di veicolo non supportato dal sistema");
-        }
-    }*/
-
 }
