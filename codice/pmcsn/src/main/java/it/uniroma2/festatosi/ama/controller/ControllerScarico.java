@@ -178,7 +178,7 @@ public class ControllerScarico {
 
                     eventHandler.getEventsSistema().get(7).setT(event.getT());
                     eventHandler.getEventsSistema().get(7).setX(1);
-                    System.out.println("ins checkout "+eventHandler.getInternalEventsCheckout().size());
+                    System.out.println("ins checkout "+event+ " "+eventHandler.getInternalEventsCheckout().size());
                 }
 
                 if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
@@ -212,7 +212,8 @@ public class ControllerScarico {
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)).getT());
 
         if(this.number==0 && this.time.getCurrent()>STOP){
-            eventHandler.getEventsSistema().get(1).setX(0);
+            this.eventHandler.getEventsScarico().get(0).setX(0);
+            //eventHandler.getEventsSistema().get(1).setX(0);
         }
 
         for (EventListEntry event:

@@ -142,7 +142,7 @@ public class ControllerSistema {
                 officina.baseSimulation();
             }
 
-            System.out.println("x "+eventList.get(0).getX());
+            System.out.println("x "+e);
             for (EventListEntry ev:
                     eventListSistema) {
                 System.out.println("sys "+ev.getX()+" "+ev.getT());

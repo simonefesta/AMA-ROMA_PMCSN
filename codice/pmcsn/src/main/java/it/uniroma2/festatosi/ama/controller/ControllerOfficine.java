@@ -130,7 +130,7 @@ public class ControllerOfficine {
                 if(this.number<=SERVERS_OFFICINA[this.id]){ //controllo se ci sono server liberi
                     double service=this.rnd.getService(); //ottengo tempo di servizio
                     //this.rnd.decrementVehicle(vType);
-                    System.out.println("in servizio "+this.number+" "+service);
+                    System.out.println(this.name+" in servizio "+this.number+" "+service);
                     this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -140,7 +140,7 @@ public class ControllerOfficine {
                     eventList.get(s).setX(1);
                     eventList.get(s).setVehicleType(vType);
 
-                    eventHandler.getEventsSistema().get(3).setT(this.time.getCurrent()+service);
+                    eventHandler.getEventsSistema().get(this.id+2).setT(this.time.getCurrent()+service);
 
                     //aggiorna la lista nell'handler
                     this.eventHandler.setEventsOfficina(this.id, eventList);
@@ -161,12 +161,16 @@ public class ControllerOfficine {
                 //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
                         .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                eventHandler.getEventsScarico().set(eventHandler.getEventsScarico().size()-1,
-                        new EventListEntry(event.getT(), 1, event.getVehicleType()));
-
-                eventHandler.getEventsSistema().get(0).setT(event.getT());
+                if (eventHandler.getEventsScarico().get(eventHandler.getEventsScarico().size() - 1).getT() > event.getT() ||
+                        eventHandler.getEventsScarico().get(eventHandler.getEventsScarico().size() - 1).getX()==0) {
+                    eventHandler.getEventsScarico().set(eventHandler.getEventsScarico().size() - 1,
+                            new EventListEntry(event.getT(), 1, event.getVehicleType()));
+                }
+                if(eventHandler.getEventsSistema().get(0).getT()>event.getT() || eventHandler.getEventsSistema().get(0).getX()==0) {
+                    eventHandler.getEventsSistema().get(0).setT(event.getT());
+                }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                System.out.println("inviato scarico carr");
+                System.out.println("inviato scarico "+this.name);
 
                 if(this.number>=SERVERS_OFFICINA[this.id]){ //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
@@ -186,6 +190,10 @@ public class ControllerOfficine {
                 }else{
                     //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                     eventList.get(e).setX(0);
+
+                    if(internalEventsOfficina.size()==0 && this.number==0){
+                        this.eventHandler.getEventsSistema().get(e).setX(0);
+                    }
                     //aggiorna la lista
                     this.eventHandler.setEventsOfficina(this.id,eventList);
                 }
@@ -196,9 +204,9 @@ public class ControllerOfficine {
             }
 
             System.out.println("officina "+eventHandler.getInternalEventsOfficina(this.id).size());
-            if(this.number==0) {
-                eventHandler.getEventsSistema().get(3).setX(0);
-            }
+            /*if(this.number==0) {
+                eventHandler.getEventsSistema().get(this.id+2).setX(0);
+            }*/
             //}
         }
 

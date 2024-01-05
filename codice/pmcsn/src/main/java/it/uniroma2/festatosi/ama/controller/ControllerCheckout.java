@@ -66,6 +66,7 @@ public class ControllerCheckout {
          * -number>0 ci sono ancora eventi nel sistema
          */
 
+
         //while(eventHandler.getInternalEventsCheckout().size()>0 || this.number>0){
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_CHECKOUT);
@@ -82,6 +83,7 @@ public class ControllerCheckout {
 
         if(internalEventsCheckout.size()==0 && e==0) {
             eventHandler.getEventsSistema().get(7).setX(0);
+            System.out.println("ck served "+this.jobServed);
             return;
         }
 
@@ -93,7 +95,7 @@ public class ControllerCheckout {
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
-            System.out.println("ins check");
+            System.out.println("ins check "+event);
             //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
                 /*if(eventList.get(0).getT()>STOP && this.number==0){
                     eventList.get(0).setX(0); //chiusura delle porte
@@ -116,6 +118,10 @@ public class ControllerCheckout {
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
+                System.out.println("messo in coda "+queueCheckout.size());
+            }
+            if(internalEventsCheckout.size()==0){
+                this.eventHandler.getEventsCheckout().get(0).setX(0);
             }
         }
         else{ //evento di fine servizio
@@ -128,7 +134,7 @@ public class ControllerCheckout {
 
             EventListEntry event=eventList.get(s);
 
-            System.out.println("uscito dal sistema "+this.number);
+            System.out.println("uscito dal sistema "+this.number+" "+event);
 
             eventHandler.decrementVType(event.getVehicleType());
 
@@ -147,9 +153,13 @@ public class ControllerCheckout {
                 queueCheckout.remove(0);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
+                System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
+                if(internalEventsCheckout.size()==0 && this.number==0){
+                    this.eventHandler.getEventsSistema().get(7).setX(0);
+                }
                 //aggiorna la lista
                 this.eventHandler.setEventsCheckout(eventList);
             }
@@ -165,10 +175,14 @@ public class ControllerCheckout {
             System.out.println("check "+ ev.getX()+" "+ev.getT());
         }
         System.out.println("chk "+this.number);
-        if(this.number==0) {
-            eventHandler.getEventsSistema().get(7).setX(0);
-        }
+        System.out.println("chk 2 "+this.jobServed);
+
         //}
+        for (EventListEntry ev:
+                eventList) {
+            System.out.println("ev ck "+ev.getX()+" "+ev.getT());
+        }
+
     }
 
     /**

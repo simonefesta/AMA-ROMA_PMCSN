@@ -137,47 +137,43 @@ public class ControllerAccettazione {
             //TODO logica di routing
 
             double rndRouting= rngs.random();
+            int off=0;
             //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
-            if(rndRouting<=P2){
-                eventHandler.getInternalEventsGommista().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+            if(rndRouting<=(P2+P3+P4+P5+P6)) {
+                if(rndRouting<=P2){
+                    off=0;
+                    System.out.println("gomm");
+                }
+                else if(rndRouting<=(P2+P3)){
+                    off=1;
+                    System.out.println("carr");
+                }
+                else if(rndRouting<=(P2+P3+P4)){
+                    off=2;
+                    System.out.println("el");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5)){
+                    off=3;
+                    System.out.println("carp");
+                }
+                else{
+                    off=4;
+                    System.out.println("mecc");
+                }
+                eventHandler.getInternalEventsOfficina(off).add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 //List<EventListEntry> it=eventHandler.getInternalEventsGommista();
-                System.out.println("ins gom "+eventHandler.getInternalEventsGommista().size());
-                eventHandler.getEventsSistema().get(2).setT(event.getT());
-                eventHandler.getEventsSistema().get(2).setX(1);
-                eventHandler.getEventsGommista().get(0).setX(1);
-            }
-            else if(rndRouting<=(P2+P3)){
-                eventHandler.getInternalEventsCarrozzeria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                System.out.println("ins carr");
-                eventHandler.getEventsSistema().get(3).setT(event.getT());
-                eventHandler.getEventsSistema().get(3).setX(1);
-                eventHandler.getEventsCarrozzeria().get(0).setX(1);
-            }
-            else if(rndRouting<=(P2+P3+P4)){
-                eventHandler.getInternalEventsElettrauto().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                System.out.println("ins el");
-                eventHandler.getEventsSistema().get(4).setT(event.getT());
-                eventHandler.getEventsSistema().get(4).setX(1);
-                eventHandler.getEventsElettrauto().get(0).setX(1);
-            }
-            else if(rndRouting<=(P2+P3+P4+P5)){
-                eventHandler.getInternalEventsCarpenteria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                System.out.println("ins carp");
-                eventHandler.getEventsSistema().get(5).setT(event.getT());
-                eventHandler.getEventsSistema().get(5).setX(1);
-                eventHandler.getEventsCarpenteria().get(0).setX(1);
-            }
-            else if(rndRouting<=(P2+P3+P4+P5+P6)){
-                eventHandler.getInternalEventsMeccanica().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                System.out.println("ins mecc");
-                eventHandler.getEventsSistema().get(6).setT(event.getT());
-                eventHandler.getEventsSistema().get(6).setX(1);
-                eventHandler.getEventsMeccanica().get(0).setX(1);
+                //System.out.println("ins gom "+eventHandler.getInternalEventsGommista().size());
+                if(eventHandler.getEventsSistema().get(off+2).getT()>event.getT() ||
+                        eventHandler.getEventsSistema().get(off+2).getX()==0){
+                    eventHandler.getEventsSistema().get(off+2).setT(event.getT());
+                }
+                eventHandler.getEventsSistema().get(off+2).setX(1);
+                eventHandler.getEventsOfficina(off).get(0).setX(1);
+
             }
             else{
                 eventHandler.decrementVType(event.getVehicleType());
                 System.out.println("abbandono");
-
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
@@ -208,14 +204,14 @@ public class ControllerAccettazione {
         }
 
         if(this.number==0 && this.time.getCurrent()>STOP){
-            eventHandler.getEventsSistema().get(1).setX(0);
-            return;
+            this.eventHandler.getEventsAccettazione().get(0).setX(0);
+            //return;
         }
 
         //System.out.println("coda size accettazione "+queueAccettazione.size()+" numero "+this.number);
-        eventHandler.getEventsSistema().get(1)
+        /*eventHandler.getEventsSistema().get(1)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE)).getT());
-
+*/
 
     }
 
