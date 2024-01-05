@@ -1,6 +1,7 @@
 package it.uniroma2.festatosi.ama;
 
 import it.uniroma2.festatosi.ama.controller.ControllerSistema;
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
@@ -17,6 +18,8 @@ public class Main {
         ControllerScarico scarico=new ControllerScarico();
         scarico.baseSimulation();
         scarico.printStats();*/
+        DataExtractor.initializeFile();
+
 
         ControllerSistema sistema=new ControllerSistema();
         sistema.baseSimulation();

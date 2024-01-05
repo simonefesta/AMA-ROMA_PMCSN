@@ -108,14 +108,13 @@ public class RandomDistribution {
 
         switch (typeOfService) {
             case 0:  //accettazione
-                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+                return rvms.idfTruncatedNormal(accettazione_SR, 450, 300, 2000, rngs.random());
             case 1:  //officina
-                //return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
-                return rvms.idfTruncatedNormal(7200, 5000, 3600, 7000, rngs.random());
+                return rvms.idfTruncatedNormal(officina_SR, 5000, 3600, 14400, rngs.random());
             case 2: //scarico
-                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+                return rvms.idfTruncatedNormal(scarico_SR, 450, 300, 2000, rngs.random());
             case 3: //checkout
-                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+                return rvms.idfTruncatedNormal(checkout_SR, 450, 300, 2000, rngs.random());
             default:
                 throw new Exception("Tipo di servizio non supportato dal sistema");
 

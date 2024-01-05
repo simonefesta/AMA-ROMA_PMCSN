@@ -68,14 +68,13 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.005; // ad ora è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 15*60;
-    public static final double riparazione_SR = 2*3600; //per tutte le officine (2 ore?)
-
+    public static final double officina_SR = 2*3600; //per tutte le officine (2 ore?)
     public static final double checkout_SR = 20*60;
 
     // numero di veicoli per ogni tipo

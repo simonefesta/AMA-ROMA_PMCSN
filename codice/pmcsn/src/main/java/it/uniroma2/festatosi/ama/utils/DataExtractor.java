@@ -36,6 +36,7 @@ public class DataExtractor{
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
             // Scrivi le intestazioni nel file CSV
             writer.write("seed " +seed +";" + "Tempo" + ";" + "Popolazione" +";" + name+"\n");
+            writer.write(";" + "0" + ";" + "0" +";"+"\n"); //inizializzo riga vuota perchè al tempo "0" ancora devo generare qualcosa
         }
     }
 
