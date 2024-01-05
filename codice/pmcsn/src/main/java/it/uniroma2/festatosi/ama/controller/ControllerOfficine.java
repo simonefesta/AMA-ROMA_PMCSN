@@ -3,9 +3,11 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +30,8 @@ public class ControllerOfficine {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListOfficina;
 
+    File datiOfficina;
+
     private List<EventListEntry> queueOfficina=new LinkedList<>();
 
     public ControllerOfficine(int id, long seed) throws Exception {
@@ -44,6 +48,8 @@ public class ControllerOfficine {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
         System.out.println(rngs.getSeed());
+        datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+
 
 
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
@@ -112,6 +118,7 @@ public class ControllerOfficine {
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            DataExtractor.writeSingleStat(datiOfficina,this.time.getCurrent(),this.number);
 
             if(this.number<=SERVERS_OFFICINA[this.id]){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(1); //ottengo tempo di servizio
@@ -141,6 +148,7 @@ public class ControllerOfficine {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
+            DataExtractor.writeSingleStat(datiOfficina,this.time.getCurrent(),this.number);
 
             this.s=e; //il server con index e è quello che si libera
 

@@ -3,9 +3,12 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +35,9 @@ public class ControllerCheckout {
 
     private List<EventListEntry> queueCheckout=new LinkedList<>();
 
-    public ControllerCheckout(long seed){
+    File datiCheckout;
+
+    public ControllerCheckout(long seed) throws IOException {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
@@ -40,6 +45,8 @@ public class ControllerCheckout {
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
+
+        datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
@@ -93,6 +100,7 @@ public class ControllerCheckout {
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             System.out.println("ins check "+event);
             //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
@@ -134,6 +142,7 @@ public class ControllerCheckout {
             EventListEntry event=eventList.get(s);
 
             System.out.println("uscito dal sistema "+this.number+" "+event);
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             eventHandler.decrementVType(event.getVehicleType());
 

@@ -3,9 +3,11 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,8 +15,9 @@ import java.util.List;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 /**
- * rappresenta la msq per lo scarico
+ * Rappresenta la msq per lo scarico
  */
+
 public class ControllerScarico {
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
@@ -33,6 +36,8 @@ public class ControllerScarico {
 
     private List<EventListEntry> queueScarico=new LinkedList<>();
 
+    File datiScarico;
+
     public ControllerScarico(long seed) throws Exception {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
@@ -42,6 +47,9 @@ public class ControllerScarico {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
         System.out.println(rngs.getSeed());
+
+        datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+
 
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -112,6 +120,9 @@ public class ControllerScarico {
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+            DataExtractor.writeSingleStat(datiScarico,this.time.getCurrent(),this.number);
+
+
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
@@ -133,6 +144,8 @@ public class ControllerScarico {
         else{ //evento di fine servizio
             //decrementa il numero di eventi nel nodo considerato
             this.number--;
+
+            DataExtractor.writeSingleStat(datiScarico,this.time.getCurrent(),this.number);
             //aumenta il numero di job serviti
             this.jobServed++;
 
