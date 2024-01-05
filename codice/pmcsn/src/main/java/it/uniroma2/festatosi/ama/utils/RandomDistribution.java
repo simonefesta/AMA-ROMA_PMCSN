@@ -95,11 +95,31 @@ public class RandomDistribution {
         }
     }
 
-    public double getService(){
+    /**
+     @param typeOfService indica se il servizio è di tipo:
+     0 - accettazione,
+     1 - officina (da gommista a meccanica),
+     2 - scarico
+     3 - check-out.
+
+     **/
+    public double getService(int typeOfService) throws Exception {
         rngs.selectStream(3);
-        //bisogna inserire un controllo sul tipo di veicolo che esce, per semplicità ora è un solo tipo
-        //TODO modificare valori rendere parametrico
-        return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
+
+        switch (typeOfService) {
+            case 0:  //accettazione
+                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+            case 1:  //officina
+                //return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
+                return rvms.idfTruncatedNormal(7200, 5000, 3600, 7000, rngs.random());
+            case 2: //scarico
+                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+            case 3: //checkout
+                return rvms.idfTruncatedNormal(1500, 450, 300, 2000, rngs.random());
+            default:
+                throw new Exception("Tipo di servizio non supportato dal sistema");
+
+        }
     }
 
 }

@@ -106,7 +106,7 @@ public class ControllerAccettazione {
                 //return;
             }
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(); //ottengo tempo di servizio
+                double service=this.rnd.getService(0); //ottengo tempo di servizio
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -179,8 +179,8 @@ public class ControllerAccettazione {
             System.out.println("uscita accettazione "+this.number);
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService();
-                //incremento tempo di servizio totale e eventi totali gestiti
+                double service=this.rnd.getService(0);
+                //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
 
