@@ -99,14 +99,14 @@ class Ssq3 {
 
     DecimalFormat f = new DecimalFormat("###0.00");
 
-    System.out.println("\nfor " + index + " jobs");
-    System.out.println("   average interarrival time =   " + f.format(t.last / index));
-    System.out.println("   average wait ............ =   " + f.format(area.node / index));
-    System.out.println("   average delay ........... =   " + f.format(area.queue / index));
-    System.out.println("   average service time .... =   " + f.format(area.service / index));
-    System.out.println("   average # in the node ... =   " + f.format(area.node / t.current));
-    System.out.println("   average # in the queue .. =   " + f.format(area.queue / t.current));
-    System.out.println("   utilization ............. =   " + f.format(area.service / t.current));
+    //System.out.println("\nfor " + index + " jobs");
+    //System.out.println("   average interarrival time =   " + f.format(t.last / index));
+    //System.out.println("   average wait ............ =   " + f.format(area.node / index));
+    //System.out.println("   average delay ........... =   " + f.format(area.queue / index));
+    //System.out.println("   average service time .... =   " + f.format(area.service / index));
+    //System.out.println("   average # in the node ... =   " + f.format(area.node / t.current));
+    //System.out.println("   average # in the queue .. =   " + f.format(area.queue / t.current));
+    //System.out.println("   utilization ............. =   " + f.format(area.service / t.current));
   }
 
 

@@ -61,22 +61,22 @@ public class RandomDistribution {
         rngs.selectStream(2);
         switch (queueType) {
             case 0: //arrivo allo scarico
-                arrival += Exponential(LAMBDA*P1);
+                arrival += Exponential(1/(LAMBDA*P1));
                 break;
             case 1: //arrivo alla accettazione
-                arrival += Exponential(LAMBDA*Q1);
+                arrival += Exponential(1/(LAMBDA*Q1));
                 break;
         }
         return arrival;
     }
 
-    public int getVehicleType(){
+    public int getExternalVehicleType() {
         rngs.selectStream(0);
         double rnd=rngs.random(); //si prende numero random
         /*se il numero random scelto è minore di 0.5 o i veicoli del secondo tipo sono tutti presenti nel sistema,
          * entra un veicolo del primo tipo
          */
-        System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
+        //System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
         if((rnd<=(double)VEICOLI1/(VEICOLI1+VEICOLI2) && eventHandler.getNumberV1()< VEICOLI1)
                 || (eventHandler.getNumberV2()==VEICOLI2 && eventHandler.getNumberV1()< VEICOLI1)){
             eventHandler.incrementNumberV1();
@@ -95,21 +95,30 @@ public class RandomDistribution {
         }
     }
 
-    public double getService(int vt) throws Exception {
+    /**
+     @param typeOfService indica se il servizio è di tipo:
+     0 - accettazione,
+     1 - officina (da gommista a meccanica),
+     2 - scarico
+     3 - check-out.
+
+     **/
+    public double getService(int typeOfService) throws Exception {
         rngs.selectStream(3);
-        //bisogna inserire un controllo sul tipo di veicolo che esce, per semplicità ora è un solo tipo
-        switch (vt) {
-            case 1:
-                eventHandler.decrementNumberV1();
-                break;
-            case 2:
-                eventHandler.decrementNumberV2();
-                break;
+
+        switch (typeOfService) {
+            case 0:  //accettazione
+                return rvms.idfTruncatedNormal(accettazione_SR, 450, 300, 2000, rngs.random());
+            case 1:  //officina
+                return rvms.idfTruncatedNormal(officina_SR, 5000, 3600, 14400, rngs.random());
+            case 2: //scarico
+                return rvms.idfTruncatedNormal(scarico_SR, 450, 300, 2000, rngs.random());
+            case 3: //checkout
+                return rvms.idfTruncatedNormal(checkout_SR, 450, 300, 2000, rngs.random());
             default:
-                throw new Exception("Tipo di veicolo non supportato dal sistema");
+                throw new Exception("Tipo di servizio non supportato dal sistema");
+
         }
-        //TODO modificare valori rendere parametrico
-        return rvms.idfTruncatedNormal(7200, 3600, 3600, 14400, rngs.random());
     }
 
 }

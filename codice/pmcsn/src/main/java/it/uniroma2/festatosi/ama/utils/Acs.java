@@ -70,9 +70,9 @@ class Acs {
         i++;
       }
     } catch (EOFException e) {
-      System.out.println("Acs: " + e);
+      //System.out.println("Acs: " + e);
     } catch (NumberFormatException nfe) {
-//      System.out.println("Acs: " + nfe);
+//      //System.out.println("Acs: " + nfe);
     }
 
     n = i;
@@ -91,10 +91,10 @@ class Acs {
     DecimalFormat f = new DecimalFormat("###0.00");
     DecimalFormat g = new DecimalFormat("###0.000");
 
-    System.out.println("for " + n + " data points");
-    System.out.println("the mean is ... " + f.format(mean));
-    System.out.println("the stdev is .. " + f.format(Math.sqrt(cosum[0])) +"\n");
-    System.out.println("  j (lag)   r[j] (autocorrelation)");
+    //System.out.println("for " + n + " data points");
+    //System.out.println("the mean is ... " + f.format(mean));
+    //System.out.println("the stdev is .. " + f.format(Math.sqrt(cosum[0])) +"\n");
+    //System.out.println("  j (lag)   r[j] (autocorrelation)");
     for (j = 1; j < SIZE; j++)
       System.out.println("  " + j + "          " + g.format(cosum[j] / cosum[0]));
   }

@@ -70,14 +70,14 @@ public class Estimate {
 	    t = rvms.idfStudent(n - 1, u);            /* critical value of t */
 	    w = t * stdev / Math.sqrt(n - 1);         /* interval half width */
 
-	    System.out.print("\nbased upon " + n + " data points");
-	    System.out.print(" and with " + (int) (100.0 * LOC + 0.5) + 
+	    //System.out.print("\nbased upon " + n + " data points");
+	    System.out.print(" and with " + (int) (100.0 * LOC + 0.5) +
 		"% confidence\n");
-	    System.out.print("the expected value is in the interval ");
-	    System.out.print( df.format(mean) + " +/- " + df.format(w) + "\n");
+	    //System.out.print("the expected value is in the interval ");
+	    //System.out.print( df.format(mean) + " +/- " + df.format(w) + "\n");
 	}
 	else{
-	    System.out.print("ERROR - insufficient data\n");
+	    //System.out.print("ERROR - insufficient data\n");
 	}
     }
 
@@ -127,14 +127,14 @@ public class Estimate {
 			t = rvms.idfStudent(n - 1, u);            /* critical value of t */
 			w = t * stdev / Math.sqrt(n - 1);         /* interval half width */
 
-			System.out.print("\nbased upon " + n + " data points");
+			//System.out.print("\nbased upon " + n + " data points");
 			System.out.print(" and with " + (int) (100.0 * LOC + 0.5) +
 					"% confidence\n");
-			System.out.print("the expected value is in the interval ");
-			System.out.print( df.format(mean) + " +/- " + df.format(w) + "\n");
+			//System.out.print("the expected value is in the interval ");
+			//System.out.print( df.format(mean) + " +/- " + df.format(w) + "\n");
 		}
 		else{
-			System.out.print("ERROR - insufficient data\n");
+			//System.out.print("ERROR - insufficient data\n");
 		}
 	}
 }

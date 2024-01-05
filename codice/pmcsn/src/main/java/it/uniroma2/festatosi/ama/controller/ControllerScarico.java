@@ -40,7 +40,7 @@ public class ControllerScarico {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(rngs.getSeed());
+        rngs.plantSeeds(123456789);
 
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){

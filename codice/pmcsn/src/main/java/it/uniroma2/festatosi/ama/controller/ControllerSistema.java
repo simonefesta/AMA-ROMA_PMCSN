@@ -13,7 +13,7 @@ import java.util.List;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
- * Rappresenta la msq per il sistema
+ * rappresenta la msq per il sistema
  */
 public class ControllerSistema {
     long number =0;                 /*number in the node*/
@@ -28,8 +28,6 @@ public class ControllerSistema {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListSistema=new ArrayList<>(NODES_SISTEMA);
 
-
-
     private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
 
     public ControllerSistema() throws Exception {
@@ -39,13 +37,10 @@ public class ControllerSistema {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
+        rngs.plantSeeds(123456789);
 
-        rngs.plantSeeds(rngs.getSeed());
-
-
-
-        ControllerAccettazione accettazione = new ControllerAccettazione();
         ControllerScarico scarico=new ControllerScarico();
+        ControllerAccettazione accettazione = new ControllerAccettazione();
         ControllerCheckout checkout= new ControllerCheckout();
 
         controllerList.addAll(Arrays.asList(scarico, accettazione));
@@ -142,23 +137,20 @@ public class ControllerSistema {
             ((ControllerOfficine) controllerList.get(i+2)).printStats();
         }
         ((ControllerCheckout) controllerList.get(7)).printStats();
+        System.out.println(this.eventHandler.getNumber());
 
-
-
-        System.out.println("Popolazione: "+ this.eventHandler.getNumber() + " cosi suddivisa: ");
-        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
-        System.out.println("Carrozzeria "+eventHandler.getInternalEventsCarrozzeria().size());
-        System.out.println("Elettrauto " + eventHandler.getInternalEventsElettrauto().size());
-        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
-        System.out.println("Meccanica " + eventHandler.getInternalEventsMeccanica().size());
-        System.out.println("Scarico " +eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
-
-
+        System.out.println("a\n"+eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println(eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println(eventHandler.getInternalEventsMeccanica().size());
+        System.out.println(eventHandler.getInternalEventsScarico().size());
+        System.out.println(eventHandler.getInternalEventsElettrauto().size());
+        System.out.println(eventHandler.getInternalEventsCheckout().size());
+        System.out.println(eventHandler.getInternalEventsGommista().size());
+        System.out.println(eventHandler.getNumber());
     }
 
     /**
-     * Seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse
+     * seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse
      * @param eventList lista degli eventi di tutto il sistema
      * @return indice dell'evento da gestire all'interno della lista
      */

@@ -3,6 +3,7 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
@@ -13,7 +14,7 @@ import java.util.List;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 /**
- * rappresenta la msq per l'accettazione
+ * Rappresenta la msq per l'accettazione
  */
 public class ControllerAccettazione {
     long number =0;                 /*number in the node*/
@@ -31,32 +32,21 @@ public class ControllerAccettazione {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
-
-
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
-
-<<<<<<< Updated upstream
-    public ControllerAccettazione(){
-=======
-
 
     public ControllerAccettazione() throws Exception {
 
->>>>>>> Stashed changes
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(rngs.getSeed());
+        rngs.plantSeeds(123456789);
 
-<<<<<<< Updated upstream
-=======
-       // DataExtractor.writeHeaders(rngs.getSeed(),this.getClass().getSimpleName());   //fornisco il seed al file delle statistiche, oltre che il nome del centro
+        DataExtractor.writeHeaders(rngs.getSeed(),this.getClass().getSimpleName());   //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
 
->>>>>>> Stashed changes
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
             this.eventListAccettazione.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -64,41 +54,45 @@ public class ControllerAccettazione {
 
         double firstArrival=this.rnd.getJobArrival(1);
 
-        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, rnd.getVehicleType()));
+
+        //viene settata la lista di eventi nell'handler
+        this.eventHandler.setEventsAccettazione(eventListAccettazione);
+
+        //inizializzo il primo evento con tempo pari a un primo arrivo.
+        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
     }
 
     public void baseSimulation() throws Exception {
+
+
         int e;
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
+
         /*
-        *il ciclo continua finchè non si verificano entrambe queste condizioni:
+        *il ciclo continua finché non si verificano entrambe queste condizioni:
         * -eventList[0].x=0 (close door),
         * -number>0 ci sono ancora eventi nel sistema
         */
 
-        while((eventList.get(0).getX() !=0) || (this.number>0)){
-            //prende l'indice del primo evento nella lista
-            e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
-            //imposta il tempo del prossimo evento
-            this.time.setNext(eventList.get(e).getT());
-            //si calcola l'area dell'integrale
-            this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
-            //imposta il tempo corrente a quello dell'evento corrente
-            this.time.setCurrent(this.time.getNext());
+        if(eventList.get(0).getX()==0 && this.number==0){
+            eventHandler.getEventsSistema().get(1).setX(0);
+            return;
+        }
+        //prende l'indice del primo evento nella lista
+        e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
+
+        //imposta il tempo del prossimo evento
+        this.time.setNext(eventList.get(e).getT());
+        //si calcola l'area dell'integrale
+        this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+        //imposta il tempo corrente a quello dell'evento corrente
+        this.time.setCurrent(this.time.getNext());
 
 
-<<<<<<< Updated upstream
-            if(e==0){ // controllo se l'evento è un arrivo
-                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-                int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
-                if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                    System.out.println("pieno");
-                    continue;
-=======
         if(e==0){ // controllo se l'evento è un arrivo
 
             eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(1));
@@ -115,7 +109,7 @@ public class ControllerAccettazione {
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
-            System.out.println("[Accettazione] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
+            System.out.println("TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
             DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
 
@@ -150,7 +144,7 @@ public class ControllerAccettazione {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            System.out.println("[Accettazione] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+            System.out.println("TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
 
             this.s=e; //il server con index e è quello che si libera
@@ -164,110 +158,74 @@ public class ControllerAccettazione {
             int off;
             //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
-                System.out.print("[Accettazione] ");
                 if(rndRouting<=P2){
                     off=0;
                     System.out.println("Goto gommista");
->>>>>>> Stashed changes
                 }
-                this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-
-                EventListEntry event=new EventListEntry(eventList.get(0).getT(), 0, vType);
-
-                if(eventList.get(0).getT()>STOP && eventList.get(0).getT()!=Double.MAX_VALUE){ //tempo maggiore della chiusura delle porte
-                    eventList.get(0).setX(0); //chiusura delle porte
-                    this.eventHandler.setEventsAccettazione(eventList);
-                }
-                if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                    double service=this.rnd.getService(vType); //ottengo tempo di servizio
-                    this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
-                    //incrementa i tempi di servizio e il numero di job serviti
-                    sum.get(s).incrementService(service);
-                    sum.get(s).incrementServed();
-                    //imposta nella lista degli eventi che il server s è busy
-                    eventList.get(s).setT(this.time.getCurrent()+service);
-                    eventList.get(s).setX(1);
-                    eventList.get(s).setVehicleType(vType);
-
-                    //aggiorna la lista nell'handler
-                    this.eventHandler.setEventsAccettazione(eventList);
-                }else{
-                    queueAccettazione.add(event);
-                }
-            }
-            else{ //evento di fine servizio
-                //decrementa il numero di eventi nel nodo considerato
-                this.number--;
-                //aumenta il numero di job serviti
-                this.jobServed++;
-
-                this.s=e; //il server con index e è quello che si libera
-
-                EventListEntry event=eventList.get(e);
-
-                //TODO logica di routing
-
-                double rndRouting= rngs.random();
-                //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
-                if(rndRouting<=P2){
-                    eventHandler.getInternalEventsGommista().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                    List<EventListEntry> it=eventHandler.getInternalEventsGommista();
+                else if(rndRouting<=(P2+P3)){
+                    off=1;
+                    System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
-                    eventHandler.getInternalEventsElettrauto().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                    System.out.println("ins el");
+                    off=2;
+                    System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
-                    eventHandler.getInternalEventsCarpenteria().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                    System.out.println("ins carp");
-                }
-                else if(rndRouting<=(P2+P3+P4+P5+P6)){
-                    eventHandler.getInternalEventsMeccanica().add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                    System.out.println("ins mecc");
+                    off=3;
+                    System.out.println("goto carpentiere");
                 }
                 else{
-                    System.out.println("abbandono");
-                    //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
+                    off=4;
+                    System.out.println("goto meccanico");
                 }
-
-                if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
-                    //se ci sono ottengo un nuovo tempo di servizio
-                    double service=this.rnd.getService(queueAccettazione.get(0).getVehicleType());
-
-                    //incremento tempo di servizio totale e eventi totali gestiti
-                    sum.get(s).incrementService(service);
-                    sum.get(s).incrementServed();
-
-                    //imposta il tempo alla fine del servizio
-                    eventList.get(s).setT(this.time.getCurrent()+service);
-                    eventList.get(s).setVehicleType(queueAccettazione.get(0).getVehicleType());
-                    queueAccettazione.remove(0);
-                    //aggiorna la lista degli eventi di accettazione
-                    this.eventHandler.setEventsAccettazione(eventList);
-                }else{
-                    //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
-                    eventList.get(e).setX(0);
-                    //aggiorna la lista
-                    this.eventHandler.setEventsAccettazione(eventList);
+                eventHandler.getInternalEventsOfficina(off).add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                if(eventHandler.getEventsSistema().get(off+2).getT()>event.getT() || eventHandler.getEventsSistema().get(off+2).getX()==0){
+                    eventHandler.getEventsSistema().get(off+2).setT(event.getT());
                 }
-<<<<<<< Updated upstream
-
-
-                //TODO gestione inserimento dell'uscita da questo centro in quello successivo
-=======
                 eventHandler.getEventsSistema().get(off+2).setX(1);
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                System.out.println("[Accettazione] abbandono");
+                System.out.println("abbandono");
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
->>>>>>> Stashed changes
             }
+
+
+            if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
+                //se ci sono ottengo un nuovo tempo di servizio
+                double service=this.rnd.getService(0);
+                //incremento tempo di servizio totale ed eventi totali gestiti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+                //imposta il tempo alla fine del servizio
+
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setVehicleType(queueAccettazione.get(0).getVehicleType());
+                queueAccettazione.remove(0);
+                //aggiorna la lista degli eventi di accettazione
+                this.eventHandler.setEventsAccettazione(eventList);
+            }else{
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+                //aggiorna la lista
+                this.eventHandler.setEventsAccettazione(eventList);
+            }
+
+
+            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
+
         }
+
+        if(this.number==0 && this.time.getCurrent()>STOP){
+            this.eventHandler.getEventsAccettazione().get(0).setX(0);
+            //return;
+        }
+
     }
 
     /**
-     * ritorna l'indice del server libero da più tempo
+     * Ritorna l'indice del server libero da più tempo
      *
      * @param eventListAccettazione lista degli eventi di accettazione
      * @return index del server libero da più tempo
@@ -288,7 +246,7 @@ public class ControllerAccettazione {
     }
 
     public void printStats() {
-        System.out.println("Accettazione\n\n");
+        /*System.out.println("Accettazione\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsAccettazione().get(0).getT() / this.jobServed);
         System.out.println("  avg wait ........... = " + this.area / this.jobServed);
@@ -303,17 +261,17 @@ public class ControllerAccettazione {
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-            // System.out.println(i+"\t");
-            // System.out.println("get service" + this.sumList[i].getService() + "\n");
-            // System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            // System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            // System.out.println("jobServiti"+this.jobServiti + "\n");
+            //System.out.println(i+"\t");
+            //System.out.println("get service" + this.sumList[i].getService() + "\n");
+            //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
+            //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
+            //System.out.println("jobServiti"+this.jobServiti + "\n");
             //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
             System.out.println("\n");
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        System.out.println("\n");
+        System.out.println("\n");*/
     }
 
 }
