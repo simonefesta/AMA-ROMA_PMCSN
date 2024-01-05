@@ -34,7 +34,7 @@ public class ControllerAccettazione {
 
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
-    public ControllerAccettazione() throws Exception {
+    public ControllerAccettazione(long seed) throws Exception {
 
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
@@ -42,7 +42,9 @@ public class ControllerAccettazione {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(seed);
+        System.out.println(rngs.getSeed());
+
 
         DataExtractor.writeHeaders(rngs.getSeed(),this.getClass().getSimpleName());   //fornisco il seed al file delle statistiche, oltre che il nome del centro
 

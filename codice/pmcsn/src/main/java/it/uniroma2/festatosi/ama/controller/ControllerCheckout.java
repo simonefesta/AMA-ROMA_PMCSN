@@ -32,14 +32,14 @@ public class ControllerCheckout {
 
     private List<EventListEntry> queueCheckout=new LinkedList<>();
 
-    public ControllerCheckout(){
+    public ControllerCheckout(long seed){
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(seed);
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));

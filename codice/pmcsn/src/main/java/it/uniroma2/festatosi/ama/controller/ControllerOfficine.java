@@ -30,7 +30,7 @@ public class ControllerOfficine {
 
     private List<EventListEntry> queueOfficina=new LinkedList<>();
 
-    public ControllerOfficine(int id) throws Exception {
+    public ControllerOfficine(int id, long seed) throws Exception {
         this.id=id;
         sum=new ArrayList<>(SERVERS_OFFICINA[id]+1);
         eventListOfficina=new ArrayList<>(SERVERS_OFFICINA[this.id]+1);
@@ -42,7 +42,9 @@ public class ControllerOfficine {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(seed);
+        System.out.println(rngs.getSeed());
+
 
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));

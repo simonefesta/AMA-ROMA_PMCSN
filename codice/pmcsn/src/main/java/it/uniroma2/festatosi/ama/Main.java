@@ -19,9 +19,9 @@ public class Main {
         scarico.baseSimulation();
         scarico.printStats();*/
         DataExtractor.initializeFile();
-
-
-        ControllerSistema sistema=new ControllerSistema();
+        long seed = 123456789;
+        ControllerSistema sistema=new ControllerSistema(seed);
+        sistema.selectSeed(seed);
         sistema.baseSimulation();
 
 
