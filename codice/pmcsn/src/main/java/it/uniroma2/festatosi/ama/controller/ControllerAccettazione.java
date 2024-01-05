@@ -31,17 +31,32 @@ public class ControllerAccettazione {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
+
+
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
+<<<<<<< Updated upstream
     public ControllerAccettazione(){
+=======
+
+
+    public ControllerAccettazione() throws Exception {
+
+>>>>>>> Stashed changes
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
 
+<<<<<<< Updated upstream
+=======
+       // DataExtractor.writeHeaders(rngs.getSeed(),this.getClass().getSimpleName());   //fornisco il seed al file delle statistiche, oltre che il nome del centro
+
+
+>>>>>>> Stashed changes
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
             this.eventListAccettazione.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -76,12 +91,84 @@ public class ControllerAccettazione {
             this.time.setCurrent(this.time.getNext());
 
 
+<<<<<<< Updated upstream
             if(e==0){ // controllo se l'evento è un arrivo
                 eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
                 int vType=rnd.getVehicleType(); //vedo quale tipo di veicolo sta arrivando
                 if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                     System.out.println("pieno");
                     continue;
+=======
+        if(e==0){ // controllo se l'evento è un arrivo
+
+            eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(1));
+            //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
+
+            int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
+            if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
+                //System.out.println("pieno");
+                //continue;
+                eventHandler.getEventsSistema().get(1).setT(eventList.get(0).getT());
+                return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
+            }
+            this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
+
+
+            System.out.println("[Accettazione] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
+            //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
+            DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
+
+            if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
+                //eventHandler.getEventsSistema().get(0).setX(0);
+                eventList.get(0).setX(0); //chiusura delle porte
+                this.eventHandler.setEventsAccettazione(eventList);
+                //return;
+            }
+
+            if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
+                double service=this.rnd.getService(0); //ottengo tempo di servizio
+                this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                //incrementa i tempi di servizio e il numero di job serviti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+                //imposta nella lista degli eventi che il server s è busy
+                double sum = this.time.getCurrent() + service;
+                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
+                eventList.get(s).setT(this.time.getCurrent() +service);
+                eventList.get(s).setX(1);
+                eventList.get(s).setVehicleType(vType);
+
+                //aggiorna la lista nell'handler
+                this.eventHandler.setEventsAccettazione(eventList);
+            }else{
+                queueAccettazione.add(event);
+            }
+        }
+        else{ //evento di fine servizio
+            //decrementa il numero di eventi nel nodo considerato
+            this.number--;
+            //aumenta il numero di job serviti
+            this.jobServed++;
+            System.out.println("[Accettazione] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+            DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
+
+            this.s=e; //il server con index e è quello che si libera
+
+            EventListEntry event=eventList.get(e);
+
+
+            //TODO logica di routing
+
+            double rndRouting= rngs.random();
+            int off;
+            //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
+            if(rndRouting<=(P2+P3+P4+P5+P6)) {
+                System.out.print("[Accettazione] ");
+                if(rndRouting<=P2){
+                    off=0;
+                    System.out.println("Goto gommista");
+>>>>>>> Stashed changes
                 }
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
@@ -163,9 +250,18 @@ public class ControllerAccettazione {
                     //aggiorna la lista
                     this.eventHandler.setEventsAccettazione(eventList);
                 }
+<<<<<<< Updated upstream
 
 
                 //TODO gestione inserimento dell'uscita da questo centro in quello successivo
+=======
+                eventHandler.getEventsSistema().get(off+2).setX(1);
+                eventHandler.getEventsOfficina(off).get(0).setX(1);
+            } else{
+                eventHandler.decrementVType(event.getVehicleType());
+                System.out.println("[Accettazione] abbandono");
+                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
+>>>>>>> Stashed changes
             }
         }
     }
