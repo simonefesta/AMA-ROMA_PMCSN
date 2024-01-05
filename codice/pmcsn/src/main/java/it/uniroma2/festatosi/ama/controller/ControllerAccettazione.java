@@ -90,7 +90,7 @@ public class ControllerAccettazione {
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             System.out.println("arrivo accettazione ");
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                ////System.out.println("pieno");
+                //System.out.println("pieno");
                 //continue;
                 eventHandler.getEventsSistema().get(1).setT(eventList.get(0).getT());
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno

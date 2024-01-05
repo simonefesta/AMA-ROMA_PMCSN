@@ -32,7 +32,7 @@ public class ControllerSistema {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListSistema=new ArrayList<>(NODES_SISTEMA);
 
-    private List<Object> controllerList;
+    private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
 
     public ControllerSistema() throws Exception {
 
@@ -45,14 +45,14 @@ public class ControllerSistema {
 
         ControllerScarico scarico=new ControllerScarico();
         ControllerAccettazione accettazione = new ControllerAccettazione();
-        ControllerGommista gommista=new ControllerGommista();
+        /*ControllerGommista gommista=new ControllerGommista();
         ControllerCarrozzeria carrozzeria= new ControllerCarrozzeria();
         ControllerElettrauto elettrauto=new ControllerElettrauto();
         ControllerCarpentiere carpenteria=new ControllerCarpentiere();
-        ControllerMeccanica meccanica=new ControllerMeccanica();
+        ControllerMeccanica meccanica=new ControllerMeccanica();*/
         ControllerCheckout checkout= new ControllerCheckout();
 
-        controllerList= Arrays.asList(scarico, accettazione, gommista, carrozzeria, elettrauto, carpenteria, meccanica, checkout);
+        controllerList.addAll(Arrays.asList(scarico, accettazione));
         /*
         * entry list
         * 0: scarico
@@ -74,34 +74,14 @@ public class ControllerSistema {
         int nextEventAccettazione=EventListEntry.getNextEvent(listAccettazione, SERVERS_ACCETTAZIONE);
         this.eventListSistema.add(1, new EventListEntry(listAccettazione.get(nextEventAccettazione).getT(),1));
         this.sum.add(1, new MsqSum());
-        //2 gommista
-        List<EventListEntry> listGommista=eventHandler.getEventsGommista();
-        //int nextEventGommista=EventListEntry.getNextEvent(listGommista, SERVERS_GOMMISTA);
-        this.eventListSistema.add(2, new EventListEntry(0,0));
-        this.sum.add(2, new MsqSum());
-        //3 carrozzeria
-        List<EventListEntry> listCarrozzeria=eventHandler.getEventsCarrozzeria();
-        //int nextEventCarrozzeria=EventListEntry.getNextEvent(listCarrozzeria, SERVERS_CARROZZERIA);
-        this.eventListSistema.add(3, new EventListEntry(0,0));
-        this.sum.add(3, new MsqSum());
-        //4 elettrauto
-        List<EventListEntry> listElettrauto=eventHandler.getEventsElettrauto();
-        //int nextEventElettrauto=EventListEntry.getNextEvent(listElettrauto, SERVERS_ELETTRAUTO);
-        this.eventListSistema.add(4, new EventListEntry(0,0));
-        this.sum.add(4, new MsqSum());
-        //5 carpenteria
-        List<EventListEntry> listCarpenteria=eventHandler.getEventsCarpenteria();
-        //int nextEventCarpenteria=EventListEntry.getNextEvent(listCarpenteria, SERVERS_CARPENTERIA);
-        this.eventListSistema.add(5, new EventListEntry(0,0));
-        this.sum.add(5, new MsqSum());  
-        //6 meccanica
-        List<EventListEntry> listMeccanica=eventHandler.getEventsMeccanica();
-        //int nextEventMeccanica=EventListEntry.getNextEvent(listMeccanica, SERVERS_MECCANICA);
-        this.eventListSistema.add(6, new EventListEntry(0,0));
-        this.sum.add(6, new MsqSum());
+        //inzializzo la eventList del sistema, creo le entry per le varie officine
+        for (int i=0;i<SERVERS_OFFICINA.length;i++) {
+            controllerList.add(new ControllerOfficine(i));
+            this.eventListSistema.add(i+2, new EventListEntry(0, 0));
+            this.sum.add(i + 2, new MsqSum());
+        }
         //7 checkout
-        List<EventListEntry> listCheckout=eventHandler.getEventsCheckout();
-        //int nextEventCheckout=EventListEntry.getNextEvent(listCheckout, SERVERS_CHECKOUT);
+        controllerList.add(checkout);
         this.eventListSistema.add(7, new EventListEntry(0,0));
         this.sum.add(7, new MsqSum());
 
@@ -129,49 +109,37 @@ public class ControllerSistema {
              eventList) {
             //System.out.println(eventList.size()+" "+ev.getT()+" "+ev.getX());
         }
-        while(getNextEvent(eventList)!=-1/*eventList.get(0).getX()!=0 || eventHandler.getNumber()!=0*/){
+        while(getNextEvent(eventList)!=-1/*eventList.get(0).getX()!=0 || eventHandler.getNumber()!=0*/) {
             //System.out.println("eventi numero "+eventHandler.getNumber());
             //prende l'indice del primo evento nella lista
-            e=getNextEvent(eventList);
+            e = getNextEvent(eventList);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
-            this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
             //System.out.println("ev "+e);
+            if (e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
 
-            if(e==0){
-                ControllerScarico scarico=(ControllerScarico) controllerList.get(e);
+            if (e == 0) {
+                ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
                 scarico.baseSimulation();
                 ////System.out.println(e);
-            }else if(e==1){
-                ControllerAccettazione accettazione=(ControllerAccettazione) controllerList.get(e);
+            } else if (e == 1) {
+                ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
                 accettazione.baseSimulation();
                 ////System.out.println(e);
-            }else if(e==2) {
-                ControllerGommista gommista=(ControllerGommista) controllerList.get(e);
-                gommista.baseSimulation();
-                //System.out.println("gomme");
-            }else if(e==3) {
-                ControllerCarrozzeria carrozzeria=(ControllerCarrozzeria) controllerList.get(e);
-                carrozzeria.baseSimulation();
-                //System.out.println("carrozzeria");
-            }else if(e==4) {
-                ControllerElettrauto elettrauto=(ControllerElettrauto) controllerList.get(e);
-                elettrauto.baseSimulation();
-                //System.out.println("elettrauto");
-            }else if(e==5) {
-                ControllerCarpentiere carpentiere=(ControllerCarpentiere) controllerList.get(e);
-                carpentiere.baseSimulation();
-                //System.out.println("carpentiere");
-            }else if(e==6) {
-                ControllerMeccanica meccanica=(ControllerMeccanica) controllerList.get(e);
-                meccanica.baseSimulation();
-                //System.out.println("meccanica");
+            }else if(e==7){
+                ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
+                checkout.baseSimulation();
+                ////System.out.println(e);
             }else{
-                throw new Exception("Errore nessun evento tra i precedenti");
+                ControllerOfficine officina= (ControllerOfficine) controllerList.get(e);
+                officina.baseSimulation();
             }
 
             System.out.println("x "+eventList.get(0).getX());

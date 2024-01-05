@@ -240,4 +240,60 @@ public class EventHandler {
     public void setEventsCheckout(List<EventListEntry> eventsCheckout) {
         this.eventsCheckout=eventsCheckout;
     }
+
+    public void setEventsOfficina(int id, List<EventListEntry> eventListOfficina) throws Exception {
+        switch (id){
+            case 0:
+                setEventsGommista(eventListOfficina);
+                break;
+            case 1:
+                setEventsCarrozzeria(eventListOfficina);
+                break;
+            case 2:
+                setEventsElettrauto(eventListOfficina);
+                break;
+            case 3:
+                setEventsCarpenteria(eventListOfficina);
+                break;
+            case 4:
+                setEventsMeccanica(eventListOfficina);
+                break;
+            default:
+                throw new Exception("EventsList indice fuori range");
+        }
+    }
+
+    public List<EventListEntry> getEventsOfficina(int id) throws Exception {
+        switch (id){
+            case 0:
+                return getEventsGommista();
+            case 1:
+                return getEventsCarrozzeria();
+            case 2:
+                return getEventsElettrauto();
+            case 3:
+                return getEventsCarpenteria();
+            case 4:
+                return getEventsMeccanica();
+            default:
+                throw new Exception("EventsList indice fuori range");
+        }
+    }
+
+    public List<EventListEntry> getInternalEventsOfficina(int id) throws Exception {
+        switch (id){
+            case 0:
+                return getInternalEventsGommista();
+            case 1:
+                return getInternalEventsCarrozzeria();
+            case 2:
+                return getInternalEventsElettrauto();
+            case 3:
+                return getInternalEventsCarpenteria();
+            case 4:
+                return getInternalEventsMeccanica();
+            default:
+                throw new Exception("EventsList indice fuori range");
+        }
+    }
 }

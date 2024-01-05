@@ -94,7 +94,6 @@ public class ControllerScarico {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-
             if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
                 //System.out.println("e scarico: "+e);
                 int vType;
@@ -160,17 +159,26 @@ public class ControllerScarico {
                 //System.out.println("prima "+eventHandler.getNumber());
 
                 //TODO logica di routing (per ora esce dal sistema direttamente)
-                eventHandler.decrementVType(event.getVehicleType());
+                //eventHandler.decrementVType(event.getVehicleType());
                 //Thread.sleep(2000);
                 //System.out.println("decrementato "+eventHandler.getNumber());
 
                 double rndRouting= rngs.random();
                 //TODO modificare la logica di routing
-                if(rndRouting<=P2){
-                    ////System.out.println("ins uscita");
+                if(rndRouting<=P7){
+                    eventHandler.decrementVType(event.getVehicleType());
+                    System.out.println("ins uscita");
                 }
                 else{
-                    ////System.out.println("ins checkout");
+                    //aggiunta dell'evento alla coda del checkout
+                    eventHandler.getInternalEventsCheckout()
+                            .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                    eventHandler.getEventsCheckout().set(0,
+                            new EventListEntry(event.getT(), 1, event.getVehicleType()));
+
+                    eventHandler.getEventsSistema().get(7).setT(event.getT());
+                    eventHandler.getEventsSistema().get(7).setX(1);
+                    System.out.println("ins checkout "+eventHandler.getInternalEventsCheckout().size());
                 }
 
                 if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire

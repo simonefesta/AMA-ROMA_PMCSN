@@ -13,6 +13,9 @@ public class Constants {
     public static int    SERVERS_CARPENTERIA = 6;
     public static int    SERVERS_MECCANICA = 5;
     public static int    SERVERS_CHECKOUT = 1;
+    public static int    SERVERS_OFFICINA[] = {SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
+            SERVERS_CARPENTERIA, SERVERS_MECCANICA};
+
     /*indica il numero di code nel sistema, serve per gestire il fatto che i veicoli sono di numero finito*/
     public static int NODES_SISTEMA = 8; //servirà per la event list del sistema per gestire la precedenza degli eventi
 
