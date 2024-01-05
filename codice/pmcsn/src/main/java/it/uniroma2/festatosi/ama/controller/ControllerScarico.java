@@ -39,8 +39,8 @@ public class ControllerScarico {
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
-        Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){

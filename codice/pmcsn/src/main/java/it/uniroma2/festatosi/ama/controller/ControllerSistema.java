@@ -37,7 +37,8 @@ public class ControllerSistema {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         ControllerScarico scarico=new ControllerScarico();
         ControllerAccettazione accettazione = new ControllerAccettazione();

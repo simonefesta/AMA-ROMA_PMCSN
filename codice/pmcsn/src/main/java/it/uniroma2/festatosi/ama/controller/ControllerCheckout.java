@@ -39,7 +39,8 @@ public class ControllerCheckout {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
