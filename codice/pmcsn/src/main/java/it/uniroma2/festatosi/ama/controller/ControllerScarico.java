@@ -50,7 +50,6 @@ public class ControllerScarico {
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
-
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){
             this.eventListScarico.add(s, new EventListEntry(0,0));

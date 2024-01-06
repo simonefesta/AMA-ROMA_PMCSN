@@ -48,6 +48,7 @@ public class ControllerAccettazione {
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
+
         System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro

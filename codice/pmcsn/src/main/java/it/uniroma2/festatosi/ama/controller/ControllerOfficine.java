@@ -46,11 +46,10 @@ public class ControllerOfficine {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
+
         rngs.plantSeeds(seed);
         System.out.println(rngs.getSeed());
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
-
 
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));

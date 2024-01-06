@@ -44,6 +44,7 @@ public class ControllerCheckout {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
+
         rngs.plantSeeds(seed);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
