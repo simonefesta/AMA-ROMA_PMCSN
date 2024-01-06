@@ -7,6 +7,7 @@ import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,17 +35,23 @@ public class ControllerAccettazione {
 
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
-    public ControllerAccettazione() throws Exception {
+    File datiAccettazione;
+
+    public ControllerAccettazione(long seed) throws Exception {
+
+
 
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
-        rngs.plantSeeds(rngs.getSeed());
+        Rngs rngs = new Rngs();
+        rngs.plantSeeds(seed);
+
         System.out.println(rngs.getSeed());
 
-        DataExtractor.writeHeaders(rngs.getSeed(),this.getClass().getSimpleName());   //fornisco il seed al file delle statistiche, oltre che il nome del centro
+        datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
 
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -111,7 +118,7 @@ public class ControllerAccettazione {
 
             System.out.println("TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
-            DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
 
             if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
                 //eventHandler.getEventsSistema().get(0).setX(0);
@@ -145,7 +152,7 @@ public class ControllerAccettazione {
             //aumenta il numero di job serviti
             this.jobServed++;
             System.out.println("TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            DataExtractor.writeSingleStat(this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
 
             this.s=e; //il server con index e è quello che si libera
 

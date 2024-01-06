@@ -8,46 +8,42 @@ import java.io.IOException;
 
 
 public class DataExtractor{
-    static File fileInTarget;
-    public static void initializeFile() throws IOException {
-        String currentDirectory = System.getProperty("user.dir"); //prende la cartella "pmcsn"
-        String targetDirectoryName = "target";                    // andiamo nella sottodirectory target
-        String fileName = "statistiche.csv";                     // nome del file prodotto
-        File targetDirectory = new File(currentDirectory, targetDirectoryName);  //compongo il percorso in cui metterò le stats
+    //static File fileInTarget;
+    public static File initializeFile(long seed, String name) throws IOException {
+        String currentDirectory = System.getProperty("user.dir");
+        String targetDirectoryName = "target";
+        String fileName = name + ".csv";
+        String targetDirectoryPath = currentDirectory + File.separator + targetDirectoryName + File.separator + "graphs" + File.separator + seed;
 
-
-        fileInTarget = new File(targetDirectory, fileName);                     //creo il file "fileName" nella cartella target
+        File targetDirectory = new File(targetDirectoryPath);
 
         if (!targetDirectory.exists()) {
-            boolean directoryCreated = targetDirectory.mkdir();
+            boolean directoryCreated = targetDirectory.mkdirs();
             if (directoryCreated) {
-                System.out.println("La cartella 'target' è stata creata.");
+                System.out.println("La cartella 'seed_" + seed + "' è stata creata in 'target'.");
             } else {
-                System.out.println("Impossibile creare la cartella 'target'.");
+                System.out.println("Impossibile creare la cartella 'seed_" + seed + "' in 'target'.");
             }
         }
 
+        File fileInTarget = new File(targetDirectory, fileName);
+        System.out.println("CREO :" + fileName + " ");
 
-    }
-
-
-
-    public static void writeHeaders(long seed, String name) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
-            // Scrivi le intestazioni nel file CSV
-            writer.write("seed " +seed +";" + "Tempo" + ";" + "Popolazione" +";" + name+"\n");
-            writer.write(";" + "0" + ";" + "0" +";"+"\n"); //inizializzo riga vuota perchè al tempo "0" ancora devo generare qualcosa
+            writer.write("seed " + seed + ";" + "Tempo" + ";" + "Popolazione" + ";" + name + "\n");
+            writer.write(";" + "0" + ";" + "0" + ";\n");
         }
+        return fileInTarget;
     }
 
-    public static void writeSingleStat(double time, double value) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget, true))) {
-            // Scrivi il tempo e il valore nel file CSV
-            writer.write(";" + time + ";" + value + "\n"); //il primo ; è per lasciare spazio al ssed
 
-            //System.out.println("Dati scritti nel file CSV con successo.");
-        } catch (IOException e) {
-            System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
+
+
+        public static void writeSingleStat(File fileInTarget, double time, double value) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget, true))) {
+                writer.write(";" + time + ";" + value + "\n");
+            } catch (IOException e) {
+                System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
+            }
         }
-    }
 }

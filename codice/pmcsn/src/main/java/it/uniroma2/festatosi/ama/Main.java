@@ -19,12 +19,11 @@ public class Main {
         ControllerScarico scarico=new ControllerScarico();
         scarico.baseSimulation();
         scarico.printStats();*/
-        DataExtractor.initializeFile();
-        Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
 
+        long seed = 123456789;
 
-        ControllerSistema sistema=new ControllerSistema();
+        ControllerSistema sistema=new ControllerSistema(seed);
+        sistema.selectSeed(seed);
         sistema.baseSimulation();
 
 

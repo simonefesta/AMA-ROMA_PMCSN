@@ -3,7 +3,6 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
-import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import java.util.List;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
- * rappresenta la msq per il sistema
+ * Rappresenta la msq per il sistema
  */
 public class ControllerSistema {
     long number =0;                 /*number in the node*/
@@ -30,19 +29,25 @@ public class ControllerSistema {
 
     private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
 
-    public ControllerSistema() throws Exception {
+    long seed;
+
+    public void selectSeed(long seed){
+        this.seed = seed;
+    }
+
+    public ControllerSistema(long seed) throws Exception {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(rngs.getSeed());
-        System.out.println(rngs.getSeed());
 
-        ControllerScarico scarico=new ControllerScarico();
-        ControllerAccettazione accettazione = new ControllerAccettazione();
-        ControllerCheckout checkout= new ControllerCheckout();
+        rngs.plantSeeds(seed);
+
+        ControllerAccettazione accettazione = new ControllerAccettazione(rngs.getSeed());
+        ControllerCheckout checkout= new ControllerCheckout(rngs.getSeed());
+        ControllerScarico scarico=new ControllerScarico(rngs.getSeed());
 
         controllerList.addAll(Arrays.asList(scarico, accettazione));
         /*
@@ -68,7 +73,7 @@ public class ControllerSistema {
         this.sum.add(1, new MsqSum());
         //inzializzo la eventList del sistema, creo le entry per le varie officine
         for (int i=0;i<SERVERS_OFFICINA.length;i++) {
-            controllerList.add(new ControllerOfficine(i));
+            controllerList.add(new ControllerOfficine(i,rngs.getSeed()));
             this.eventListSistema.add(i+2, new EventListEntry(0, 0));
             this.sum.add(i + 2, new MsqSum());
         }
@@ -130,20 +135,22 @@ public class ControllerSistema {
             ((ControllerOfficine) controllerList.get(i+2)).printStats();
         }
         ((ControllerCheckout) controllerList.get(7)).printStats();
-        System.out.println(this.eventHandler.getNumber());
 
-        System.out.println("a\n"+eventHandler.getInternalEventsCarrozzeria().size());
-        System.out.println(eventHandler.getInternalEventsCarpenteria().size());
-        System.out.println(eventHandler.getInternalEventsMeccanica().size());
-        System.out.println(eventHandler.getInternalEventsScarico().size());
-        System.out.println(eventHandler.getInternalEventsElettrauto().size());
-        System.out.println(eventHandler.getInternalEventsCheckout().size());
-        System.out.println(eventHandler.getInternalEventsGommista().size());
-        System.out.println(eventHandler.getNumber());
+
+        System.out.println("Popolazione: "+ eventHandler.getNumber());
+        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
+        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
+        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
+        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
+
+
     }
 
     /**
-     * seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse
+     * Seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse
      * @param eventList lista degli eventi di tutto il sistema
      * @return indice dell'evento da gestire all'interno della lista
      */
