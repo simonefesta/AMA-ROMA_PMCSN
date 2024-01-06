@@ -85,17 +85,9 @@ public class ControllerSistema {
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
         /*
-        *il ciclo continua finché non si verificano entrambe queste condizioni:
-        * -eventList[0].x=0 (close door),
-        * -number>0 ci sono ancora eventi nel sistema
+        * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
-
-        for (EventListEntry ev:
-             eventList) {
-            //System.out.println(eventList.size()+" "+ev.getT()+" "+ev.getX());
-        }
-        while(getNextEvent(eventList)!=-1/*eventList.get(0).getX()!=0 || eventHandler.getNumber()!=0*/) {
-            //System.out.println("eventi numero "+eventHandler.getNumber());
+        while(getNextEvent(eventList)!=-1) {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
             //imposta il tempo del prossimo evento
@@ -105,7 +97,7 @@ public class ControllerSistema {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-            //System.out.println("ev "+e);
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
             if (e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
