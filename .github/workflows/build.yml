@@ -32,7 +32,7 @@ jobs:
     - name: Configura Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.6'
+        python-version: '3.12.1'
         
     - name: Installa dipendenze
       run: |
