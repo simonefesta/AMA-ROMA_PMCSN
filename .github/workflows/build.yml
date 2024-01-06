@@ -28,3 +28,6 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         path: target/graphs
+
+    - name: Disegna grafici
+      run: python graph_drawer.py
