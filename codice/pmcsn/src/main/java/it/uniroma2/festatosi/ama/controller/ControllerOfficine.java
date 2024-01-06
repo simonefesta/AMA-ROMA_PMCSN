@@ -42,7 +42,8 @@ public class ControllerOfficine {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
@@ -112,7 +113,7 @@ public class ControllerOfficine {
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
             if(this.number<=SERVERS_OFFICINA[this.id]){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(); //ottengo tempo di servizio
+                double service=this.rnd.getService(1); //ottengo tempo di servizio
                 System.out.println(this.name+" in servizio "+this.number+" "+service);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -160,7 +161,7 @@ public class ControllerOfficine {
 
             if(this.number>=SERVERS_OFFICINA[this.id]){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService();
+                double service=this.rnd.getService(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);

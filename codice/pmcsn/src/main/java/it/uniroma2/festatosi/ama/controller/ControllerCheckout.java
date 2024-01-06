@@ -39,7 +39,8 @@ public class ControllerCheckout {
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
@@ -101,7 +102,7 @@ public class ControllerCheckout {
                     this.eventHandler.setEventsCheckout(eventList);
                 }*/
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(); //ottengo tempo di servizio
+                double service=this.rnd.getService(3); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -139,10 +140,10 @@ public class ControllerCheckout {
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService();
+                double service=this.rnd.getService(3);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
-                //incremento tempo di servizio totale e eventi totali gestiti
+                //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
 

@@ -39,8 +39,8 @@ public class ControllerScarico {
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
-        Rngs rngs = new Rngs();
-        rngs.plantSeeds(123456789);
+        rngs.plantSeeds(rngs.getSeed());
+        System.out.println(rngs.getSeed());
 
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -112,7 +112,7 @@ public class ControllerScarico {
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(); //ottengo tempo di servizio
+                double service=this.rnd.getService(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -161,7 +161,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService();
+                double service=this.rnd.getService(2);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
