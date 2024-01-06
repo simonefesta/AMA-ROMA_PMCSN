@@ -30,4 +30,4 @@ jobs:
         path: target/graphs
 
     - name: Disegna grafici
-      run: python graph_drawer.py
+      run: python codice/pmcsn/graph_drawer.py
