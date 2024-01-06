@@ -27,4 +27,4 @@ jobs:
     - name: Upload csv files
       uses: actions/upload-artifact@v3
       with:
-        path: bookkeeper-server/target/graphs
+        path: target/graphs
