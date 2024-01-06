@@ -29,5 +29,15 @@ jobs:
       with:
         path: target/graphs
 
+    - name: Configura Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.6'
+        
+    - name: Installa dipendenze
+      run: |
+        python -m pip install --upgrade pip
+        pip install matplotlib  # Installa la libreria matplotlib
+
     - name: Disegna grafici
       run: python codice/pmcsn/graph_drawer.py
