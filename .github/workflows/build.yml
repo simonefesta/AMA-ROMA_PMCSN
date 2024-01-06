@@ -23,3 +23,8 @@ jobs:
 
     - name: Esegui build con Maven
       run: mvn -f ${{ github.workspace }}/codice/pmcsn/pom.xml clean install exec:java
+
+    - name: Upload csv files
+      uses: actions/upload-artifact@v3
+      with:
+        path: bookkeeper-server/target/graphs
