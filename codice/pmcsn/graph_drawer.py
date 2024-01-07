@@ -31,13 +31,13 @@ def draw(valori_asse_x,valori_asse_y, nome_asse_x, nome_asse_y,seed,cartella,nom
 directory_corrente = os.getcwd()
 
 # Definisci il percorso della cartella contenente i file CSV
-percorso_cartella = os.path.join(directory_corrente, "target\graphs")
+percorso_cartella = os.path.join(directory_corrente, "target/graphs")
 
 # Verifica se la cartella principale esiste
 if os.path.exists(percorso_cartella):
     # Scandisci ricorsivamente tutte le sottocartelle e i file CSV
     for cartella, sottocartelle, files in os.walk(percorso_cartella):
-        percorso_img=percorso_cartella+"\\img"
+        percorso_img=percorso_cartella+"/img"
         for filename in files:
             percorso_file = os.path.join(cartella, filename)
 
@@ -65,8 +65,8 @@ if os.path.exists(percorso_cartella):
                             valori_asse_y.append(float(riga[2]))
 
                 # Verifica se la cartella non esiste, quindi creala se necessario
-                if not os.path.exists(percorso_cartella+"\\img"):
-                    os.makedirs(percorso_cartella+"\\img")
+                if not os.path.exists(percorso_cartella+"/img"):
+                    os.makedirs(percorso_cartella+"/img")
 
                 draw(valori_asse_x, valori_asse_y, nome_asse_x, nome_asse_y, seed, percorso_img, nome_centro)
 else:
