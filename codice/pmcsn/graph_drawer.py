@@ -70,4 +70,4 @@ if os.path.exists(percorso_cartella):
 
                 draw(valori_asse_x, valori_asse_y, nome_asse_x, nome_asse_y, seed, percorso_img, nome_centro)
 else:
-    print(f"La cartella {percorso_cartella_principale} non esiste.")
+    print(f"La cartella {percorso_cartella} non esiste.")
