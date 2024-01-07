@@ -27,7 +27,6 @@ jobs:
     - name: Upload csv files
       uses: actions/upload-artifact@v3
       with:
-	name: graphs (dati e immagini)
         path: target/graphs
 
     - name: Configura Python
