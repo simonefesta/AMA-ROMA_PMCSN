@@ -55,7 +55,7 @@ public class ControllerCheckout {
         }
 
 //        EventListEntry event= eventHandler.getInternalEventsCheckout().get(0);
-        this.eventListCheckout.set(0,new EventListEntry(0,1));
+        this.eventListCheckout.set(0,new EventListEntry(this.time.getCurrent(),1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsCheckout(eventListCheckout);
@@ -99,7 +99,7 @@ public class ControllerCheckout {
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-
+            System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
@@ -195,7 +195,7 @@ public class ControllerCheckout {
     }
 
     /**
-     * ritorna l'indice del server libero da più tempo
+     * Ritorna l'indice del server libero da più tempo
      *
      * @param eventListCheckout lista degli eventi di checkout
      * @return index del server libero da più tempo

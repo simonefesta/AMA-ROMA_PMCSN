@@ -14,6 +14,7 @@ import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 
+
 /**
  * Rappresenta la msq per l'accettazione
  */
@@ -36,6 +37,11 @@ public class ControllerAccettazione {
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
+    private int[] vectorFirstArrival = new int[5]; // Creazione del vettore di 5 elementi inizializzati a 0
+
+    public void SetFistArrival( long time, int index){
+        vectorFirstArrival[index] = 1;
+    }
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -49,7 +55,7 @@ public class ControllerAccettazione {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
 
-        System.out.println(rngs.getSeed());
+        //System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
@@ -116,7 +122,7 @@ public class ControllerAccettazione {
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
-            System.out.println("TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
+            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
 
@@ -134,7 +140,7 @@ public class ControllerAccettazione {
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
-                double sum = this.time.getCurrent() + service;
+                //double sum = this.time.getCurrent() + service;
                 //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
@@ -151,12 +157,13 @@ public class ControllerAccettazione {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            System.out.println("TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+            //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
 
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+            //System.out.println("[accettazione uscita] " + event.getT());
 
 
             //TODO logica di routing
@@ -167,24 +174,26 @@ public class ControllerAccettazione {
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
-                    System.out.println("Goto gommista");
+                    //System.out.println("Goto gommista");
                 }
                 else if(rndRouting<=(P2+P3)){
                     off=1;
-                    System.out.println("Goto carrozziere");
+                    //System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
                     off=2;
-                    System.out.println("goto elettrauto");
+                    //System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
                     off=3;
-                    System.out.println("goto carpentiere");
+                    //System.out.println("goto carpentiere");
                 }
                 else{
                     off=4;
-                    System.out.println("goto meccanico");
+                    //System.out.println("goto meccanico");
                 }
+
+                //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
                 eventHandler.getInternalEventsOfficina(off).add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 if(eventHandler.getEventsSistema().get(off+2).getT()>event.getT() || eventHandler.getEventsSistema().get(off+2).getX()==0){
                     eventHandler.getEventsSistema().get(off+2).setT(event.getT());

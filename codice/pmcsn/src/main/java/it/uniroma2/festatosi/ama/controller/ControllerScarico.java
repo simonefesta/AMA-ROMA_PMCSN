@@ -46,7 +46,7 @@ public class ControllerScarico {
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
-        System.out.println(rngs.getSeed());
+        //System.out.println(rngs.getSeed());
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
@@ -56,7 +56,7 @@ public class ControllerScarico {
             this.sum.add(s, new MsqSum());
         }
         /*imposta a 1 l'evento di arrivo da fuori, si aprono le porte*/
-        this.eventListScarico.set(0, new EventListEntry(0, 1, 1));
+        this.eventListScarico.set(0, new EventListEntry(this.time.getCurrent(), 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsScarico(eventListScarico);
