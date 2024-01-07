@@ -24,11 +24,6 @@ jobs:
     - name: Esegui build con Maven
       run: mvn -f ${{ github.workspace }}/codice/pmcsn/pom.xml clean install exec:java
 
-    - name: Upload csv files
-      uses: actions/upload-artifact@v3
-      with:
-        path: target/graphs
-
     - name: Configura Python
       uses: actions/setup-python@v2
       with:
@@ -41,3 +36,8 @@ jobs:
 
     - name: Disegna grafici
       run: python codice/pmcsn/graph_drawer.py
+      
+    - name: Upload csv files and graph images
+      uses: actions/upload-artifact@v3
+      with:
+        path: target/graphs
