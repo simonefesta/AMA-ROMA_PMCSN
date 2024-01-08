@@ -4,8 +4,7 @@ on:
   push:
     branches:
       - main
-      - avoid-loop
-      - controllerScarico
+      - testing
 
 jobs:
   build:
