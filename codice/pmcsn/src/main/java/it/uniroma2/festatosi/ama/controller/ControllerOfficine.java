@@ -102,10 +102,18 @@ public class ControllerOfficine {
          * -eventList[0].x=0 (close door),
          * -number>0 ci sono ancora eventi nel sistema
          */
-
+        if (internalEventsOfficina.size()>0){
+            eventList.get(0).setT(internalEventsOfficina.get(0).getT());
+        }
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
-        System.out.println(this.name + " next entry is " + eventList.get(e).getT());
+        //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
+        System.out.println(this.name + " stampe");
+        for(EventListEntry ev: eventList){
+            System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
+        }
+        System.out.println(this.name + " fine stampa\n\n");
+
 
 
         //imposta il tempo del prossimo evento
@@ -127,6 +135,8 @@ public class ControllerOfficine {
 
                 //this.time.setCurrent(event.getT());
 
+                System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
+
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
@@ -139,9 +149,9 @@ public class ControllerOfficine {
                     sum.get(s).incrementServed();
 
 
-                    double sum = event.getT() + service;
+                    double sum =event.getT() + service;
                     //imposta nella lista degli eventi che il server s è busy
-                  //  System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
+                    System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
                     //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
 
 
@@ -160,19 +170,28 @@ public class ControllerOfficine {
                 if (internalEventsOfficina.size() == 0) {
                     this.eventListOfficina.get(0).setX(0);
                 }
-            } else { //evento di fine servizio
+               /* eventList.get(e).setT(0);
+                eventList.get(e).setX(0);
+
+                this.eventHandler.setEventsOfficina(this.id, eventList);*/
+                //eventHandler.getEventsOfficina(this.id).get(0).setT(0);
+               // eventHandler.getEventsOfficina(this.id).get(0).setX(0);
+
+        } else { //evento di fine servizio
                 //decrementa il numero di eventi nel nodo considerato
                 this.number--;
                 //aumenta il numero di job serviti
                 this.jobServed++;
 
-                DataExtractor.writeSingleStat(datiOfficina, eventList.get(e).getT(), this.number);
-                System.out.println(this.name + " Uscita a " + eventList.get(e).getT() + " popolazione " + this.number);
+
 
 
                 this.s = e; //il server con index e è quello che si libera
 
                 EventListEntry event = eventList.get(s);
+
+                DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
+                System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
 
 
@@ -221,6 +240,11 @@ public class ControllerOfficine {
 
 
 
+        if(this.number==0){
+            eventList.get(0).setX(1);
+
+            this.eventHandler.setEventsOfficina(this.id, eventList);
+        }
     }
 
 
