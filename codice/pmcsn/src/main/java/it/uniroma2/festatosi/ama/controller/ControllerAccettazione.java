@@ -104,7 +104,7 @@ public class ControllerAccettazione {
 
         if(e==0){ // controllo se l'evento è un arrivo
 
-            eventList.get(0).setT(this.rnd.getJobArrival(1));
+            eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
             //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
 
             System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
@@ -236,6 +236,11 @@ public class ControllerAccettazione {
 
         eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
+        System.out.println("event list accettazione");
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println(ev.getX()+" "+ev.getT());
+        }
         if(this.number==0 && this.time.getCurrent()>STOP){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
             //return;

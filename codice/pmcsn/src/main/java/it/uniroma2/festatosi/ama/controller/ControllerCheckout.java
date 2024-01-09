@@ -149,6 +149,17 @@ public class ControllerCheckout {
             eventHandler.decrementVType(event.getVehicleType());
             DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
 
+            if(event.getT()<STOP && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                //attivo di nuovo arrivi per scarico
+                eventHandler.getEventsScarico().get(0).setX(1);
+                eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                //attivo di nuovo arrivi per accettazione
+                eventHandler.getEventsAccettazione().get(0).setX(1);
+                eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+            }
+
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
                 double service=this.rnd.getService(3);
