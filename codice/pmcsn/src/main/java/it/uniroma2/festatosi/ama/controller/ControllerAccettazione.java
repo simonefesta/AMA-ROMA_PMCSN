@@ -125,6 +125,7 @@ public class ControllerAccettazione {
             //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
 
             if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
                 //eventHandler.getEventsSistema().get(0).setX(0);
@@ -159,6 +160,7 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 

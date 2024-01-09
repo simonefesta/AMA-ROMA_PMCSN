@@ -1,5 +1,11 @@
 package it.uniroma2.festatosi.ama.model;
 
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
+import it.uniroma2.festatosi.ama.utils.Rngs;
+
+import java.io.File;
+import java.io.IOException;
+
 // Qui introduciamo le probabilità e costanti varie
 public class Constants {
 
@@ -68,17 +74,27 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.005555; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
-    public static final double accettazione_SR = 10*60;
-    public static final double scarico_SR = 15*60;
-    public static final double officina_SR = 2*3600; //per tutte le officine (2 ore?)
-    public static final double checkout_SR = 20*60;
+    public static final double accettazione_SR = 15*60;
+    public static final double scarico_SR = 20*60;
+    public static final double officina_SR = 2.5*3600; //per tutte le officine (2 ore?)
+    public static final double checkout_SR = 25*60;
 
     // numero di veicoli per ogni tipo
     public static final int VEICOLI1 =40; //veicoli piccoli
     public static final int VEICOLI2 =59; //veicoli grandi
+
+    public static File fileSys;
+
+    static {
+        try {
+            fileSys = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

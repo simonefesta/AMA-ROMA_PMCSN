@@ -38,6 +38,7 @@ public class EventHandler {
 
     private int numberV1=0; /*conta i veicoli del primo tipo nel sistema*/
     private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
+    private int arr=0;
 
     private EventHandler() {
         /*event list per i vari msq*/
@@ -275,5 +276,13 @@ public class EventHandler {
             }
         }
         return time;
+    }
+
+    public void incrementArr() {
+        arr++;
+    }
+
+    public int getArr(){
+        return arr;
     }
 }

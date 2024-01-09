@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static it.uniroma2.festatosi.ama.model.Constants.SERVERS_OFFICINA;
-import static it.uniroma2.festatosi.ama.model.Constants.STOP;
+import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 public class ControllerOfficine {
     long number =0;                 /*number in the node*/
@@ -139,6 +138,7 @@ public class ControllerOfficine {
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
+                DataExtractor.writeSingleStat(fileSys, event.getT(), eventHandler.getNumber());
                 System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
 
                 if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
@@ -191,6 +191,7 @@ public class ControllerOfficine {
                 EventListEntry event = eventList.get(s);
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
+                DataExtractor.writeSingleStat(fileSys, event.getT(), eventHandler.getNumber());
                 System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
 

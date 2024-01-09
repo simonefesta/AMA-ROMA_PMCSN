@@ -102,6 +102,7 @@ public class ControllerCheckout {
             System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
 
             System.out.println("ins check "+event);
             //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
@@ -146,6 +147,7 @@ public class ControllerCheckout {
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             eventHandler.decrementVType(event.getVehicleType());
+            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
@@ -191,6 +193,8 @@ public class ControllerCheckout {
                 eventList) {
             System.out.println("ev ck "+ev.getX()+" "+ev.getT());
         }
+
+        eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 
     }
 
