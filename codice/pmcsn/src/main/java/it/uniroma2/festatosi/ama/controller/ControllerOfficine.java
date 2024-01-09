@@ -238,13 +238,7 @@ public class ControllerOfficine {
                 }
             }
 
-
-
-        if(this.number==0){
-            eventList.get(0).setX(1);
-
-            this.eventHandler.setEventsOfficina(this.id, eventList);
-        }
+        eventHandler.getEventsSistema().get(this.id+2).setT(eventHandler.getMinTime(eventList));
     }
 
 

@@ -94,8 +94,15 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
+            System.out.println("evl sys");
+            for (EventListEntry ev:
+                 eventList) {
+                System.out.println(ev.getX()+" "+ev.getT());
+            }
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
+
+            System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale

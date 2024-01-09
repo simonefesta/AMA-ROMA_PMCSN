@@ -266,4 +266,14 @@ public class EventHandler {
                 throw new Exception("EventsList indice fuori range");
         }
     }
+
+    public double getMinTime(List<EventListEntry> eventList){
+        double time=Double.MAX_VALUE;
+        for (EventListEntry e:eventList) {
+            if(e.getX()==1 && e.getT()<time){
+                time=e.getT();
+            }
+        }
+        return time;
+    }
 }

@@ -140,8 +140,8 @@ public class ControllerAccettazione {
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
-                //double sum = this.time.getCurrent() + service;
-                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
+                double sum = this.time.getCurrent() + service;
+                System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
@@ -195,8 +195,8 @@ public class ControllerAccettazione {
 
                 //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
                 eventHandler.getInternalEventsOfficina(off).add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
-                if(eventHandler.getEventsSistema().get(off+2).getT()>event.getT() || eventHandler.getEventsSistema().get(off+2).getX()==0){
-                    eventHandler.getEventsSistema().get(off+2).setT(event.getT());
+                if(eventHandler.getEventsSistema().get(off+2).getT()>eventList.get(e).getT() || eventHandler.getEventsSistema().get(off+2).getX()==0){
+                    eventHandler.getEventsSistema().get(off+2).setT(eventList.get(e).getT());
                 }
                 eventHandler.getEventsSistema().get(off+2).setX(1);
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
@@ -232,6 +232,8 @@ public class ControllerAccettazione {
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
 
         }
+
+        eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
         if(this.number==0 && this.time.getCurrent()>STOP){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
