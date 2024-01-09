@@ -45,9 +45,6 @@ public class ControllerAccettazione {
 
     public ControllerAccettazione(long seed) throws Exception {
 
-
-
-
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
@@ -80,7 +77,6 @@ public class ControllerAccettazione {
 
     public void baseSimulation() throws Exception {
 
-
         int e;
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
@@ -108,14 +104,17 @@ public class ControllerAccettazione {
 
         if(e==0){ // controllo se l'evento è un arrivo
 
-            eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(1));
+            eventList.get(0).setT(this.rnd.getJobArrival(1));
             //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
+
+            System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                 //System.out.println("pieno");
                 //continue;
-                eventHandler.getEventsSistema().get(1).setT(eventList.get(0).getT());
+                eventList.get(0).setX(0);
+                eventHandler.setEventsAccettazione(eventList);
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema

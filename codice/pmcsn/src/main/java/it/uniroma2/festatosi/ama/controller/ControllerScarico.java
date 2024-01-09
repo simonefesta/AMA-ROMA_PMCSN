@@ -104,13 +104,15 @@ public class ControllerScarico {
             if(e==0) { //arrivo dall'esterno
                 vType = rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
                 if (vType == Integer.MAX_VALUE) { //se i veicoli sono già tutti nel sistema il VType viene impostato a MAX
+                    eventList.get(0).setX(0);
+                    eventHandler.setEventsScarico(eventList);
                     return; //se i veicoli sono già tutti presenti nel sistema non possono esserci altri arrivi
                 }
 
                 //viene creato l'evento in base alle informazioni ricavate
                 event = new EventListEntry(eventList.get(0).getT(), 1, vType);
                 //si imposta il tempo del prossimo arrivo
-                eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(0));
+                eventList.get(0).setT(this.rnd.getJobArrival(0));
                 //si imposta la event list di tutto il sistema con il tempo dell'evento corrente
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
 
@@ -170,6 +172,11 @@ public class ControllerScarico {
             if(rndRouting<=P7){ //uscita dal sistema
                 //se il veicolo esce viene decrementato il numero di veicoli dello stesso tipo presenti nel sistema
                 eventHandler.decrementVType(event.getVehicleType());
+                if(event.getT()<STOP){
+                    eventList.get(0).setX(1);
+                    eventHandler.setEventsScarico(eventList);
+                    eventHandler.getEventsAccettazione().get(0).setX(1);
+                }
             }
             else{
                 //aggiunta dell'evento alla coda del checkout

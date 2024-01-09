@@ -78,10 +78,10 @@ public class Constants {
 
 
     // ---- SERVICE RATES  [sec] ----
-    public static final double accettazione_SR = 15*60;
-    public static final double scarico_SR = 20*60;
-    public static final double officina_SR = 2.5*3600; //per tutte le officine (2 ore?)
-    public static final double checkout_SR = 25*60;
+    public static final double accettazione_SR = 10*60;
+    public static final double scarico_SR = 15*60;
+    public static final double officina_SR = 2*3600; //per tutte le officine (2 ore?)
+    public static final double checkout_SR = 20*60;
 
     // numero di veicoli per ogni tipo
     public static final int VEICOLI1 =40; //veicoli piccoli
