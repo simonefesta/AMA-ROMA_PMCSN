@@ -55,7 +55,7 @@ public class ControllerCheckout {
         }
 
 //        EventListEntry event= eventHandler.getInternalEventsCheckout().get(0);
-        this.eventListCheckout.set(0,new EventListEntry(0,1));
+        this.eventListCheckout.set(0,new EventListEntry(this.time.getCurrent(),1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsCheckout(eventListCheckout);
@@ -99,9 +99,10 @@ public class ControllerCheckout {
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-
+            System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             System.out.println("ins check "+event);
             //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
@@ -146,6 +147,18 @@ public class ControllerCheckout {
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             eventHandler.decrementVType(event.getVehicleType());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
+            if(event.getT()<STOP && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                //attivo di nuovo arrivi per scarico
+                eventHandler.getEventsScarico().get(0).setX(1);
+                eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                //attivo di nuovo arrivi per accettazione
+                eventHandler.getEventsAccettazione().get(0).setX(1);
+                eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+            }
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
@@ -192,10 +205,12 @@ public class ControllerCheckout {
             System.out.println("ev ck "+ev.getX()+" "+ev.getT());
         }
 
+        eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
+
     }
 
     /**
-     * ritorna l'indice del server libero da più tempo
+     * Ritorna l'indice del server libero da più tempo
      *
      * @param eventListCheckout lista degli eventi di checkout
      * @return index del server libero da più tempo

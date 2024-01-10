@@ -3,7 +3,9 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
+
 import it.uniroma2.festatosi.ama.utils.Rngs;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -94,8 +96,15 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
+            System.out.println("evl sys");
+            for (EventListEntry ev:
+                 eventList) {
+                System.out.println(ev.getX()+" "+ev.getT());
+            }
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
+
+            System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -146,6 +155,7 @@ public class ControllerSistema {
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
 
+        System.out.println("arrivi nelle 24 ore"+eventHandler.getArr());
 
     }
 

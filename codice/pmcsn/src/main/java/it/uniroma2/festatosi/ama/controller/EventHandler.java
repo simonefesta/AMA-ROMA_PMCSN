@@ -38,6 +38,7 @@ public class EventHandler {
 
     private int numberV1=0; /*conta i veicoli del primo tipo nel sistema*/
     private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
+    private int arr=0;
 
     private EventHandler() {
         /*event list per i vari msq*/
@@ -265,5 +266,23 @@ public class EventHandler {
             default:
                 throw new Exception("EventsList indice fuori range");
         }
+    }
+
+    public double getMinTime(List<EventListEntry> eventList){
+        double time=Double.MAX_VALUE;
+        for (EventListEntry e:eventList) {
+            if(e.getX()==1 && e.getT()<time){
+                time=e.getT();
+            }
+        }
+        return time;
+    }
+
+    public void incrementArr() {
+        arr++;
+    }
+
+    public int getArr(){
+        return arr;
     }
 }

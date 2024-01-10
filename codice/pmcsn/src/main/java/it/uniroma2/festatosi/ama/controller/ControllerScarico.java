@@ -46,7 +46,7 @@ public class ControllerScarico {
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
-        System.out.println(rngs.getSeed());
+        //System.out.println(rngs.getSeed());
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
@@ -56,7 +56,7 @@ public class ControllerScarico {
             this.sum.add(s, new MsqSum());
         }
         /*imposta a 1 l'evento di arrivo da fuori, si aprono le porte*/
-        this.eventListScarico.set(0, new EventListEntry(0, 1, 1));
+        this.eventListScarico.set(0, new EventListEntry(rnd.getJobArrival(0), 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsScarico(eventListScarico);
@@ -78,8 +78,18 @@ public class ControllerScarico {
             return;
         }
 
+        if (internalEventsScarico.size()>0){
+            eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
+        }
+
+        System.out.println("scarico evlist");
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println("scarico "+ev.getT()+" "+ev.getX());
+        }
+
         //prende l'indice del primo evento nella lista
-        e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO);
+        e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
         //imposta il tempo del prossimo evento
         this.time.setNext(eventList.get(e).getT());
         //si calcola l'area dell'integrale
@@ -94,13 +104,16 @@ public class ControllerScarico {
             if(e==0) { //arrivo dall'esterno
                 vType = rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
                 if (vType == Integer.MAX_VALUE) { //se i veicoli sono già tutti nel sistema il VType viene impostato a MAX
+                    eventList.get(0).setX(0);
+                    eventHandler.setEventsScarico(eventList);
+                    eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
                     return; //se i veicoli sono già tutti presenti nel sistema non possono esserci altri arrivi
                 }
 
                 //viene creato l'evento in base alle informazioni ricavate
                 event = new EventListEntry(eventList.get(0).getT(), 1, vType);
                 //si imposta il tempo del prossimo arrivo
-                eventList.get(0).setT(this.time.getCurrent() + this.rnd.getJobArrival(0));
+                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
                 //si imposta la event list di tutto il sistema con il tempo dell'evento corrente
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
 
@@ -114,12 +127,15 @@ public class ControllerScarico {
                 internalEventsScarico.remove(0);
                 System.out.println("interno");
                 vType=event.getVehicleType();
-
+                if(internalEventsScarico.size()==0){
+                    eventList.get(eventList.size()-1).setX(0);
+                }
             }
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
-            DataExtractor.writeSingleStat(datiScarico,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
@@ -144,19 +160,25 @@ public class ControllerScarico {
             //decrementa il numero di eventi nel nodo considerato
             this.number--;
 
-            DataExtractor.writeSingleStat(datiScarico,this.time.getCurrent(),this.number);
             //aumenta il numero di job serviti
             this.jobServed++;
 
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
 
             //logica di routing
             double rndRouting= rngs.random();
             if(rndRouting<=P7){ //uscita dal sistema
                 //se il veicolo esce viene decrementato il numero di veicoli dello stesso tipo presenti nel sistema
                 eventHandler.decrementVType(event.getVehicleType());
+                if(event.getT()<STOP && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                    eventList.get(0).setX(1);
+                    eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                    eventHandler.setEventsScarico(eventList);
+                    eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                }
             }
             else{
                 //aggiunta dell'evento alla coda del checkout
@@ -171,6 +193,9 @@ public class ControllerScarico {
                 eventHandler.getEventsSistema().get(7).setT(event.getT());
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
+
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
@@ -199,8 +224,10 @@ public class ControllerScarico {
 
         /*viene impostato nella event list del sistema il tempo in cui lo scarico dovrà riprendere servizio come il
           prossimo evento disponibile per lo scarico*/
-        eventHandler.getEventsSistema().get(0)
+        /*eventHandler.getEventsSistema().get(0)
                 .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)).getT());
+*/
+        eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
 
         /*se sono stati processati tutti gli eventi arrivati e il tempo corrente supera il tempo di stop vengono chiuse
          * le porte, i prossimi arrivi possono arrivare solo da dentro il sistema*/

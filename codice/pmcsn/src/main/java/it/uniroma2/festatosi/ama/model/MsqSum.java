@@ -1,6 +1,6 @@
 package it.uniroma2.festatosi.ama.model;
 
-/**classe che accumula le somme*/
+/** Classe che accumula le somme*/
 public class MsqSum {
     private double service;         /*tempo di servizio*/
     private long served;            /*numero di servizi*/

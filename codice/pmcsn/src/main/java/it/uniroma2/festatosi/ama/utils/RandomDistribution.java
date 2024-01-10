@@ -21,7 +21,8 @@ public class RandomDistribution {
     private Rvms rvms=new Rvms();
 
     private final double start=0;
-    private double arrival=this.start;
+    private double arrivalScarico=this.start;
+    private double arrivalAccettazione=this.start;
 
     private RandomDistribution(){
         this.intTime=0;
@@ -57,17 +58,21 @@ public class RandomDistribution {
      * @param queueType indica la coda a cui va l'arrivo (0 scarico, 1 accettazione)
      * @return ritorna il tempo di arrivo dell'evento
      */
-    public double getJobArrival(int queueType) {
+    public double getJobArrival(int queueType) throws Exception {
         rngs.selectStream(2);
+        eventHandler.incrementArr();
         switch (queueType) {
             case 0: //arrivo allo scarico
-                arrival += Exponential(1/(LAMBDA*P1));
-                break;
+                arrivalScarico = Exponential(1.0/(LAMBDA*P1));
+                System.out.println("Arrival sc "+arrivalScarico);
+                return arrivalScarico;
             case 1: //arrivo alla accettazione
-                arrival += Exponential(1/(LAMBDA*Q1));
-                break;
+                arrivalAccettazione = Exponential(1.0/(LAMBDA*Q1));
+                System.out.println("Arrival ac "+arrivalAccettazione);
+                return arrivalAccettazione;
+            default:
+                throw new Exception("Arrivo non definito");
         }
-        return arrival;
     }
 
     public int getExternalVehicleType() {
