@@ -4,6 +4,7 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 
@@ -11,8 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.uniroma2.festatosi.ama.controller.BatchSimulation.getJobInBatch;
-import static it.uniroma2.festatosi.ama.controller.BatchSimulation.incrementNBatch;
+import static it.uniroma2.festatosi.ama.controller.BatchSimulation.*;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
@@ -92,6 +92,19 @@ public class ControllerSistema {
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
+    public void simulation(int type) throws Exception {
+        switch (type){
+            case 0:
+                baseSimulation();
+                break;
+            case 1:
+                infiniteSimulation();
+                break;
+            default:
+                throw new Exception("Type deve essere 0 o 1");
+        }
+    }
+
     public void baseSimulation() throws Exception {
         int e;
         //prende la lista di eventi per il sistema
@@ -168,25 +181,23 @@ public class ControllerSistema {
         MsqT time=new MsqT();
         time.setCurrent(START);
         time.setNext(START);
+        double batchDuration;
+        int numVeicoliSys;
+        DataExtractor.initializeFile(seed, "Infinite_simulation.csv");
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
         /*
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
+
         while (getJobInBatch() < B * K) {
-            if(getJobInBatch()%B==0){
-                incrementNBatch();
-            }
-            System.out.println("evl sys");
-            for (EventListEntry ev :
-                    eventList) {
-                System.out.println(ev.getX() + " " + ev.getT());
-            }
+            numVeicoliSys=eventHandler.getNumber();
+
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-            System.out.println("servito " + e);
+            //System.out.println("servito " + e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -201,11 +212,13 @@ public class ControllerSistema {
 
             if (e == 0) {
                 ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
-                scarico.baseSimulation();
+                scarico.infiniteSimulation();
+//                scarico.baseSimulation();
                 ////System.out.println(e);
             } else if (e == 1) {
                 ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
-                accettazione.baseSimulation();
+                accettazione.infiniteSimulation();
+//                accettazione.baseSimulation();
                 ////System.out.println(e);
             } else if (e == 7) {
                 ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
@@ -216,8 +229,19 @@ public class ControllerSistema {
                 officina.baseSimulation();
             }
 
+            if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
+                batchDuration= time.getCurrent()-time.getBatch();
+
+                System.out.println("batch "+getNBatch());
+                System.out.println("job in batch "+getJobInBatch());
+                //todo media e varianza
+                incrementNBatch();
+                time.setBatch(time.getCurrent());
+            }
+            System.out.println("");
 
             eventList = eventHandler.getEventsSistema();
+            time.setBatch(time.getCurrent());
         }
 
         ((ControllerScarico) controllerList.get(0)).printStats();

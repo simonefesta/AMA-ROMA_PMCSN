@@ -9,7 +9,10 @@ import java.io.IOException;
 // Qui introduciamo le probabilità e costanti varie
 public class Constants {
 
-    public static double STOP    = 86400.0;        /*  terminazione lavoro giornaliero (24 ore in secondi) */
+    public static double STOP_FINITE = 86400; /*  terminazione lavoro giornaliero (24 ore in secondi) */
+    public static double STOP_INFINITE= Double.MAX_VALUE;
+    /*\*100 si toglie nel momento in cui orizzonte finito*/
+    public static double START   = 0.0;
     public static int    SERVERS_SCARICO = 5;
     public static int    SERVERS_ACCETTAZIONE = 4;
     public static int    SERVERS_GOMMISTA = 2;
@@ -18,7 +21,7 @@ public class Constants {
     public static int    SERVERS_CARPENTERIA = 6;
     public static int    SERVERS_MECCANICA = 5;
     public static int    SERVERS_CHECKOUT = 1;
-    public static int    SERVERS_OFFICINA[] = {SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
+    public static int[] SERVERS_OFFICINA = {SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
             SERVERS_CARPENTERIA, SERVERS_MECCANICA};
 
     /*indica il numero di code nel sistema, serve per gestire il fatto che i veicoli sono di numero finito*/
@@ -91,7 +94,7 @@ public class Constants {
         }
     }
 
-    public static final int B=64; //numero di batch
-    public static final int K=1024; //numero di job nel singolo batch
+    public static final int B=1024; //numero di job nel singolo batch
+    public static final int K=64; //numero di batch
 
 }

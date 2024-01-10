@@ -149,7 +149,7 @@ public class ControllerCheckout {
             eventHandler.decrementVType(event.getVehicleType());
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            if(event.getT()<STOP && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+            if(event.getT()< STOP_FINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                 //attivo di nuovo arrivi per scarico
                 eventHandler.getEventsScarico().get(0).setX(1);
                 eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));

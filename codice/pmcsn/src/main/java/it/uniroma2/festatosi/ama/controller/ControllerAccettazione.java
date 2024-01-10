@@ -124,7 +124,7 @@ public class ControllerAccettazione {
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            if(eventList.get(0).getT()>STOP){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
+            if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
                 //eventHandler.getEventsSistema().get(0).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
@@ -238,7 +238,7 @@ public class ControllerAccettazione {
              eventList) {
             System.out.println(ev.getX()+" "+ev.getT());
         }
-        if(this.number==0 && this.time.getCurrent()>STOP){
+        if(this.number==0 && this.time.getCurrent()> STOP_FINITE){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
             //return;
         }
@@ -282,13 +282,14 @@ public class ControllerAccettazione {
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                //System.out.println("pieno");
+                System.out.println("pieno");
                 //continue;
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
 
+            System.out.println("Entrato");
             BatchSimulation.incrementJobInBatch(); //arriva un job incremento il numero di job nel batch corrente
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
@@ -297,7 +298,7 @@ public class ControllerAccettazione {
             //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             //a orizzonte infinito le porte non vengono mai chiuse
             /*if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
@@ -333,7 +334,7 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 
@@ -415,10 +416,10 @@ public class ControllerAccettazione {
                 eventList) {
             System.out.println(ev.getX()+" "+ev.getT());
         }
-        if(this.number==0 && this.time.getCurrent()>STOP){
+        /*if(this.number==0 && this.time.getCurrent()>STOP){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
             //return;
-        }
+        }*/
 
     }
 

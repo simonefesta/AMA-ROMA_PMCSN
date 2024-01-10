@@ -17,4 +17,8 @@ public class BatchSimulation {
     public static int getJobInBatch() {
         return nJobInBatch;
     }
+
+    public static double getNBatch() {
+        return nBatch;
+    }
 }
