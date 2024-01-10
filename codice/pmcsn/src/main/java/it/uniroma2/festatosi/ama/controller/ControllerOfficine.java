@@ -138,7 +138,7 @@ public class ControllerOfficine {
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-                DataExtractor.writeSingleStat(fileSys, event.getT(), eventHandler.getNumber());
+                DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
                 System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
 
                 if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
@@ -191,7 +191,7 @@ public class ControllerOfficine {
                 EventListEntry event = eventList.get(s);
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-                DataExtractor.writeSingleStat(fileSys, event.getT(), eventHandler.getNumber());
+                DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
                 System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
 
