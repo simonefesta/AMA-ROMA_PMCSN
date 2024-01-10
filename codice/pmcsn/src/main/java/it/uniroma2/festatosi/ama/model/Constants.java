@@ -97,4 +97,7 @@ public class Constants {
         }
     }
 
+    public static final int B=64; //numero di batch
+    public static final int K=1024; //numero di job nel singolo batch
+
 }

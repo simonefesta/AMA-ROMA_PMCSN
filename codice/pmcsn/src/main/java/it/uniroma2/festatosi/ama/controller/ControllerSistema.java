@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static it.uniroma2.festatosi.ama.controller.BatchSimulation.getJobInBatch;
+import static it.uniroma2.festatosi.ama.controller.BatchSimulation.incrementNBatch;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
@@ -32,6 +34,8 @@ public class ControllerSistema {
     private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
 
     long seed;
+
+
 
     public void selectSeed(long seed){
         this.seed = seed;
@@ -136,6 +140,84 @@ public class ControllerSistema {
 
 
             eventList=eventHandler.getEventsSistema();
+        }
+
+        ((ControllerScarico) controllerList.get(0)).printStats();
+        ((ControllerAccettazione) controllerList.get(1)).printStats();
+        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {
+            ((ControllerOfficine) controllerList.get(i+2)).printStats();
+        }
+        ((ControllerCheckout) controllerList.get(7)).printStats();
+
+
+        System.out.println("Popolazione: "+ eventHandler.getNumber());
+        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
+        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
+        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
+        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
+
+        System.out.println("arrivi nelle 24 ore"+eventHandler.getArr());
+    }
+
+
+    public void infiniteSimulation() throws Exception {
+        int e;
+        MsqT time=new MsqT();
+        time.setCurrent(START);
+        time.setNext(START);
+
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+        * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+        */
+        while (getJobInBatch() < B * K) {
+            if(getJobInBatch()%B==0){
+                incrementNBatch();
+            }
+            System.out.println("evl sys");
+            for (EventListEntry ev :
+                    eventList) {
+                System.out.println(ev.getX() + " " + ev.getT());
+            }
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+            System.out.println("servito " + e);
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            if (e == 0) {
+                ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
+                scarico.baseSimulation();
+                ////System.out.println(e);
+            } else if (e == 1) {
+                ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
+                accettazione.baseSimulation();
+                ////System.out.println(e);
+            } else if (e == 7) {
+                ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
+                checkout.baseSimulation();
+                ////System.out.println(e);
+            } else {
+                ControllerOfficine officina = (ControllerOfficine) controllerList.get(e);
+                officina.baseSimulation();
+            }
+
+
+            eventList = eventHandler.getEventsSistema();
         }
 
         ((ControllerScarico) controllerList.get(0)).printStats();
