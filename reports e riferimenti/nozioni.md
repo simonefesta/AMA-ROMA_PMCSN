@@ -269,6 +269,7 @@ Implementazione di next-event multi-server service node simulation model. Abbiam
 
 Trattasi di tecnica popolare per ridurre l'effetto dell'autocorrelazione nell'analisi dell'output. Questa tecnica coinvolge l'eliminazione di alcuni punti dati generati al fine di ridurre l'autocorrelazione tra le osservazioni rimanenti.
 Prima di tutto, ricordiamo che *Statistiche steady state* o *infinite horizon* sono quelle statistiche prodotte simulando l'operatività di un sistema *stazionario* di tipo *discreto* per una quantità infinita di tempo.
+Nb: $n$ numero di intervalli di tempo, $l$ oggetti nell'inventario.
 
 <img src="img_nozioni/0_steady.png" alt="steady">
 
@@ -278,7 +279,7 @@ Però stiamo parlando di *approssimazione*, quindi un approccio migliore è quel
 Nello stato stazionario simulo un tempo potenzialmente infinito PER QUEL SISTEMA, calcolo media campionaria finale di una statistica, ottengo un PUNTO DI STIMA, che però ci dice poco, e quindi vogliamo un vero e proprio intervallo di confidenza anche qui! Useremo metodo BATCH MEANS.
 
 Una differenza tra *orizzonte finito* ed *orizzonte infinito* risiede nel fatto che, nel caso infinito, le condizioni iniziali *non* sono importanti, quindi c'è una perdita di memoria dello stato iniziale.
-Le statistiche ad *nel transiente* sono prodotte da una simulazione a *tempo finito*.
+Le statistiche *nel transiente* sono prodotte da una simulazione a *tempo finito*.
 Altra differenza è che nell'orizzonte infinito possiamo dire che il sistema rimanga *stazionario* (p.365), ovvero, preso ad esempio una M/M/1, arrivi e servizi sono assumibili come costanti nel tempo. Nell'orizzonte finito abbiamo invece un ambiente più dinamico.
 
 Come visibile in foto, lo stato iniziale può essere più o meno impattante:
@@ -296,7 +297,56 @@ Le statistiche in stato stazionario sono più semplici da comprendere perché so
 
 Le statistiche transitorie sono importanti perché lo stato stazionario è spesso una semplificazione conveniente: la maggior parte dei sistemi reali non opera abbastanza a lungo in un ambiente stazionario per produrre statistiche in stato stazionario.
 
+## Metodo batch means
+Prima, ogni replicazione era inizializzata con lo stesso stato, portando al bias iniziale.
+Con batch means, prendiamo un *run lungo* che spezzo i nrepliche, computando statistiche per ogni batch, e costruendovi un intervallo di stima.
+Cosi si elimina il bias iniziale (in quando la run è lunga), dove lo stato finale di ogni batch $i$ corrisponde allo stato iniziale del batch $i+1$.
 
+## Algoritmo 8.4.1
+
+Dobbiamo creare campione lungo *n*, di cui farò unico run, e le *x* sono indici di riferimento, *b* definisce il batch, e per ogni batch definisco media campionaria.
+
+Nel run lungo prendiamo *k* batch, ovvero *k* gruppi, e calcolo la *batch mean*
+
+<img src="img_nozioni/2_batch.png" alt="batch">
+
+Per computare poi la media $\bar{x}$ (appena descritta) e la deviazione standard $s$ di *ogni batch means*.
+
+Passiamo poi al calcolo dell'*intervallo di confidenza*.
+- Prendiamo $\alpha = 0.05$ e calcoliamo il *livello di confidenza* $1-\alpha$.
+- Calcoliamo il valore critico $t^* = \text{idfStudent}(k-1,1-\alpha/2)$
+- Calcoliamo infine gli intervalli endpoint $\bar{x} \pm \frac{s}{\sqrt{k-1}}$
+
+Ricordiamo che non possiamo scartare alcun punto, se ho 100 numeri possiamo ad esempio prendere i primi 20 e dividere per 20 e poi prendere gli ultimi 80 e dividere per 80, ma in alcun modo non posso scartare alcun valore.
+La scelta $(b,k)$ non ha impatto sui punti stimati, solo l'**ampiezza dell'intervallo stimato lo ha**.
+
+## Esempio
+ Se vogliamo produrre 10 intervalli di stima usando i batch means, dovrò fare 10 simulazioni diverse con 10 generatori diversi.
+
+ <img src="img_nozioni/3_example.png" alt="example">
+
+ Nel grafico a sinistra abbiamo $(b,k) = (256,64)$ (ovvero 256 campioni lungi 64), come vediamo gli intervalli di confidenza sono ampi, mentre con $(b,k) = (1, 16384)$ abbiamo intervalli troppo piccoli. Ciò si traduce in una migliore cattura del valore teorico nel primo grafico.
+ Nel primo esempio, tra due batch $i$ ed $i+1$ c'è una differenza di 256,
+ mentre nel secondo abbiamo un campione lungo $16384$.
+
+ Ogni *batch* è come se fosse una simulazione del sistema in un altro giorno o altro scenario, lo stato iniziale del sistema non influisce nell'orizzonte infinito, ma solo nel finito. Ogni batch è come se fosse una replica che non si cura dello stato iniziale del sistema.
+ I generatori devono sempre andare avanti, non sono casuali, altrimenti potremmo prendere una parte della "ruota" già utilizzata.
+
+ ## Scelta di (b,k)
+
+ La scelta di $k$ deve ricadere in valori $\geq 32$, tipicamente si usa $64$.
+ La scelta di $b$ deve essere due volte l'autocorrelazione *cut-off* lag.
+
+
+
+ 
+## Alcune osservazioni
+
+Mentre la simulazione a orizzonte finito va ad analizzare il comportamento in uno stato transiente con tempo limitato, questo tipo di simulazione va ad esaminare il comportamento del simulatore in un regime stazionario. Per fare questo tipo di simulazione si utilizza il metodo delle batch means, che consiste  nell’eseguire una run molto lunga, dividerla in batch in base al numero di job e calcolare le statistiche di interesse come media tra le medie delle varie batch. Sono necessari due parametri, il numero di batch e il numero di job in ogni batch. Tipicamente $b=64$, che la letteratura in merito indica come numero ideale e che offre anche simmetria con la simulazione a orizzonte finito in cui abbiamo effettuato 64 run. In questo modo abbiamo la stessa quantità di dati aggregati per ogni simulazione. Per quanto 
+riguarda il numero di job, si può considerare $k= 1024$, che non è altissimo ma è raggiungibile anche da centri con meno affluenza senza andare a terminare i numeri in nessuno stream causando sovrapposizioni.Due sono le differenze fondamentali rispetto alla simulazione a orizzonte finito: lo 
+stop del sistema è calcolato in modo differente, e la matrice che contiene i dati va riempita totalmente dall’unica run che effettuiamo, mentre prima ogni run riempiva solo una riga.
+Per quanto riguarda il momento in cui il sistema si ferma, in questo caso non è più basato sul tempo: il sistema si ferma quando tutte le batch di tutti i centri sono state riempite. 
+Non avendo più un tempo di STOP, effettuare il calcolo del tempo finale non è più possibile,e quindi si può definire INF come il più grande double rappresentabile.
 
 
 
