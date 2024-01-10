@@ -13,7 +13,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  */
 public class EventHandler {
 
-    //instanza unica di EventHandler
+    //istanza unica di EventHandler
     private static EventHandler instance=null;
 
     //event Lists (come presentate da libro una entry per server più una per gli ingressi)
@@ -63,7 +63,7 @@ public class EventHandler {
         this.internalEventsScarico=new ArrayList<>();
     }
 
-    //crea la instanza di singleton per l'event handler se questa non esiste già
+    //crea la istanza di singleton per l'event handler se questa non esiste già
     public static EventHandler getInstance() {
         if(instance==null){
             instance = new EventHandler();

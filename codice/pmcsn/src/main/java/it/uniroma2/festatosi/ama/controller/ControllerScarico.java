@@ -135,7 +135,7 @@ public class ControllerScarico {
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
-            DataExtractor.writeSingleStat(fileSys,event.getT(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
@@ -194,7 +194,7 @@ public class ControllerScarico {
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
 
-            DataExtractor.writeSingleStat(fileSys,event.getT(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire

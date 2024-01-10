@@ -2,7 +2,7 @@ package it.uniroma2.festatosi.ama.model;
 
 import java.util.List;
 
-/**classe che implementa la EventList, si hanno n entry con n=c+1 (c sono i channels ossia i server paralleli nella
+/** Classe che implementa la EventList, si hanno n entry con n=c+1 (c sono i channels ossia i server paralleli nella
  * multi-server queue, il posto 0 è occupato dalla entry che rappresenta gli arrivi).
  * - x: stato di attività corrente dell'evento (per l'evento[0] rappresenta se arrivi attivi, per gli altri se i server
  * sono busy o meno)

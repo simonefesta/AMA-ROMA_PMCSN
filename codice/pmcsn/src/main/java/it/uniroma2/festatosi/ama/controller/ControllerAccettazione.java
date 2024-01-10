@@ -104,36 +104,34 @@ public class ControllerAccettazione {
 
         if(e==0){ // controllo se l'evento è un arrivo
 
-            eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+            eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1)); // genero il tempo del prossimo arrivo come tempo attuale + interrarivo random
             //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
 
             System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                //System.out.println("pieno");
-                //continue;
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
-            this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            this.number++; //poiché sto processando un arrivo, la popolazione aumenta
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
             //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
             //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            if(eventList.get(0).getT()>STOP){ //tempo maggiore della chiusura delle porte
+            if(eventList.get(0).getT()>STOP){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
                 //eventHandler.getEventsSistema().get(0).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
                 //return;
             }
 
-            if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
+            if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi per servire il job che sto analizzando
                 double service=this.rnd.getService(0); //ottengo tempo di servizio
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -146,7 +144,7 @@ public class ControllerAccettazione {
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
 
-                //aggiorna la lista nell'handler
+                //aggiorna la lista nell' handler
                 this.eventHandler.setEventsAccettazione(eventList);
             }else{
                 queueAccettazione.add(event);
@@ -159,19 +157,18 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(fileSys,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
-            //System.out.println("[accettazione uscita] " + event.getT());
 
 
-            //TODO logica di routing
+
+            //Logica di routing
 
             double rndRouting= rngs.random();
             int off;
-            //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
@@ -209,7 +206,7 @@ public class ControllerAccettazione {
 
 
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
-                //se ci sono ottengo un nuovo tempo di servizio
+                //se ci sono altri job nel sistema, dovrò generare altri tempi di servizio
                 double service=this.rnd.getService(0);
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);

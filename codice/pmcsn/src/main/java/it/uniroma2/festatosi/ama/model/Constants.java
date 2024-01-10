@@ -9,7 +9,6 @@ import java.io.IOException;
 // Qui introduciamo le probabilità e costanti varie
 public class Constants {
 
-    public static double START   = 0.0;            /* inizio lavoro giornaliero       */
     public static double STOP    = 86400.0;        /*  terminazione lavoro giornaliero (24 ore in secondi) */
     public static int    SERVERS_SCARICO = 5;
     public static int    SERVERS_ACCETTAZIONE = 4;
@@ -58,8 +57,6 @@ public class Constants {
     // probabilità difetto tipologia "meccanica"
     public static final double P6 = 0.3;
 
-    public static final double [] Percentuali_OFFICINA = {Q2,  P2,  P3,  P4,  P5,  P6};
-
 
     /*
        Zona CHECKOUT
@@ -67,9 +64,6 @@ public class Constants {
 
     // probabilità di uscire dal sistema senza checkout
     public static final double P7 = 0.7;
-
-    // probabilità di uscire dal sistema previo checkout
-    public static final double Q7 = 0.3;
 
 
     // ---- ARRIVAL RATES [req/sec]----
@@ -87,11 +81,11 @@ public class Constants {
     public static final int VEICOLI1 =40; //veicoli piccoli
     public static final int VEICOLI2 =59; //veicoli grandi
 
-    public static File fileSys;
+    public static File datiSistema;
 
     static {
         try {
-            fileSys = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
+            datiSistema = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
         } catch (IOException e) {
             e.printStackTrace();
         }
