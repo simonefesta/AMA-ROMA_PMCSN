@@ -315,7 +315,7 @@ Per computare poi la media $\bar{x}$ (appena descritta) e la deviazione standard
 Passiamo poi al calcolo dell'*intervallo di confidenza*.
 - Prendiamo $\alpha = 0.05$ e calcoliamo il *livello di confidenza* $1-\alpha$.
 - Calcoliamo il valore critico $t^* = \text{idfStudent}(k-1,1-\alpha/2)$
-- Calcoliamo infine gli intervalli endpoint $\bar{x} \pm \frac{s}{\sqrt{k-1}}$
+- Calcoliamo infine gli intervalli endpoint di confidenza per la media $\bar{x} \pm \frac{s}{\sqrt{k-1}}$
 
 Ricordiamo che non possiamo scartare alcun punto, se ho 100 numeri possiamo ad esempio prendere i primi 20 e dividere per 20 e poi prendere gli ultimi 80 e dividere per 80, ma in alcun modo non posso scartare alcun valore.
 La scelta $(b,k)$ non ha impatto sui punti stimati, solo l'**ampiezza dell'intervallo stimato lo ha**.
@@ -340,13 +340,29 @@ La scelta $(b,k)$ non ha impatto sui punti stimati, solo l'**ampiezza dell'inter
 
 
  
-## Alcune osservazioni
+## Osservazioni sull'implementazione nel progetto.
+### Osservazione 1
 
-Mentre la simulazione a orizzonte finito va ad analizzare il comportamento in uno stato transiente con tempo limitato, questo tipo di simulazione va ad esaminare il comportamento del simulatore in un regime stazionario. Per fare questo tipo di simulazione si utilizza il metodo delle batch means, che consiste  nell’eseguire una run molto lunga, dividerla in batch in base al numero di job e calcolare le statistiche di interesse come media tra le medie delle varie batch. Sono necessari due parametri, il numero di batch e il numero di job in ogni batch. Tipicamente $b=64$, che la letteratura in merito indica come numero ideale e che offre anche simmetria con la simulazione a orizzonte finito in cui abbiamo effettuato 64 run. In questo modo abbiamo la stessa quantità di dati aggregati per ogni simulazione. Per quanto 
-riguarda il numero di job, si può considerare $k= 1024$, che non è altissimo ma è raggiungibile anche da centri con meno affluenza senza andare a terminare i numeri in nessuno stream causando sovrapposizioni.Due sono le differenze fondamentali rispetto alla simulazione a orizzonte finito: lo 
-stop del sistema è calcolato in modo differente, e la matrice che contiene i dati va riempita totalmente dall’unica run che effettuiamo, mentre prima ogni run riempiva solo una riga.
-Per quanto riguarda il momento in cui il sistema si ferma, in questo caso non è più basato sul tempo: il sistema si ferma quando tutte le batch di tutti i centri sono state riempite. 
-Non avendo più un tempo di STOP, effettuare il calcolo del tempo finale non è più possibile,e quindi si può definire INF come il più grande double rappresentabile.
+Mentre la simulazione a orizzonte finito va ad analizzare il comportamento in uno stato transiente con tempo limitato, questo tipo di simulazione va ad esaminare il comportamento del simulatore in un regime stazionario. Per fare questo tipo di simulazione si utilizza il metodo delle batch means, che consiste  nell’eseguire una run molto lunga, dividerla in batch in base al *numero di job* e calcolare le statistiche di interesse come *media tra le medie delle varie batch*. Sono necessari due parametri, il numero di batch e il numero di job in ogni batch. Tipicamente $b=64$, che la letteratura in merito indica come numero ideale e che offre anche simmetria con la simulazione a orizzonte finito in cui abbiamo effettuato 64 run. In questo modo abbiamo la stessa quantità di dati aggregati per ogni simulazione. Per quanto 
+riguarda il numero di job, si può considerare $k= 1024$, che non è altissimo ma è raggiungibile anche da centri con meno affluenza senza andare a terminare i numeri in nessuno stream causando sovrapposizioni.
+Due sono le differenze fondamentali rispetto alla simulazione a orizzonte finito: 
+- Lo stop del sistema è calcolato in modo differente, e la matrice che contiene i dati va riempita totalmente dall’unica run che effettuiamo, mentre prima ogni run riempiva solo una riga.
+- Per quanto riguarda il momento in cui il sistema si ferma, in questo caso non è più basato sul tempo: il sistema si ferma quando tutte le batch di tutti i centri sono state riempite. 
+
+## Osservazione 2
+
+Ciò che dobbiamo fare compone la fase di **verifica**, ovvero verificare che il modello computazionale realizzato produca risultati corretti.
+Il confronto avviene considerando:
+- simulazione ad orizzonte infinito: prendiamo le statistiche nello stato stazionario, simulando con $k = 128$ batch e dimensione $b = 1024$ job.
+- valori teorici proveniente dal modello analitico.
+
+Lo studio viene fatto per ogni centro, scegliendo un seed.
+Per valutare la verifica, possiamo usare i seguenti criteri:
+- $E[T_s] = E[T_q] + E[s]$
+- $E[N_s] = E[N_q] + m \cdot \rho$
+
+Quindi calcoliamo questi tempi, sia *a mano* sia dalle statistiche batch means, e vediamo se c'è corrispondenza.
+
 
 
 
