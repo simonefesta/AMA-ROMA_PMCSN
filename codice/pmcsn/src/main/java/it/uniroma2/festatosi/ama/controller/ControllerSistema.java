@@ -114,7 +114,7 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
-            System.out.println("evl sys");
+           // System.out.println("evl sys");
             for (EventListEntry ev:
                  eventList) {
                 System.out.println(ev.getX()+" "+ev.getT());
@@ -122,7 +122,7 @@ public class ControllerSistema {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-            System.out.println("servito "+e);
+           // System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -173,7 +173,7 @@ public class ControllerSistema {
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
 
-        System.out.println("arrivi nelle 24 ore"+eventHandler.getArr());
+        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
     }
 
 
@@ -184,7 +184,7 @@ public class ControllerSistema {
         time.setNext(START);
         double batchDuration;
         int numVeicoliSys;
-        DataExtractor.initializeFile(seed, "Infinite_simulation.csv");
+        DataExtractor.initializeFile(seed, "Infinite_simulation");
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -235,12 +235,14 @@ public class ControllerSistema {
             if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
 
                 batchDuration= this.time.getCurrent()-this.time.getBatch();
-                System.out.println("batch duration "+ batchDuration + " = current " + this.time.getCurrent() + "- getBatch " + this.time.getBatch());
+                System.out.println("\nbatch duration "+ batchDuration + " con " + getJobInBatch() + " job"/*+ " = current " + this.time.getCurrent() + " - getBatch " + this.time.getBatch()*/);
                 Statistics statAccettazione = ((ControllerAccettazione) controllerList.get(1)).getStatistics(batchDuration);
                 System.out.println("batch "+getNBatch());
-                System.out.println("job in batch "+getJobInBatch());
+
+                System.out.println("job in batch "+getJobInBatch() +"\n");
                 //todo media e varianza
                 incrementNBatch();
+               // resetJobInBatch();
                 this.time.setBatch(this.time.getCurrent());
             }
             //System.out.println("");
@@ -266,7 +268,7 @@ public class ControllerSistema {
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
 
-        System.out.println("arrivi nelle 24 ore"+eventHandler.getArr());
+        System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
 
 
     }
@@ -312,7 +314,7 @@ public class ControllerSistema {
              //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
              //System.out.println("jobServiti"+this.jobServiti + "\n");
             //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            System.out.println("\n");
+            //System.out.println("\n");
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }

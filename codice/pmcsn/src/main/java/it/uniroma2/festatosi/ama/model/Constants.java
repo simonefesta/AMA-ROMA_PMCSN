@@ -81,8 +81,8 @@ public class Constants {
     public static final double checkout_SR = 20*60;
 
     // numero di veicoli per ogni tipo
-    public static final int VEICOLI1 =40; //veicoli piccoli
-    public static final int VEICOLI2 =59; //veicoli grandi
+    public static final int VEICOLI1 =40; //veicoli piccoli #40
+    public static final int VEICOLI2 =59; //veicoli grandi #59
 
     public static File datiSistema;
 
@@ -95,6 +95,6 @@ public class Constants {
     }
 
     public static final int B=1024; //numero di job nel singolo batch
-    public static final int K=2; //numero di batch
+    public static final int K=16; //numero di batch
 
 }

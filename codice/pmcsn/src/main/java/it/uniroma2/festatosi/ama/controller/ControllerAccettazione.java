@@ -108,7 +108,7 @@ public class ControllerAccettazione {
             eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1)); // genero il tempo del prossimo arrivo come tempo attuale + interrarivo random
             //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
 
-            System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
+            //System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
@@ -140,7 +140,7 @@ public class ControllerAccettazione {
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
                 double sum = this.time.getCurrent() + service;
-                System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
+                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
@@ -156,9 +156,9 @@ public class ControllerAccettazione {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            System.out.println("job served " +this.jobServed);
+            //System.out.println("job served " +this.jobServed);
 
-            // System.out.println("[accettazione] jobServer " +this.jobServed);
+            // System.out.println("[accettazione] jobServer" +this.jobServed);
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
@@ -204,7 +204,7 @@ public class ControllerAccettazione {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                System.out.println("abbandono");
+                //System.out.println("abbandono");
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
@@ -237,11 +237,11 @@ public class ControllerAccettazione {
 
         eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
-        System.out.println("event list accettazione");
+        /*System.out.println("event list accettazione");
         for (EventListEntry ev:
              eventList) {
             System.out.println(ev.getX()+" "+ev.getT());
-        }
+        }*/
         if(this.number==0 && this.time.getCurrent()> STOP_FINITE){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
             //return;
@@ -282,20 +282,21 @@ public class ControllerAccettazione {
             eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
             //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
 
-            System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
+            //System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                System.out.println("pieno");
+                //System.out.println("pieno");
                 //continue;
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
 
-            System.out.println("Entrato");
-            BatchSimulation.incrementJobInBatch(); //arriva un job incremento il numero di job nel batch corrente
+           //  System.out.println("Entrato");
+            BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
@@ -313,7 +314,7 @@ public class ControllerAccettazione {
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
                 double sum = this.time.getCurrent() + service;
-                System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
+                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
@@ -329,7 +330,7 @@ public class ControllerAccettazione {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            System.out.println("job served " +this.jobServed);
+            System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
@@ -376,7 +377,7 @@ public class ControllerAccettazione {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                System.out.println("abbandono");
+                //System.out.println("abbandono");
                 //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
@@ -409,8 +410,8 @@ public class ControllerAccettazione {
 
         eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
-        System.out.println("event list accettazione");
-        for (EventListEntry ev:
+        //System.out.println("event list accettazione");
+        /*for (EventListEntry ev:
                 eventList) {
             System.out.println(ev.getX()+" "+ev.getT());
         }
@@ -475,7 +476,7 @@ public class ControllerAccettazione {
 
         double meanUtilization=0.0;
         Statistics statAccettazione = new Statistics();
-        System.out.println("area is " + this.area + " mentre job serviti " + this.jobServed);
+        System.out.println("area: " + this.area + " , job serviti: " + this.jobServed);
         statAccettazione.setMeanDelay(this.area/this.jobServed);
 
         // togliamo i tempi di servizio dal calcolo dell'area
@@ -490,8 +491,8 @@ public class ControllerAccettazione {
         System.out.println("[accettazione] MeanUtilization "+ meanUtilization);
         System.out.println("[accettazione] MeanDelay "+ statAccettazione.getMeanDelay());
 
-        this.area = 0;
-        this.jobServed = 0;
+         this.area = 0;
+         this.jobServed = 0;
 
 
         return statAccettazione;
