@@ -99,12 +99,12 @@ public class ControllerCheckout {
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-            System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+            //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            System.out.println("ins check "+event);
+            //System.out.println("ins check "+event);
             //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
                 /*if(eventList.get(0).getT()>STOP && this.number==0){
                     eventList.get(0).setX(0); //chiusura delle porte
@@ -127,7 +127,7 @@ public class ControllerCheckout {
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
-                System.out.println("messo in coda "+queueCheckout.size());
+                //System.out.println("messo in coda "+queueCheckout.size());
             }
             if(internalEventsCheckout.size()==0){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
@@ -143,7 +143,7 @@ public class ControllerCheckout {
 
             EventListEntry event=eventList.get(s);
 
-            System.out.println("uscito dal sistema "+this.number+" "+event);
+            //System.out.println("uscito dal sistema "+this.number+" "+event);
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             eventHandler.decrementVType(event.getVehicleType());
@@ -175,7 +175,7 @@ public class ControllerCheckout {
                 queueCheckout.remove(0);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
-                System.out.println("preso coda");
+                //System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
@@ -188,10 +188,10 @@ public class ControllerCheckout {
 
             //System.out.println("aggiunta centro scarico");
 
-            System.out.println("size chck "+queueCheckout.size());
+            //System.out.println("size chck "+queueCheckout.size());
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
-
+        /*
         for (EventListEntry ev:
              eventList) {
             System.out.println("check "+ ev.getX()+" "+ev.getT());
@@ -203,7 +203,7 @@ public class ControllerCheckout {
         for (EventListEntry ev:
                 eventList) {
             System.out.println("ev ck "+ev.getX()+" "+ev.getT());
-        }
+        }*/
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 

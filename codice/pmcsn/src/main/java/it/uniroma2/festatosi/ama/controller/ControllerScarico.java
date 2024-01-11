@@ -82,11 +82,11 @@ public class ControllerScarico {
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
-        System.out.println("scarico evlist");
+        /*System.out.println("scarico evlist");
         for (EventListEntry ev:
              eventList) {
             System.out.println("scarico "+ev.getT()+" "+ev.getX());
-        }
+        }*/
 
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
@@ -125,7 +125,7 @@ public class ControllerScarico {
             }else{ //arrivo dall'interno del sistema
                 event=internalEventsScarico.get(0);
                 internalEventsScarico.remove(0);
-                System.out.println("interno");
+               // System.out.println("interno");
                 vType=event.getVehicleType();
                 if(internalEventsScarico.size()==0){
                     eventList.get(eventList.size()-1).setX(0);
@@ -256,11 +256,11 @@ public class ControllerScarico {
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
-        System.out.println("scarico evlist");
+        /*System.out.println("scarico evlist");
         for (EventListEntry ev:
              eventList) {
             System.out.println("scarico "+ev.getT()+" "+ev.getX());
-        }
+        }*/
 
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
@@ -300,7 +300,7 @@ public class ControllerScarico {
             }else{ //arrivo dall'interno del sistema
                 event=internalEventsScarico.get(0);
                 internalEventsScarico.remove(0);
-                System.out.println("interno");
+                //System.out.println("interno");
                 vType=event.getVehicleType();
                 if(internalEventsScarico.size()==0){
                     eventList.get(eventList.size()-1).setX(0);

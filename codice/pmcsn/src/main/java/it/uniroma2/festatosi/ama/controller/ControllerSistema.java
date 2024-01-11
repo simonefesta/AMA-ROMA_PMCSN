@@ -202,7 +202,7 @@ public class ControllerSistema {
 
            //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
-            System.out.println(" time event is " + eventList.get(e).getT());
+            //System.out.println(" time event is " + eventList.get(e).getT());
             //si calcola l'area dell'integrale
             this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
             //imposta il tempo corrente a quello dell'evento corrente
@@ -233,8 +233,9 @@ public class ControllerSistema {
             }
 
             if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
+
                 batchDuration= this.time.getCurrent()-this.time.getBatch();
-                System.out.println("batch duration "+ batchDuration + " = current " + this.time.getCurrent() + " getBatch" + this.time.getBatch());
+                System.out.println("batch duration "+ batchDuration + " = current " + this.time.getCurrent() + "- getBatch " + this.time.getBatch());
                 Statistics statAccettazione = ((ControllerAccettazione) controllerList.get(1)).getStatistics(batchDuration);
                 System.out.println("batch "+getNBatch());
                 System.out.println("job in batch "+getJobInBatch());
@@ -242,7 +243,7 @@ public class ControllerSistema {
                 incrementNBatch();
                 this.time.setBatch(this.time.getCurrent());
             }
-            System.out.println("");
+            //System.out.println("");
 
             eventList = eventHandler.getEventsSistema();
             this.time.setCurrent(this.time.getNext());

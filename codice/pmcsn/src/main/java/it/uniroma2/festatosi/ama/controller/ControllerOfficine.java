@@ -211,7 +211,7 @@ public class ControllerOfficine {
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
                 }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                System.out.println("inviato scarico " + this.name);
+                //System.out.println("inviato scarico " + this.name);
 
                 if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio

@@ -64,11 +64,11 @@ public class RandomDistribution {
         switch (queueType) {
             case 0: //arrivo allo scarico
                 arrivalScarico = Exponential(1.0/(LAMBDA*P1));
-                System.out.println("Arrival sc "+arrivalScarico);
+               // System.out.println("Arrival sc "+arrivalScarico);
                 return arrivalScarico;
             case 1: //arrivo alla accettazione
                 arrivalAccettazione = Exponential(1.0/(LAMBDA*Q1));
-                System.out.println("Arrival ac "+arrivalAccettazione);
+              //  System.out.println("Arrival ac "+arrivalAccettazione);
                 return arrivalAccettazione;
             default:
                 throw new Exception("Arrivo non definito");
