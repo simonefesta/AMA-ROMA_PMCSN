@@ -6,6 +6,7 @@ import it.uniroma2.festatosi.ama.model.MsqT;
 import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
+import it.uniroma2.festatosi.ama.utils.Statistics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -445,7 +446,7 @@ public class ControllerAccettazione {
     }
 
     public void printStats() {
-        /*System.out.println("Accettazione\n\n");
+        System.out.println("Accettazione\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsAccettazione().get(0).getT() / this.jobServed);
         System.out.println("  avg wait ........... = " + this.area / this.jobServed);
@@ -470,7 +471,34 @@ public class ControllerAccettazione {
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-        System.out.println("\n");*/
+        System.out.println("\n");
+    }
+
+    public Statistics getStatistics(double batchTime){
+
+        double meanUtilization=0.0;
+        Statistics statAccettazione = new Statistics();
+        System.out.println("area is " + this.area + " mentre job serviti " + this.jobServed);
+        statAccettazione.setMeanDelay(this.area/this.jobServed);
+
+        // togliamo i tempi di servizio dal calcolo dell'area
+        for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
+            this.area -= this.sum.get(i).getService();
+            meanUtilization+=this.sum.get(s).getService();
+        }
+
+        meanUtilization /= batchTime*SERVERS_ACCETTAZIONE;
+        statAccettazione.setMeanUtilization(meanUtilization);
+
+        System.out.println("[accettazione] MeanUtilization "+ meanUtilization);
+        System.out.println("[accettazione] MeanDelay "+ statAccettazione.getMeanDelay());
+
+        this.area = 0;
+        this.jobServed = 0;
+
+
+        return statAccettazione;
+
     }
 
 }

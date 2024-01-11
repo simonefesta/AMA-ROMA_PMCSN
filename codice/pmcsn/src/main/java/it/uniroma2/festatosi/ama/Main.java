@@ -24,7 +24,7 @@ public class Main {
 
         ControllerSistema sistema=new ControllerSistema(seed);
         sistema.selectSeed(seed);
-        sistema.simulation(0); //0 finita, 1 infinita
+        sistema.simulation(1); //0 finita, 1 infinita
 //        sistema.baseSimulation();
 
 

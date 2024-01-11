@@ -21,4 +21,6 @@ public class BatchSimulation {
     public static double getNBatch() {
         return nBatch;
     }
+
+
 }

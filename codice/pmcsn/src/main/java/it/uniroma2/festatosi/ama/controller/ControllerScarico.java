@@ -293,7 +293,7 @@ public class ControllerScarico {
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
 
 
-                if (eventList.get(0).getT() > STOP_FINITE) { //tempo maggiore della chiusura delle porte
+                if (eventList.get(0).getT() > STOP_INFINITE) { //tempo maggiore della chiusura delle porte
                     eventList.get(0).setX(0); //chiusura delle porte dall'esterno
                     this.eventHandler.setEventsScarico(eventList);
                 }
@@ -348,7 +348,7 @@ public class ControllerScarico {
             if(rndRouting<=P7){ //uscita dal sistema
                 //se il veicolo esce viene decrementato il numero di veicoli dello stesso tipo presenti nel sistema
                 eventHandler.decrementVType(event.getVehicleType());
-                if(event.getT()< STOP_FINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                     eventList.get(0).setX(1);
                     eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
                     eventHandler.setEventsScarico(eventList);
