@@ -4,13 +4,17 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.Rngs;
+import it.uniroma2.festatosi.ama.utils.Rvms;
+import it.uniroma2.festatosi.ama.utils.Statistics;
 
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static it.uniroma2.festatosi.ama.controller.BatchSimulation.*;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
@@ -32,6 +36,8 @@ public class ControllerSistema {
     private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
 
     long seed;
+
+
 
     public void selectSeed(long seed){
         this.seed = seed;
@@ -73,7 +79,7 @@ public class ControllerSistema {
         int nextEventAccettazione=EventListEntry.getNextEvent(listAccettazione, SERVERS_ACCETTAZIONE);
         this.eventListSistema.add(1, new EventListEntry(listAccettazione.get(nextEventAccettazione).getT(),1));
         this.sum.add(1, new MsqSum());
-        //inzializzo la eventList del sistema, creo le entry per le varie officine
+        //inizializzo la eventList del sistema, creo le entry per le varie officine
         for (int i=0;i<SERVERS_OFFICINA.length;i++) {
             controllerList.add(new ControllerOfficine(i,rngs.getSeed()));
             this.eventListSistema.add(i+2, new EventListEntry(0, 0));
@@ -88,6 +94,19 @@ public class ControllerSistema {
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
+    public void simulation(int type) throws Exception {
+        switch (type){
+            case 0:
+                baseSimulation();
+                break;
+            case 1:
+                infiniteSimulation();
+                break;
+            default:
+                throw new Exception("Type deve essere 0 o 1");
+        }
+    }
+
     public void baseSimulation() throws Exception {
         int e;
         //prende la lista di eventi per il sistema
@@ -96,7 +115,7 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
-            System.out.println("evl sys");
+           // System.out.println("evl sys");
             for (EventListEntry ev:
                  eventList) {
                 System.out.println(ev.getX()+" "+ev.getT());
@@ -104,7 +123,7 @@ public class ControllerSistema {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-            System.out.println("servito "+e);
+           // System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -138,12 +157,12 @@ public class ControllerSistema {
             eventList=eventHandler.getEventsSistema();
         }
 
-        ((ControllerScarico) controllerList.get(0)).printStats();
-        ((ControllerAccettazione) controllerList.get(1)).printStats();
-        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {
+        ((ControllerScarico) controllerList.get(0)).printStats(); //scarico
+        //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
             ((ControllerOfficine) controllerList.get(i+2)).printStats();
         }
-        ((ControllerCheckout) controllerList.get(7)).printStats();
+        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout
 
 
         System.out.println("Popolazione: "+ eventHandler.getNumber());
@@ -155,7 +174,124 @@ public class ControllerSistema {
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
 
-        System.out.println("arrivi nelle 24 ore"+eventHandler.getArr());
+        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+    }
+
+
+    public void infiniteSimulation() throws Exception {
+        int e;
+        MsqT time=new MsqT();
+        time.setCurrent(START);
+        time.setNext(START);
+        double batchDuration;
+        int numVeicoliSys;
+        DataExtractor.initializeFile(seed, "Infinite_simulation");
+
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+        * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+        */
+
+        while (getJobInBatch() < B * K) {
+            numVeicoliSys=eventHandler.getNumber();
+
+            eventList = this.eventHandler.getEventsSistema();
+
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+           //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //System.out.println(" time event is " + eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            //this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            if (e == 0) {
+                ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
+                scarico.infiniteSimulation();
+//                scarico.baseSimulation();
+                ////System.out.println(e);
+            } else if (e == 1) {
+                ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
+                accettazione.infiniteSimulation();
+                //accettazione.baseSimulation();
+                ////System.out.println(e);
+            } else if (e == 7) {
+                ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
+                checkout.baseSimulation();
+                ////System.out.println(e);
+            } else {
+                ControllerOfficine officina = (ControllerOfficine) controllerList.get(e);
+                officina.baseSimulation();
+            }
+
+            if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
+
+                batchDuration= this.time.getCurrent()-this.time.getBatch();
+                System.out.println("\nbatch duration "+ batchDuration + " con " + getJobInBatch() + " job");
+                ((ControllerAccettazione) controllerList.get(1)).getStatistics(batchDuration,getNBatch());
+                System.out.println("batch "+getNBatch());
+
+                System.out.println("job in batch "+getJobInBatch() +"\n");
+                //todo media e varianza
+
+                incrementNBatch();
+
+
+
+
+
+                this.time.setBatch(this.time.getCurrent());
+            }
+            //System.out.println("");
+
+           // eventList = eventHandler.getEventsSistema();
+            this.time.setCurrent(this.time.getNext());
+        }
+
+        Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
+
+        Statistics stat = Statistics.getInstance();       //finiti i batch
+        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.print("Statistiche per E[Tq] ");
+        stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
+        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Nq] ");
+        stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
+        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
+
+
+
+
+        // STAMPA STATISTICHE, PER ORA DISABILITATO
+        //((ControllerScarico) controllerList.get(0)).printStats(); //scarico
+        //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+       /* for (int i = 0; i < SERVERS_OFFICINA.length; i++) {         //officine
+            ((ControllerOfficine) controllerList.get(i+2)).printStats(); //checkout
+        }
+        ((ControllerCheckout) controllerList.get(7)).printStats();*/
+
+
+        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
+        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
+        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
+        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
+        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
+
+        System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
+
 
     }
 
@@ -200,7 +336,7 @@ public class ControllerSistema {
              //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
              //System.out.println("jobServiti"+this.jobServiti + "\n");
             //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            System.out.println("\n");
+            //System.out.println("\n");
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }

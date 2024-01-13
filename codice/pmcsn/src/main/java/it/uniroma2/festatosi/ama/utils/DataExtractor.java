@@ -27,7 +27,7 @@ public class DataExtractor{
         }
 
         File fileInTarget = new File(targetDirectory, fileName);
-        System.out.println("CREO :" + fileName + " ");
+        //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
             writer.write("seed " + seed + ";" + "Tempo" + ";" + "Popolazione" + ";" + name + "\n");

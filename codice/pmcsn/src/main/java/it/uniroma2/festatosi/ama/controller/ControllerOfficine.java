@@ -107,11 +107,11 @@ public class ControllerOfficine {
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
         //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
-        System.out.println(this.name + " stampe");
+       /* System.out.println(this.name + " stampe");
         for(EventListEntry ev: eventList){
             System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
         }
-        System.out.println(this.name + " fine stampa\n\n");
+        System.out.println(this.name + " fine stampa\n\n");*/
 
 
 
@@ -134,12 +134,12 @@ public class ControllerOfficine {
 
                 //this.time.setCurrent(event.getT());
 
-                System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
+              //  System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-                System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
+                //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
 
                 if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
                     double service = this.rnd.getService(1); //ottengo tempo di servizio
@@ -151,7 +151,7 @@ public class ControllerOfficine {
 
                     double sum =event.getT() + service;
                     //imposta nella lista degli eventi che il server s è busy
-                    System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
+                   // System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
                     //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
 
 
@@ -165,7 +165,7 @@ public class ControllerOfficine {
                     this.eventHandler.setEventsOfficina(this.id, eventList);
                 } else {
                     queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
-                    System.out.println(this.name + " in attesa di essere servito at " + event.getT());
+                    //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
                 }
                 if (internalEventsOfficina.size() == 0) {
                     this.eventListOfficina.get(0).setX(0);
@@ -192,7 +192,7 @@ public class ControllerOfficine {
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-                System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
+               //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
 
 
@@ -211,7 +211,7 @@ public class ControllerOfficine {
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
                 }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                System.out.println("inviato scarico " + this.name);
+                //System.out.println("inviato scarico " + this.name);
 
                 if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
