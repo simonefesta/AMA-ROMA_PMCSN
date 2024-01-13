@@ -412,7 +412,7 @@ public class ControllerScarico {
     }
 
     /**
-     * ritorna l'indice del server libero da più tempo
+     * Ritorna l'indice del server libero da più tempo
      *
      * @param eventListScarico lista degli eventi di Scarico
      * @return index del server libero da più tempo

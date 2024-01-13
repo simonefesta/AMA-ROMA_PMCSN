@@ -12,7 +12,6 @@ public class BatchSimulation {
 
     public static void incrementJobInBatch(){
         nJobInBatch++;
-        //System.out.println("n job in batch: " + nJobInBatch);
     }
 
     public static int getJobInBatch() {

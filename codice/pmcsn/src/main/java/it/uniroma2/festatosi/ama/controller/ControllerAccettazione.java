@@ -26,6 +26,7 @@ public class ControllerAccettazione {
     private long jobServed=0;           /*contatore jobs processati*/
     private double area=0.0;        /*time integrated number in the node*/
 
+
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
 
     private final RandomDistribution rnd=RandomDistribution.getInstance();
@@ -38,11 +39,6 @@ public class ControllerAccettazione {
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
-    private int[] vectorFirstArrival = new int[5]; // Creazione del vettore di 5 elementi inizializzati a 0
-
-    public void SetFistArrival( long time, int index){
-        vectorFirstArrival[index] = 1;
-    }
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -139,7 +135,6 @@ public class ControllerAccettazione {
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
-                double sum = this.time.getCurrent() + service;
                 //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
@@ -237,11 +232,6 @@ public class ControllerAccettazione {
 
         eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
-        /*System.out.println("event list accettazione");
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println(ev.getX()+" "+ev.getT());
-        }*/
         if(this.number==0 && this.time.getCurrent()> STOP_FINITE){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
             //return;
@@ -253,6 +243,7 @@ public class ControllerAccettazione {
     public void infiniteSimulation() throws Exception {
 
         int e;
+
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
 
@@ -273,6 +264,9 @@ public class ControllerAccettazione {
         this.time.setNext(eventList.get(e).getT());
         //si calcola l'area dell'integrale
         this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+        double deltaT = this.time.getNext()-this.time.getCurrent();
+        //System.out.println("deltaT è " + deltaT + " = " + this.time.getNext()+" + " + this.time.getCurrent() + " mentre number " + this.number);
+        // System.out.println("thisarea " + this.area);
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
 
@@ -280,28 +274,21 @@ public class ControllerAccettazione {
         if(e==0){ // controllo se l'evento è un arrivo
 
             eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-            //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
-
-            //System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
-                //System.out.println("pieno");
-                //continue;
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
 
-           //  System.out.println("Entrato");
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-            System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
+            //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
-            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
-            //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
+            System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
@@ -313,13 +300,11 @@ public class ControllerAccettazione {
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
-                double sum = this.time.getCurrent() + service;
-                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
 
-                //aggiorna la lista nell'handler
+                //aggiorna la lista nell' handler
                 this.eventHandler.setEventsAccettazione(eventList);
             }else{
                 queueAccettazione.add(event);
@@ -330,7 +315,7 @@ public class ControllerAccettazione {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
+            //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
@@ -338,14 +323,9 @@ public class ControllerAccettazione {
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
-            //System.out.println("[accettazione uscita] " + event.getT());
-
-
-            //TODO logica di routing
 
             double rndRouting= rngs.random();
             int off;
-            //TODO volendo vedere se si può fare somma tra i primi x elementi di un array
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
@@ -410,16 +390,6 @@ public class ControllerAccettazione {
 
         eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
 
-        //System.out.println("event list accettazione");
-        /*for (EventListEntry ev:
-                eventList) {
-            System.out.println(ev.getX()+" "+ev.getT());
-        }
-        /*if(this.number==0 && this.time.getCurrent()>STOP){
-            this.eventHandler.getEventsAccettazione().get(0).setX(0);
-            //return;
-        }*/
-
     }
 
     /**
@@ -472,31 +442,44 @@ public class ControllerAccettazione {
         System.out.println("\n");
     }
 
-    public Statistics getStatistics(double batchTime){
+    public void getStatistics(double batchTime, double batchNumber){
 
-        double meanUtilization=0.0;
-        Statistics statAccettazione = new Statistics();
-        System.out.println("area: " + this.area + " , job serviti: " + this.jobServed);
-        statAccettazione.setMeanDelay(this.area/this.jobServed);
+        double meanUtilization;
+        Statistics statAccettazione = Statistics.getInstance();
+        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
+        System.out.println("Area E[Ns]: " + this.area/(batchTime*SERVERS_ACCETTAZIONE)); //  Da msq è definita come area/t_Current
+        System.out.println("Attesa/Wait nel sistema E[Ts] : " + this.area/jobServed );
+        //statAccettazione.setMeanWait(this.area/jobServed);
 
-        // togliamo i tempi di servizio dal calcolo dell'area
+        double sumService = 0; //qui metto la somma dei service time
+
+        // Salviamo i tempi di servizio in una variabile di appoggio
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
-            this.area -= this.sum.get(i).getService();
-            meanUtilization+=this.sum.get(s).getService();
+
+            sumService += this.sum.get(i).getService();
+            //meanUtilization+=this.sum.get(i).getService();
+            this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
         }
 
-        meanUtilization /= batchTime*SERVERS_ACCETTAZIONE;
+
+        double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
+
+        double Enq = (this.area-sumService)/(batchTime*SERVERS_ACCETTAZIONE);
+        statAccettazione.setBatchPopolazioneCodaArray(Enq , (int) batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+
+        System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
+
+        meanUtilization = sumService/(batchTime*SERVERS_ACCETTAZIONE);
         statAccettazione.setMeanUtilization(meanUtilization);
 
-        System.out.println("[accettazione] MeanUtilization "+ meanUtilization);
-        System.out.println("[accettazione] MeanDelay "+ statAccettazione.getMeanDelay());
+        System.out.println("MeanUtilization "+ statAccettazione.getMeanUtilization());
+
 
          this.area = 0;
          this.jobServed = 0;
 
-
-        return statAccettazione;
-
     }
+
 
 }
