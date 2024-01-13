@@ -447,7 +447,7 @@ public class ControllerAccettazione {
         double meanUtilization;
         Statistics statAccettazione = Statistics.getInstance();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
-        System.out.println("Area E[Ns]: " + this.area/(batchTime*SERVERS_ACCETTAZIONE)); //  Da msq è definita come area/t_Current
+        System.out.println("Area E[Ns]: " + this.area/(batchTime)); //  Da msq è definita come area/t_Current
         System.out.println("Attesa/Wait nel sistema E[Ts] : " + this.area/jobServed );
         //statAccettazione.setMeanWait(this.area/jobServed);
 
@@ -465,7 +465,7 @@ public class ControllerAccettazione {
         double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
         statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
 
-        double Enq = (this.area-sumService)/(batchTime*SERVERS_ACCETTAZIONE);
+        double Enq = (this.area-sumService)/(batchTime);
         statAccettazione.setBatchPopolazioneCodaArray(Enq , (int) batchNumber); // E[Nq] = area/DeltaT (cosi definito)
 
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);

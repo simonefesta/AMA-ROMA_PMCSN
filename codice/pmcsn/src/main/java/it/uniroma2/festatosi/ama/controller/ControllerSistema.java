@@ -261,7 +261,7 @@ public class ControllerSistema {
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
 
         Statistics stat = Statistics.getInstance();       //finiti i batch
-        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha) +  "%");
+        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
         System.out.print("Statistiche per E[Tq] ");
         stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
         System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));

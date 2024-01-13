@@ -25,7 +25,7 @@ public class Constants {
     /*\*100 si toglie nel momento in cui orizzonte finito*/
     public static double START   = 0.0;
     public static int    SERVERS_SCARICO = 4;
-    public static int    SERVERS_ACCETTAZIONE = 3;
+    public static int    SERVERS_ACCETTAZIONE = 4;
     public static int    SERVERS_GOMMISTA = 3;
     public static int    SERVERS_CARROZZERIA = 3;
     public static int    SERVERS_ELETTRAUTO = 1;
