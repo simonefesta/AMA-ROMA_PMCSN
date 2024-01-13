@@ -11,7 +11,7 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.0055; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
@@ -58,7 +58,7 @@ public class Constants {
     public static final double P3 = 0.09;
 
     // ---- SKIPP PROB ----
-    // probabilità difetto tipologia "elettrauti"
+    // probabilità difetto tipologia "elettrauto"
     public static final double P4 = 0.1;
 
     // probabilità difetto tipologia "carpenteria meccanica"
@@ -78,8 +78,8 @@ public class Constants {
 
 
     // numero di veicoli per ogni tipo
-    public static final int VEICOLI1 = 103; //veicoli piccoli #40
-    public static final int VEICOLI2 = 79; //veicoli grandi #59
+    public static final int VEICOLI1 = 76; //veicoli piccoli
+    public static final int VEICOLI2 = 59; //veicoli grandi
 
     public static File datiSistema;
 

@@ -6,16 +6,19 @@ public class Statistics {
 
     private double meanDelay; // attesa media in coda, ovvero E[Tq]
     private double meanUtilization;  // utilizzo rho = lambda/mu = lambda * E[S]
-
-    private double popMediaCoda;
+    private double popMediaCoda; // E[Nq]
 
     private double meanWait;  // attesa media nel centro, ovvero E[Ts] = E[Tq] + E[S_i]
 
-    private double varianceEtq; //varianza per Etq
-    private double varianceEnq; //varianza per Enq
+    private double varianceEtq; //varianza per E[Tq]
+    private double varianceEnq; //varianza per E[Nq]
+    private double varianceUtilization; //varianza per utilizzazione rho
+
+    /* vettori contenenti i risultati dei singoli batch */
     private double[] batchMedia;
 
     private double[] batchPopolazioneCoda;
+    private double[] batchMeanUtilization;
 
     private static Statistics instance;
     // Costruttore privato per evitare inizializzazione diretta
@@ -24,6 +27,7 @@ public class Statistics {
         meanUtilization = 0;
         batchMedia = new double[K + 1];
         batchPopolazioneCoda = new double[K+1];
+        batchMeanUtilization = new double[K+1];
     }
 
 
@@ -66,13 +70,14 @@ public class Statistics {
 
     public double getVariance(int type) {
         if (type == 0)  return varianceEtq;
-        else return varianceEnq;
+        else if (type == 1) return varianceEnq;
+        else return varianceUtilization;
     }
 
     /*
         Varianza calcolata prendendo in ingresso tutte le medie campionarie nel vettore
      */
-    public void setVariance(double[] batchMedia, int type) {  // type 0: Etq, type 1 : Enq
+    public void setVariance(double[] batchMedia, int type) {  // type 0: Etq, type 1 : Enq, type 2: rho
 
         if (batchMedia.length == 0) {
             System.out.println("Il vettore è vuoto, impossibile calcolare la varianza.");
@@ -86,6 +91,7 @@ public class Statistics {
         media /= batchMedia.length;
         if (type == 0) setMeanDelay(media);     // type 0: media E[Tq]
         else if (type == 1) setPopMediaCoda(media); //type 1: media E[Nq]
+        else if (type == 2) setMeanUtilization(media); // type 2: utilizzazione rho
 
         // Calcola la somma dei quadrati delle differenze dalla media
         double sommaQuadratiDifferenze = 0.0;
@@ -98,8 +104,10 @@ public class Statistics {
 
         double variance = sommaQuadratiDifferenze / batchMedia.length;
 
+
         if (type == 0) varianceEtq = variance;
         else if (type == 1) varianceEnq = variance;
+        else if (type == 2) varianceUtilization = variance;
 
     }
 
@@ -133,5 +141,15 @@ public class Statistics {
 
     public void setPopMediaCoda(double popMediaCoda) {
         this.popMediaCoda = popMediaCoda;
+    }
+
+
+    /* Metodi get e set per MeanUtilization */
+    public double[] getBatchMeanUtilization() {
+        return batchMeanUtilization;
+    }
+
+    public void setBatchMeanUtilization(double BatchMeanUtilizationValue, int index) {
+        batchMeanUtilization[index] = BatchMeanUtilizationValue;
     }
 }

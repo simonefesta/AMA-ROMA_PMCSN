@@ -471,10 +471,7 @@ public class ControllerAccettazione {
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
         meanUtilization = sumService/(batchTime*SERVERS_ACCETTAZIONE);
-        statAccettazione.setMeanUtilization(meanUtilization);
-
-        System.out.println("MeanUtilization "+ statAccettazione.getMeanUtilization());
-
+        statAccettazione.setBatchMeanUtilization(meanUtilization, (int) batchNumber);
 
          this.area = 0;
          this.jobServed = 0;

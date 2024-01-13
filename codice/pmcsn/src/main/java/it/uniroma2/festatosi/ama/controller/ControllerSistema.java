@@ -262,12 +262,18 @@ public class ControllerSistema {
 
         Statistics stat = Statistics.getInstance();       //finiti i batch
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
-        System.out.print("Statistiche per E[Tq] ");
+
+        System.out.print("Statistiche per E[Tq]: ");
         stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
         System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Nq] ");
+
+        System.out.print("Statistiche per E[Nq]: ");
         stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
         System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
+
+        System.out.print("Statistiche per Rho: ");
+        stat.setVariance(stat.getBatchMeanUtilization(),2);     // calcolo la varianza per Enq
+        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getVariance(2)/(Math.sqrt(K-1)));
 
 
 
