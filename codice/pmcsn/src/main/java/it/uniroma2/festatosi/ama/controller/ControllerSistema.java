@@ -4,7 +4,7 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
+
 import it.uniroma2.festatosi.ama.utils.Rngs;
 import it.uniroma2.festatosi.ama.utils.Rvms;
 import it.uniroma2.festatosi.ama.utils.Statistics;
@@ -185,7 +185,6 @@ public class ControllerSistema {
         time.setNext(START);
         double batchDuration;
         int numVeicoliSys;
-        DataExtractor.initializeFile(seed, "Infinite_simulation");
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -226,11 +225,11 @@ public class ControllerSistema {
                 ////System.out.println(e);
             } else if (e == 7) {
                 ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
-                checkout.baseSimulation();
+                checkout.infiniteSimulation();
                 ////System.out.println(e);
             } else {
                 ControllerOfficine officina = (ControllerOfficine) controllerList.get(e);
-                officina.baseSimulation();
+                officina.infiniteSimulation();
             }
 
             if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
@@ -262,12 +261,18 @@ public class ControllerSistema {
 
         Statistics stat = Statistics.getInstance();       //finiti i batch
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
-        System.out.print("Statistiche per E[Tq] ");
+
+        System.out.print("Statistiche per E[Tq]: ");
         stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
         System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Nq] ");
+
+        System.out.print("Statistiche per E[Nq]: ");
         stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
         System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
+
+        System.out.print("Statistiche per Rho: ");
+        stat.setVariance(stat.getBatchMeanUtilization(),2);     // calcolo la varianza per Enq
+        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getVariance(2)/(Math.sqrt(K-1)));
 
 
 
