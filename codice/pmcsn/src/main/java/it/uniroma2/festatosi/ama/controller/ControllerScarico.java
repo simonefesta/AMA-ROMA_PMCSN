@@ -37,6 +37,7 @@ public class ControllerScarico {
     private List<EventListEntry> queueScarico=new LinkedList<>();
 
     File datiScarico;
+    File datiScaricoBatch;
 
     public ControllerScarico(long seed) throws Exception {
 
@@ -48,7 +49,8 @@ public class ControllerScarico {
         rngs.plantSeeds(seed);
         //System.out.println(rngs.getSeed());
 
-        datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+        datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName());
+        datiScaricoBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");//fornisco il seed al file delle statistiche, oltre che il nome del centro
 
         /*inizializza la lista degli eventi dello scarico*/
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -173,7 +175,7 @@ public class ControllerScarico {
             if(rndRouting<=P7){ //uscita dal sistema
                 //se il veicolo esce viene decrementato il numero di veicoli dello stesso tipo presenti nel sistema
                 eventHandler.decrementVType(event.getVehicleType());
-                if(event.getT()< STOP_FINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                     eventList.get(0).setX(1);
                     eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
                     eventHandler.setEventsScarico(eventList);
@@ -224,9 +226,7 @@ public class ControllerScarico {
 
         /*viene impostato nella event list del sistema il tempo in cui lo scarico dovrà riprendere servizio come il
           prossimo evento disponibile per lo scarico*/
-        /*eventHandler.getEventsSistema().get(0)
-                .setT(eventList.get(EventListEntry.getNextEvent(eventList, SERVERS_SCARICO)).getT());
-*/
+
         eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
 
         /*se sono stati processati tutti gli eventi arrivati e il tempo corrente supera il tempo di stop vengono chiuse
@@ -309,8 +309,8 @@ public class ControllerScarico {
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
-            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+            DataExtractor.writeBatchStat(datiScaricoBatch, (int)BatchSimulation.getNBatch(),this.number);
+            DataExtractor.writeBatchStat(datiSistemaBatch,(int)BatchSimulation.getNBatch(),eventHandler.getNumber());
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi

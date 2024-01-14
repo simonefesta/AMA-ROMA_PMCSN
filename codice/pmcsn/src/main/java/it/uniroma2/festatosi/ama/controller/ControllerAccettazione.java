@@ -39,6 +39,7 @@ public class ControllerAccettazione {
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
+    File datiAccettazioneBatch;
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -49,10 +50,9 @@ public class ControllerAccettazione {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
 
-        //System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
 
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
             this.eventListAccettazione.add(s, new EventListEntry(0,0));
@@ -289,8 +289,8 @@ public class ControllerAccettazione {
 
 
             System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
+            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
@@ -317,8 +317,8 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
+            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 

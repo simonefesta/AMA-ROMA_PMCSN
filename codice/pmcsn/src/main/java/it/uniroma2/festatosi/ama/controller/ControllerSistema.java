@@ -4,7 +4,7 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
+
 import it.uniroma2.festatosi.ama.utils.Rngs;
 import it.uniroma2.festatosi.ama.utils.Rvms;
 import it.uniroma2.festatosi.ama.utils.Statistics;
@@ -185,7 +185,6 @@ public class ControllerSistema {
         time.setNext(START);
         double batchDuration;
         int numVeicoliSys;
-        DataExtractor.initializeFile(seed, "Infinite_simulation");
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -226,11 +225,11 @@ public class ControllerSistema {
                 ////System.out.println(e);
             } else if (e == 7) {
                 ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
-                checkout.baseSimulation();
+                checkout.infiniteSimulation();
                 ////System.out.println(e);
             } else {
                 ControllerOfficine officina = (ControllerOfficine) controllerList.get(e);
-                officina.baseSimulation();
+                officina.infiniteSimulation();
             }
 
             if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){

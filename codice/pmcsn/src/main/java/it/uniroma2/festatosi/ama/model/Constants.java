@@ -11,7 +11,7 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.0055; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
@@ -82,10 +82,12 @@ public class Constants {
     public static final int VEICOLI2 = 59; //veicoli grandi
 
     public static File datiSistema;
+    public static File datiSistemaBatch;
 
     static {
         try {
             datiSistema = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
+            datiSistemaBatch = DataExtractor.initializeFileBatch((new Rngs()).getSeed(), "SistemaBatch");
         } catch (IOException e) {
             System.out.println("Problema nell'inizializzazione del file coi dati del Sistema.");
         }
