@@ -139,7 +139,7 @@ public class ControllerScarico {
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(2); //ottengo tempo di servizio
+                double service=this.rnd.getService(1); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -199,7 +199,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getService(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -314,7 +314,7 @@ public class ControllerScarico {
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(2); //ottengo tempo di servizio
+                double service=this.rnd.getService(1); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -374,7 +374,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getService(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);

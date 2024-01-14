@@ -11,13 +11,15 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.0052; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 10*60;
-    public static final double officina_SR = 5400;// 1 ora e mezza
+    //public static final double officina_SR = 5400;// 1 ora e mezza
+    public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
+            {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi
     public static final double checkout_SR = 15*60;//20*60;
 
     public static double STOP_FINITE = 86400; /*  terminazione lavoro giornaliero (24 ore in secondi) */
@@ -78,8 +80,8 @@ public class Constants {
 
 
     // numero di veicoli per ogni tipo
-    public static final int VEICOLI1 = 103; //veicoli piccoli #40
-    public static final int VEICOLI2 = 79; //veicoli grandi #59
+    public static final int VEICOLI1 = 40; //veicoli piccoli #40
+    public static final int VEICOLI2 = 59; //veicoli grandi #59
 
     public static File datiSistema;
 

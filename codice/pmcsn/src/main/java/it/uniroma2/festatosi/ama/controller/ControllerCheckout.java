@@ -111,7 +111,7 @@ public class ControllerCheckout {
                     this.eventHandler.setEventsCheckout(eventList);
                 }*/
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(3); //ottengo tempo di servizio
+                double service=this.rnd.getService(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -162,7 +162,7 @@ public class ControllerCheckout {
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(3);
+                double service=this.rnd.getService(2);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
