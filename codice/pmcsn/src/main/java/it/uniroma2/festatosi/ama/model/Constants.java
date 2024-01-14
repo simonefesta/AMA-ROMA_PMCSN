@@ -80,13 +80,8 @@ public class Constants {
 
 
     // numero di veicoli per ogni tipo
-<<<<<<< HEAD
-    public static final int VEICOLI1 = 40; //veicoli piccoli #40
-    public static final int VEICOLI2 = 59; //veicoli grandi #59
-=======
     public static final int VEICOLI1 = 76; //veicoli piccoli
     public static final int VEICOLI2 = 59; //veicoli grandi
->>>>>>> c34895d254dc0c26488b79b6f1644335d2afb5ec
 
     public static File datiSistema;
     public static File datiSistemaBatch;
