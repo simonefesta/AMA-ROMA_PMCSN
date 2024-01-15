@@ -269,6 +269,10 @@ public class ControllerSistema {
         stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
         System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
 
+        System.out.println("MeanDelay Etq");
+        for(double mean : stat.getBatchMeanDelayArray()){
+            System.out.print(mean+" ");
+        }
 
 
 

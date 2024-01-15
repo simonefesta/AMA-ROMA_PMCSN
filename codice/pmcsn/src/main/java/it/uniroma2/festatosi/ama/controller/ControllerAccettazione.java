@@ -39,7 +39,7 @@ public class ControllerAccettazione {
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
-    private int jobInBatch=0;
+    private int jobInBatch=1;
     private double batchDuration=0;
     private int batchNumber=1;
 
@@ -296,6 +296,15 @@ public class ControllerAccettazione {
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
+            if(this.jobInBatch%B==0){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
+
+                getStatistics();
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(0); //ottengo tempo di servizio
@@ -314,15 +323,6 @@ public class ControllerAccettazione {
                 queueAccettazione.add(event);
             }
 
-            if(this.jobInBatch%B==0){
-                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
-
-                getStatistics();
-                this.batchNumber++;
-
-            }
         }
         else{ //evento di fine servizio
             //decrementa il numero di eventi nel nodo considerato
@@ -469,7 +469,6 @@ public class ControllerAccettazione {
 
         // Salviamo i tempi di servizio in una variabile di appoggio
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
-
             sumService += this.sum.get(i).getService();
             //meanUtilization+=this.sum.get(i).getService();
             this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
@@ -477,6 +476,10 @@ public class ControllerAccettazione {
 
 
         double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        if(Etq<0){
+            System.out.println("ETQ "+Etq+" area "+this.area+" servizi "+sumService);
+            System.exit(1);
+        }
         statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
 
         double Enq = (this.area-sumService)/(this.batchDuration);
