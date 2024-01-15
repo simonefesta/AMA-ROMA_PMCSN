@@ -39,6 +39,9 @@ public class ControllerAccettazione {
     private List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
+    private int jobInBatch=0;
+    private double batchDuration=0;
+    private int batchNumber=1;
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -283,6 +286,7 @@ public class ControllerAccettazione {
             }
 
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
+            this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
@@ -308,6 +312,16 @@ public class ControllerAccettazione {
                 this.eventHandler.setEventsAccettazione(eventList);
             }else{
                 queueAccettazione.add(event);
+            }
+
+            if(this.jobInBatch%B==0){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
+
+                getStatistics();
+                this.batchNumber++;
+
             }
         }
         else{ //evento di fine servizio
@@ -442,12 +456,12 @@ public class ControllerAccettazione {
         System.out.println("\n");
     }
 
-    public void getStatistics(double batchTime, double batchNumber){
+    public void getStatistics(/*double batchTime, double batchNumber*/){
 
         double meanUtilization;
         Statistics statAccettazione = Statistics.getInstance();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
-        System.out.println("Area E[Ns]: " + this.area/(batchTime)); //  Da msq è definita come area/t_Current
+        System.out.println("Area E[Ns]: " + this.area/(this.batchDuration)); //  Da msq è definita come area/t_Current
         System.out.println("Attesa/Wait nel sistema E[Ts] : " + this.area/jobServed );
         //statAccettazione.setMeanWait(this.area/jobServed);
 
@@ -465,12 +479,12 @@ public class ControllerAccettazione {
         double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
         statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
 
-        double Enq = (this.area-sumService)/(batchTime);
+        double Enq = (this.area-sumService)/(this.batchDuration);
         statAccettazione.setBatchPopolazioneCodaArray(Enq , (int) batchNumber); // E[Nq] = area/DeltaT (cosi definito)
 
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
-        meanUtilization = sumService/(batchTime*SERVERS_ACCETTAZIONE);
+        meanUtilization = sumService/(this.batchDuration*SERVERS_ACCETTAZIONE);
         statAccettazione.setMeanUtilization(meanUtilization);
 
         System.out.println("MeanUtilization "+ statAccettazione.getMeanUtilization());
@@ -482,4 +496,7 @@ public class ControllerAccettazione {
     }
 
 
+    public int getJobInBatch() {
+        return this.jobInBatch;
+    }
 }

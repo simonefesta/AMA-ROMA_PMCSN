@@ -193,7 +193,7 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
 
-        while (getJobInBatch() < B * K) {
+        while (((ControllerAccettazione)controllerList.get(1)).getJobInBatch() < B * K) {
             numVeicoliSys=eventHandler.getNumber();
 
             eventList = this.eventHandler.getEventsSistema();
@@ -233,7 +233,7 @@ public class ControllerSistema {
                 officina.baseSimulation();
             }
 
-            if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
+            /*if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
 
                 batchDuration= this.time.getCurrent()-this.time.getBatch();
                 System.out.println("\nbatch duration "+ batchDuration + " con " + getJobInBatch() + " job");
@@ -250,7 +250,7 @@ public class ControllerSistema {
 
 
                 this.time.setBatch(this.time.getCurrent());
-            }
+            }*/
             //System.out.println("");
 
            // eventList = eventHandler.getEventsSistema();
