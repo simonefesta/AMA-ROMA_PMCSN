@@ -1,10 +1,7 @@
 package it.uniroma2.festatosi.ama.utils;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 
 
 public class DataExtractor{
@@ -79,5 +76,37 @@ public class DataExtractor{
         } catch (IOException e) {
             System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
         }
+    }
+
+    public static String convertCsvToTxt(/*String inputCsvPath, String outputTxtPath*/) throws IOException {
+        String inputCsvPath = "target/graphs/123456789/ControllerAccettazioneBatch.csv";
+        String outputTxtPath = "target/graphs/123456789/AutocorrelazioneAccettazioneBatch.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(inputCsvPath));
+             PrintWriter writer = new PrintWriter(new FileWriter(outputTxtPath))) {
+
+            // Salta l'intestazione
+            br.readLine();
+
+            String line;
+            boolean firstLine = true;
+            while ((line = br.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue; // Salta la prima riga
+                }
+                String[] values = line.split(";");
+                String lastColumnValue = values[values.length - 1];
+                writer.println(lastColumnValue);
+            }
+
+            System.out.println("File TXT creato con successo: " + outputTxtPath);
+            return outputTxtPath;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e; // Rilancia l'eccezione per indicare eventuali errori nella chiamata esterna
+        }
+
+
     }
 }

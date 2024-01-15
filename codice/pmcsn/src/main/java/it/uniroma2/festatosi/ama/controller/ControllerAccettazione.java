@@ -289,7 +289,7 @@ public class ControllerAccettazione {
 
 
             System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
-            DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
+            //DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
             DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
 
@@ -317,7 +317,7 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
+           //DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
             DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
@@ -462,7 +462,7 @@ public class ControllerAccettazione {
         }
 
 
-        double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        double Etq = (this.area-sumService)/this.jobServed;             //E[Tq] = area/nCompletamenti (cosi definito)
         statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
 
         double Enq = (this.area-sumService)/(batchTime);
@@ -471,6 +471,7 @@ public class ControllerAccettazione {
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
         meanUtilization = sumService/(batchTime*SERVERS_ACCETTAZIONE);
+        DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.area/(batchTime));
         statAccettazione.setBatchMeanUtilization(meanUtilization, (int) batchNumber);
 
          this.area = 0;

@@ -236,7 +236,7 @@ public class ControllerCheckout {
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
             //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-            DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
+            //DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
             DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
@@ -274,7 +274,7 @@ public class ControllerCheckout {
 
 
             eventHandler.decrementVType(event.getVehicleType());
-            DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
+            //DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
             DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
 
             if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){

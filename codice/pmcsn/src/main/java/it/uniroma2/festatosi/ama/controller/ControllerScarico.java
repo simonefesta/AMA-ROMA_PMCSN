@@ -406,7 +406,7 @@ public class ControllerScarico {
 
         /*se sono stati processati tutti gli eventi arrivati e il tempo corrente supera il tempo di stop vengono chiuse
          * le porte, i prossimi arrivi possono arrivare solo da dentro il sistema*/
-        /*if(this.number==0 && this.time.getCurrent()>STOP){
+        /* if(this.number==0 && this.time.getCurrent()>STOP){
             this.eventHandler.getEventsScarico().get(0).setX(0);
         }*/
     }

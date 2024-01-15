@@ -5,10 +5,7 @@ import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
 
-import it.uniroma2.festatosi.ama.utils.Rngs;
-import it.uniroma2.festatosi.ama.utils.Rvms;
-import it.uniroma2.festatosi.ama.utils.Statistics;
-
+import it.uniroma2.festatosi.ama.utils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -277,6 +274,7 @@ public class ControllerSistema {
 
 
 
+
         // STAMPA STATISTICHE, PER ORA DISABILITATO
         //((ControllerScarico) controllerList.get(0)).printStats(); //scarico
         //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
@@ -296,7 +294,8 @@ public class ControllerSistema {
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
-
+        String autoLagFile = DataExtractor.convertCsvToTxt();
+        Acs.calculate(autoLagFile);
 
     }
 

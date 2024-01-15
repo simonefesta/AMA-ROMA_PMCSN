@@ -93,9 +93,9 @@ def elabora_files_csv(directory_corrente):
                     # Verifica se la parola "Batch" è presente nel nome del file
                     if "Batch" in filename:
                             risultati = calcola_media_per_batch(data)
-                            print("risultati per " + nome_centro)
+                            #print("risultati per " + nome_centro)
                             for batch, media in risultati:
-                                print(f"Batch: {batch}, Media Popolazione: {media}")
+                                #print(f"Batch: {batch}, Media Popolazione: {media}")
                                 valori_asse_x.append(batch)
                                 valori_asse_y.append(media)
 
