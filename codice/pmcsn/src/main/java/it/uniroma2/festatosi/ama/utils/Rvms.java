@@ -748,7 +748,7 @@ public class Rvms{
 
 	/**
 	 *
-	 * calcolo normale troncata
+	 * Calcolo normale troncata
 	 *
 	 * @param m media della normale
 	 * @param s deviazione standard della normale

@@ -11,7 +11,7 @@ public class Constants {
 
     // ---- ARRIVAL RATES [req/sec]----
 
-    public static final double LAMBDA = 0.005; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
+    public static final double LAMBDA = 0.0055; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
 
 
     // ---- SERVICE RATES  [sec] ----
@@ -95,7 +95,7 @@ public class Constants {
     /*
         Batch Means
      */
-    public static final int B=1024; //numero di job nel singolo batch
+    public static final int B=1080; //numero di job nel singolo batch
     public static final int K=64; //numero di batch
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05

@@ -259,20 +259,25 @@ public class ControllerSistema {
 
         Rvms rvms = new Rvms();
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
+        System.out.println("Critical value is " + criticalValue);
 
         Statistics stat = Statistics.getInstance();       //finiti i batch
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
-        System.out.print("Statistiche per E[Tq] ");
-        stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
-        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Nq] ");
-        stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
-        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Ts] ");
+        stat.setDevStd(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
+        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)) /*+ " variance is " + stat.getDevStd(0)/(Math.sqrt(K-1))*/);
+        System.out.print("Statistiche per E[Ns] ");
+        stat.setDevStd(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
+        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getDevStd(1)/(Math.sqrt(K-1)) /*+ " variance is" + stat.getDevStd(1)/(Math.sqrt(K-1))*/);
+        System.out.print("Statistiche per rho ");
+        stat.setDevStd(stat.getBatchUtilizzazione(),2);     // calcolo la varianza per Enq
+        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getDevStd(2)/(Math.sqrt(K-1))  /*+ " variance is" + stat.getDevStd(2)/(Math.sqrt(K-1))*/);
 
-        System.out.println("MeanDelay Etq");
+
+       /* System.out.println("MeanDelay Etq");
         for(double mean : stat.getBatchMeanDelayArray()){
             System.out.print(mean+" ");
-        }
+        }*/
 
 
 
