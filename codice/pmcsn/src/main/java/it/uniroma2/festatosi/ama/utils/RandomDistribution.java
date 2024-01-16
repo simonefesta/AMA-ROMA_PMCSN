@@ -111,25 +111,45 @@ public class RandomDistribution {
     public double getService(int typeOfService) throws Exception {
         rngs.selectStream(3);
 
-        /*switch (typeOfService) {
+        switch (typeOfService) {
             case 0:  //accettazione
-                return rvms.idfTruncatedNormal(accettazione_SR, 0.1, 600, 600, rngs.random());
-            case 1:  //officina
-                return rvms.idfTruncatedNormal(officina_SR, 1, 1800, 9000, rngs.random());
-            case 2: //scarico
-                return rvms.idfTruncatedNormal(scarico_SR, 1, 480, 900, rngs.random());
-            case 3: //checkout
-                return rvms.idfTruncatedNormal(checkout_SR, 1, 600, 1200, rngs.random());
+                return rvms.idfTruncatedNormal(accettazione_SR, 100, 300, 900, rngs.random());
+
+            case 1: //scarico
+                return rvms.idfTruncatedNormal(scarico_SR, 450, 480, 900, rngs.random());
+            case 2: //checkout
+                return rvms.idfTruncatedNormal(checkout_SR, 450, 600, 1200, rngs.random());
+            case 3:  //gommista
+            case 4:  //carrozzeria
+            case 5:  //elettrauto
+            case 6:  //carpenteria
+            case 7:  //meccanica
+                return rvms.idfTruncatedNormal(officina_SR[typeOfService-3][0],officina_SR[typeOfService-3][1],officina_SR[typeOfService-3][1],officina_SR[typeOfService-3][2], rngs.random());
             default:
                 throw new Exception("Tipo di servizio non supportato dal sistema");
 
+        }
+    }
 
-        }*/
+    public double getServiceBatch(int typeOfService) throws Exception {
         rngs.selectStream(3);
 
-        //System.out.println("prodotto tempo servizio " + departure);
-
-        return Exponential(600);
+        switch (typeOfService) {
+            case 0:  //accettazione
+                return Exponential(accettazione_SR);
+            case 1: //scarico
+                return Exponential(scarico_SR);
+            case 2: //checkout
+                return Exponential(checkout_SR);
+            case 3:  //gommista
+            case 4:  //carrozzeria
+            case 5:  //elettrauto
+            case 6:  //carpenteria
+            case 7:  //meccanica
+                return Exponential(officina_SR[typeOfService-3][0]);
+            default:
+                throw new Exception("Tipo di servizio non supportato dal sistema");
+        }
     }
 
 

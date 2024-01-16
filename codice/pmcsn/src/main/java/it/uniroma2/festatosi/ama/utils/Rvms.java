@@ -757,7 +757,7 @@ public class Rvms{
 	 * @param r valore random tra 0 e 1
 	 * @return valore tra 0 e 1 per la VA
 	 */
-	public double idfTruncatedNormal(double m, double s, int lowerBound, int upperBound, double r){
+	public double idfTruncatedNormal(double m, double s, double lowerBound, double upperBound, double r){
 		double a= cdfNormal(m, s, lowerBound-1);
 		double b= 1.0-cdfNormal(m, s, upperBound);
 		double u=idfUniform(a,1.0-b, r);

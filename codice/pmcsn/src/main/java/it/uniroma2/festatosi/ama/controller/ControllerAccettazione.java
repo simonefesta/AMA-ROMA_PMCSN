@@ -296,7 +296,7 @@ public class ControllerAccettazione {
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            if(this.jobInBatch%B==0){
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
                 System.out.println("batch "+batchNumber);
                 System.out.println("job in batch "+jobInBatch +"\n");
@@ -307,7 +307,7 @@ public class ControllerAccettazione {
             }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(0); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(0); //ottengo tempo di servizio
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -378,7 +378,7 @@ public class ControllerAccettazione {
 
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(0);
+                double service=this.rnd.getServiceBatch(0);
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
@@ -458,6 +458,7 @@ public class ControllerAccettazione {
 
     public void getStatistics(/*double batchTime, double batchNumber*/){
 
+        System.out.println("Accettazione");
         double meanUtilization;
         Statistics statAccettazione = Statistics.getInstance();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);

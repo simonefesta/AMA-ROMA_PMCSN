@@ -6,6 +6,7 @@ import it.uniroma2.festatosi.ama.model.MsqT;
 import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
+import it.uniroma2.festatosi.ama.utils.Statistics;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,6 +36,10 @@ public class ControllerScarico {
     private final List<EventListEntry> eventListScarico=new ArrayList<>(SERVERS_SCARICO+2);
 
     private List<EventListEntry> queueScarico=new LinkedList<>();
+
+    private int jobInBatch=1;
+    private double batchDuration=0;
+    private int batchNumber=1;
 
     File datiScarico;
 
@@ -284,7 +289,6 @@ public class ControllerScarico {
                     return; //se i veicoli sono già tutti presenti nel sistema non possono esserci altri arrivi
                 }
 
-                BatchSimulation.incrementJobInBatch();
                 //viene creato l'evento in base alle informazioni ricavate
                 event = new EventListEntry(eventList.get(0).getT(), 1, vType);
                 //si imposta il tempo del prossimo arrivo
@@ -307,14 +311,25 @@ public class ControllerScarico {
                 }
             }
 
+            BatchSimulation.incrementJobInBatch();
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            this.jobInBatch++;
 
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
             DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
+
+                getStatistics();
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(2); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -374,7 +389,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getServiceBatch(2);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -432,6 +447,49 @@ public class ControllerScarico {
         return (s);
     }
 
+    public void getStatistics(/*double batchTime, double batchNumber*/){
+
+        System.out.println("Scarico");
+        double meanUtilization;
+        Statistics statScarico = Statistics.getInstance();
+        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
+        double Ens = this.area/(this.batchDuration);
+        double Ets = (this.area)/this.jobServed;
+        System.out.println("E[Ns]: " + Ens + " Ets " + Ets); //  Da msq è definita come area/t_Current
+        statScarico.setBatchPopolazioneSistema(Ens, batchNumber); //metto dentro il vettore Ens del batch
+        statScarico.setBatchTempoSistema(Ets, batchNumber); //Metto dentro il vettore Ets del batch
+
+
+        double sumService = 0; //qui metto la somma dei service time
+
+        // Salviamo i tempi di servizio in una variabile di appoggio
+        for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
+            sumService += this.sum.get(i).getService();
+            this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
+            this.sum.get(i).setServed(0);
+        }
+
+        double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        double Enq = (this.area-sumService)/(this.batchDuration);
+
+        statScarico.setBatchPopolazioneCodaArray(Enq ,  batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+        statScarico.setBatchTempoCoda(Etq, batchNumber);
+
+        System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
+
+
+        meanUtilization = sumService/(this.batchDuration*SERVERS_ACCETTAZIONE);
+        statScarico.setBatchUtilizzazione(meanUtilization, batchNumber);
+
+        System.out.println("MeanUtilization "+ meanUtilization);
+
+
+
+        this.area = 0;
+        this.jobServed = 0;
+
+    }
+
     public void printStats() {
         System.out.println("Scarico\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
@@ -461,4 +519,7 @@ public class ControllerScarico {
         System.out.println("\n");
     }
 
+    public int getJobInBatch() {
+        return this.jobInBatch;
+    }
 }

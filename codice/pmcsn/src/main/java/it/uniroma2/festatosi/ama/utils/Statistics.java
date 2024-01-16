@@ -21,11 +21,11 @@ public class Statistics {
     private double devEns; //dev std per Enq
     private double devRho; //dev std per Rho
 
-    private double[] batchPopolazioneCoda;
-    private double[] batchTempoCoda;
-    private double[] batchPopolazioneSistema;
-    private double[] batchTempoSistema;
-    private double[] batchUtilizzazione;
+    private final double[] batchPopolazioneCoda;
+    private final double[] batchTempoCoda;
+    private final double[] batchPopolazioneSistema;
+    private final double[] batchTempoSistema;
+    private final double[] batchUtilizzazione;
 
     private static Statistics instance;
     // Costruttore privato per evitare inizializzazione diretta
