@@ -111,7 +111,7 @@ public class RandomDistribution {
     public double getService(int typeOfService) throws Exception {
         rngs.selectStream(3);
 
-        switch (typeOfService) {
+        /*switch (typeOfService) {
             case 0:  //accettazione
                 return rvms.idfTruncatedNormal(accettazione_SR, 0.1, 600, 600, rngs.random());
             case 1:  //officina
@@ -124,7 +124,12 @@ public class RandomDistribution {
                 throw new Exception("Tipo di servizio non supportato dal sistema");
 
 
-        }
+        }*/
+        rngs.selectStream(3);
+
+        //System.out.println("prodotto tempo servizio " + departure);
+
+        return Exponential(600);
     }
 
 

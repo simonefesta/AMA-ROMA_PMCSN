@@ -461,39 +461,29 @@ public class ControllerAccettazione {
         double meanUtilization;
         Statistics statAccettazione = Statistics.getInstance();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
-        System.out.println("Area E[Ns]: " + this.area/(this.batchDuration)); //  Da msq è definita come area/t_Current
+        double Ens = this.area/(this.batchDuration);
+        double Ets = (this.area)/this.jobServed;
+        System.out.println("E[Ns]: " + Ens + " Ets " + Ets); //  Da msq è definita come area/t_Current
+        statAccettazione.setBatchPopolazioneSistema(Ens, batchNumber); //metto dentro il vettore Ens del batch
+        statAccettazione.setBatchTempoSistema(Ets, batchNumber); //Metto dentro il vettore Ets del batch
 
-        //statAccettazione.setMeanWait(this.area/jobServed);
 
         double sumService = 0; //qui metto la somma dei service time
 
         // Salviamo i tempi di servizio in una variabile di appoggio
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
             sumService += this.sum.get(i).getService();
-            //meanUtilization+=this.sum.get(i).getService();
             this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
             this.sum.get(i).setServed(0);
         }
-        long l = this.jobServed * 600;
-        System.out.println("Attesa/Wait nel sistema E[Ts] : " + this.area/this.jobServed  + " job serviti " + this.jobServed + " area " +this.area + " sumService " + sumService + " altra sum " + l);
-
 
         double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
-        double Ets = (this.area)/this.jobServed;
-        //System.out.println("ETQ "+Etq+" area "+this.area+" servizi "+sumService);
-       /* if(Etq<0){
-            System.out.println("ETQ NEGATIVA, FIXO");
-            statAccettazione.setBatchMeanDelayArray(0, batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
-        } else {*/
-
-            statAccettazione.setBatchMeanDelayArray(Ets, batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
-        //}
-
         double Enq = (this.area-sumService)/(this.batchDuration);
-        double Ens = (this.area)/(this.batchDuration);
-        statAccettazione.setBatchPopolazioneCodaArray(Ens ,  batchNumber); // E[Nq] = area/DeltaT (cosi definito)
 
-        System.out.println("Delay E[Ts]: " + Ets + " ; E[Ns] " + Ens);
+        statAccettazione.setBatchPopolazioneCodaArray(Enq ,  batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+        statAccettazione.setBatchTempoCoda(Etq, batchNumber);
+
+        System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
 
         meanUtilization = sumService/(this.batchDuration*SERVERS_ACCETTAZIONE);

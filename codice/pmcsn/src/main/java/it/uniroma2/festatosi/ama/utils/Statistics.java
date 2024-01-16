@@ -5,18 +5,26 @@ import static it.uniroma2.festatosi.ama.model.Constants.K;
 public class Statistics {
 
     private double meanDelay; // attesa media in coda, ovvero E[Tq]
-    private double meanUtilization;  // utilizzo rho = lambda/mu = lambda * E[S]
-
-    private double popMediaCoda;
-
     private double meanWait;  // attesa media nel centro, ovvero E[Ts] = E[Tq] + E[S_i]
 
+    private double meanUtilization;  // utilizzo rho = lambda/mu = lambda * E[S]
+
+    private double popMediaCoda;  //Enq
+    private double popMediaSistema; //Ens
+
+
+
     private double devEtq; //dev std per Etq
+    private double devEts; //dev std per Ets
+
     private double devEnq; //dev std per Enq
-    private double devRho;
-    private double[] batchMedia;
+    private double devEns; //dev std per Enq
+    private double devRho; //dev std per Rho
 
     private double[] batchPopolazioneCoda;
+    private double[] batchTempoCoda;
+    private double[] batchPopolazioneSistema;
+    private double[] batchTempoSistema;
     private double[] batchUtilizzazione;
 
     private static Statistics instance;
@@ -24,9 +32,11 @@ public class Statistics {
     private Statistics() {
         meanDelay = 0;
         meanUtilization = 0;
-        batchMedia = new double[K + 1];
-        batchPopolazioneCoda = new double[K+1];
         batchUtilizzazione = new double[K+1];
+        batchPopolazioneCoda = new double[K+1];
+        batchTempoCoda = new double[K+1];
+        batchPopolazioneSistema = new double[K+1];
+        batchTempoSistema = new double[K+1];
     }
 
 
@@ -67,10 +77,16 @@ public class Statistics {
         this.meanWait = meanWait;
     }
 
+    public double getMeanWait() {
+        return this.meanWait;
+    }
+
     public double getDevStd(int type) {
         if (type == 0)  return devEtq;
         else if ( type == 1) return devEnq;
         else if (type == 2) return devRho;
+        else if (type == 3) return devEts;
+        else if (type == 4) return devEns;
         else return -1;
     }
 
@@ -92,6 +108,8 @@ public class Statistics {
         if (type == 0) setMeanDelay(media);     // type 0: media E[Tq]
         else if (type == 1) setPopMediaCoda(media); //type 1: media E[Nq]
         else if (type == 2) setMeanUtilization(media);
+        else if (type == 3) setMeanWait(media);   //Ets
+        else if (type == 4) setPopMediaSistema(media);
 
         // Calcola la somma dei quadrati delle differenze dalla media
         double sommaQuadratiDifferenze = 0.0;
@@ -107,19 +125,18 @@ public class Statistics {
         if (type == 0) devEtq = devStd;
         else if (type == 1) devEnq = devStd;
         else if (type == 2) devRho = devStd;
+        else if (type == 3) devEts = devStd;
+        else if (type == 4) devEns = devStd;
 
     }
 
+    private void setPopMediaSistema(double media) {
+        this.popMediaSistema = media;
 
-    /*
-            Set e Get dei singoli E[Tq] nel vettore di batch
-     */
-    public void setBatchMeanDelayArray( double media, int index){
-        batchMedia[index] = media;
     }
 
-    public double[] getBatchMeanDelayArray(){
-        return batchMedia;
+    public double getPopMediaSistema() {
+       return this.popMediaSistema;
     }
 
 
@@ -142,10 +159,7 @@ public class Statistics {
         this.popMediaCoda = popMediaCoda;
     }
 
-    public void setMeanUtilizationBatch(double meanUtilization) {
-        this.meanUtilization = meanUtilization;
-    }
-
+ 
     public double[] getBatchUtilizzazione() {
         return batchUtilizzazione;
     }
@@ -153,4 +167,30 @@ public class Statistics {
     public void setBatchUtilizzazione(double utilizzazione, int index) {
         this.batchUtilizzazione[index] = utilizzazione;
     }
+
+    public double[] getBatchPopolazioneSistema() {
+        return this.batchPopolazioneSistema;
+    }
+
+    public void setBatchPopolazioneSistema(double batchPopSistema, int index) {
+        this.batchPopolazioneSistema[index] = batchPopSistema;
+    }
+
+    public double[] getBatchTempoCoda() {
+        return batchTempoCoda;
+    }
+
+    public void setBatchTempoCoda( double tempoCoda, int index) {
+        this.batchTempoCoda[index] = tempoCoda;
+    }
+
+    public double[] getBatchTempoSistema() {
+        return batchTempoSistema;
+    }
+
+    public void setBatchTempoSistema(double tempoSistema, int index) {
+        this.batchTempoSistema[index] = tempoSistema;
+    }
+
+
 }

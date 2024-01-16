@@ -259,19 +259,24 @@ public class ControllerSistema {
 
         Rvms rvms = new Rvms();
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
-        System.out.println("Critical value is " + criticalValue);
 
         Statistics stat = Statistics.getInstance();       //finiti i batch
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
-        System.out.print("Statistiche per E[Ts] ");
-        stat.setDevStd(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
-        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)) /*+ " variance is " + stat.getDevStd(0)/(Math.sqrt(K-1))*/);
-        System.out.print("Statistiche per E[Ns] ");
-        stat.setDevStd(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
-        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getDevStd(1)/(Math.sqrt(K-1)) /*+ " variance is" + stat.getDevStd(1)/(Math.sqrt(K-1))*/);
+        System.out.print("Statistiche per E[Tq] ");
+        stat.setDevStd(stat.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
+        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Nq] ");
+        stat.setDevStd(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getDevStd(1)/(Math.sqrt(K-1)));
         System.out.print("Statistiche per rho ");
-        stat.setDevStd(stat.getBatchUtilizzazione(),2);     // calcolo la varianza per Enq
-        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getDevStd(2)/(Math.sqrt(K-1))  /*+ " variance is" + stat.getDevStd(2)/(Math.sqrt(K-1))*/);
+        stat.setDevStd(stat.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getDevStd(2)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Ts] ");
+        stat.setDevStd(stat.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
+        System.out.println("Critical endpoints " + stat.getMeanWait() + " +/- " + criticalValue * stat.getDevStd(3)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Ns] ");
+        stat.setDevStd(stat.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
+        System.out.println("Critical endpoints " + stat.getPopMediaSistema() + " +/- " + criticalValue * stat.getDevStd(4)/(Math.sqrt(K-1)));
 
 
        /* System.out.println("MeanDelay Etq");
