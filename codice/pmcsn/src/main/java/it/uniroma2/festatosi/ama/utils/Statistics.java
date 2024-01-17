@@ -29,7 +29,7 @@ public class Statistics {
 
     private static Statistics instance;
     // Costruttore privato per evitare inizializzazione diretta
-    private Statistics() {
+    public Statistics() {
         meanDelay = 0;
         meanUtilization = 0;
         batchUtilizzazione = new double[K+1];
@@ -40,13 +40,13 @@ public class Statistics {
     }
 
 
-    // Metodo per ottenere l'istanza del singleton
+    /*// Metodo per ottenere l'istanza del singleton
     public static Statistics getInstance() {
         if (instance == null) {
             instance = new Statistics();
         }
         return instance;
-    }
+    }*/
 
     /*
       Set e Get di E[Tq] del singolo batch

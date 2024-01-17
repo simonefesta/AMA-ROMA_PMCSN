@@ -257,12 +257,16 @@ public class ControllerSistema {
            // eventList = eventHandler.getEventsSistema();
             this.time.setCurrent(this.time.getNext());
         }
-        
-        Rvms rvms = new Rvms();
-        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
 
-        Statistics stat = Statistics.getInstance();       //finiti i batch
-        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        //stampo statistiche finali scarico
+        ((ControllerScarico)controllerList.get(0)).printFinalStats();
+        ((ControllerAccettazione)controllerList.get(1)).printFinalStats();
+
+        /*Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);*/
+
+        //Statistics stat = Statistics.getInstance();       //finiti i batch
+        /*System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
         System.out.print("Statistiche per E[Tq] ");
         stat.setDevStd(stat.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
         System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)));
@@ -277,7 +281,7 @@ public class ControllerSistema {
         System.out.println("Critical endpoints " + stat.getMeanWait() + " +/- " + criticalValue * stat.getDevStd(3)/(Math.sqrt(K-1)));
         System.out.print("Statistiche per E[Ns] ");
         stat.setDevStd(stat.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
-        System.out.println("Critical endpoints " + stat.getPopMediaSistema() + " +/- " + criticalValue * stat.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println("Critical endpoints " + stat.getPopMediaSistema() + " +/- " + criticalValue * stat.getDevStd(4)/(Math.sqrt(K-1)));*/
 
 
        /* System.out.println("MeanDelay Etq");

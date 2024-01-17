@@ -3,10 +3,7 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
-import it.uniroma2.festatosi.ama.utils.RandomDistribution;
-import it.uniroma2.festatosi.ama.utils.Rngs;
-import it.uniroma2.festatosi.ama.utils.Statistics;
+import it.uniroma2.festatosi.ama.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -42,6 +39,7 @@ public class ControllerAccettazione {
     private int jobInBatch=1;
     private double batchDuration=0;
     private int batchNumber=1;
+    private Statistics statAccettazione;
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -460,7 +458,7 @@ public class ControllerAccettazione {
 
         System.out.println("Accettazione");
         double meanUtilization;
-        Statistics statAccettazione = Statistics.getInstance();
+        statAccettazione = new Statistics();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ets = (this.area)/this.jobServed;
@@ -502,5 +500,26 @@ public class ControllerAccettazione {
 
     public int getJobInBatch() {
         return this.jobInBatch;
+    }
+
+    public void printFinalStats() {
+        Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
+        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.print("Statistiche per E[Tq] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
+        System.out.println("Critical endpoints " + statAccettazione.getMeanDelay() + " +/- " + criticalValue * statAccettazione.getDevStd(0)/(Math.sqrt(K-1)));
+        System.out.print("statAccettazioneistiche per E[Nq] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statAccettazione.getPopMediaCoda() + " +/- " + criticalValue * statAccettazione.getDevStd(1)/(Math.sqrt(K-1)));
+        System.out.print("statAccettazioneistiche per rho ");
+        statAccettazione.setDevStd(statAccettazione.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statAccettazione.getMeanUtilization() + " +/- " + criticalValue * statAccettazione.getDevStd(2)/(Math.sqrt(K-1)));
+        System.out.print("statAccettazioneistiche per E[Ts] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
+        System.out.println("Critical endpoints " + statAccettazione.getMeanWait() + " +/- " + criticalValue * statAccettazione.getDevStd(3)/(Math.sqrt(K-1)));
+        System.out.print("statAccettazioneistiche per E[Ns] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
+        System.out.println("Critical endpoints " + statAccettazione.getPopMediaSistema() + " +/- " + criticalValue * statAccettazione.getDevStd(4)/(Math.sqrt(K-1)));
     }
 }
