@@ -59,7 +59,7 @@ public class Constants {
     public static final double P3 = 0.09;
 
     // ---- SKIPP PROB ----
-    // probabilità difetto tipologia "elettrauti"
+    // probabilità difetto tipologia "elettrauto"
     public static final double P4 = 0.1;
 
     // probabilità difetto tipologia "carpenteria meccanica"
@@ -83,10 +83,12 @@ public class Constants {
     public static final int VEICOLI2 = 79; //veicoli grandi #59
 
     public static File datiSistema;
+    public static File datiSistemaBatch;
 
     static {
         try {
             datiSistema = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
+            datiSistemaBatch = DataExtractor.initializeFile((new Rngs()).getSeed(), "SistemaBatch");
         } catch (IOException e) {
             System.out.println("Problema nell'inizializzazione del file coi dati del Sistema.");
         }

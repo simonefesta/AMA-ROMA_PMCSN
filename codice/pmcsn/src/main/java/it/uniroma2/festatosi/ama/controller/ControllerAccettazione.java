@@ -490,7 +490,7 @@ public class ControllerAccettazione implements Controller {
         statAccettazione.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
-        DataExtractor.writeBatchStat(datiAccettazioneBatch,(int)BatchSimulation.getNBatch(),Ens);
+        DataExtractor.writeBatchStat(datiAccettazioneBatch,batchNumber,Ens);
 
 
 

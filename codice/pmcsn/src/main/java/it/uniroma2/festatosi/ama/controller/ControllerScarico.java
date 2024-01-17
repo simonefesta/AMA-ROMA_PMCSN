@@ -488,7 +488,7 @@ public class ControllerScarico implements Controller{
         statScarico.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
-        DataExtractor.writeBatchStat(datiScaricoBatch,(int)BatchSimulation.getNBatch(),Ens);
+        DataExtractor.writeBatchStat(datiScaricoBatch,batchNumber,Ens);
 
 
 

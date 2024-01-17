@@ -169,7 +169,7 @@ public class ControllerSistema {
         time.setNext(START);
         double batchDuration;
         int numVeicoliSys;
-        DataExtractor.initializeFile(seed, "Infinite_simulation");
+
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();

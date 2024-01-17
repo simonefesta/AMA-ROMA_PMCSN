@@ -104,7 +104,8 @@ public class DataExtractor{
 
         } catch (IOException e) {
             e.printStackTrace();
-            throw e; // Rilancia l'eccezione per indicare eventuali errori nella chiamata esterna
+            System.out.println("Errore nella conversione da .csv a .txt");
+            throw e; // Rilancia l'eccezione per indicare eventuali errori nella chiamata
         }
 
 

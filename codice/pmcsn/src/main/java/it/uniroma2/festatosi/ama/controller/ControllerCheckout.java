@@ -459,7 +459,7 @@ public class ControllerCheckout implements Controller{
 
         System.out.println("MeanUtilization "+ meanUtilization);
 
-        DataExtractor.writeBatchStat(datiCheckoutBatch,(int)BatchSimulation.getNBatch(),Ens);
+        DataExtractor.writeBatchStat(datiCheckoutBatch,batchNumber,Ens);
 
 
 

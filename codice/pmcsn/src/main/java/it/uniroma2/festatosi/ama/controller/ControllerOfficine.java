@@ -487,7 +487,7 @@ public void infiniteSimulation() throws Exception {
 
         System.out.println("MeanUtilization "+ meanUtilization);
 
-        DataExtractor.writeBatchStat(datiOfficinaBatch, (int) BatchSimulation.getNBatch(), Ens);
+        DataExtractor.writeBatchStat(datiOfficinaBatch, batchNumber, Ens);
 
 
 
