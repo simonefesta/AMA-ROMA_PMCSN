@@ -16,7 +16,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
 /**
  * Rappresenta la msq per l'accettazione
  */
-public class ControllerAccettazione {
+public class ControllerAccettazione implements Controller {
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
@@ -455,7 +455,7 @@ public class ControllerAccettazione {
         System.out.println("\n");
     }
 
-    public void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(/*double batchTime, double batchNumber*/){
 
         System.out.println("Accettazione");
         double meanUtilization;

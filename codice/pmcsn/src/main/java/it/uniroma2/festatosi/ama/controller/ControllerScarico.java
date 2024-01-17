@@ -16,7 +16,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  * Rappresenta la msq per lo scarico
  */
 
-public class ControllerScarico {
+public class ControllerScarico implements Controller{
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
@@ -453,7 +453,7 @@ public class ControllerScarico {
         return (s);
     }
 
-    public void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(/*double batchTime, double batchNumber*/){
 
         System.out.println("Scarico");
         double meanUtilization;
@@ -468,7 +468,7 @@ public class ControllerScarico {
         double sumService = 0; //qui metto la somma dei service time
 
         // Salviamo i tempi di servizio in una variabile di appoggio
-        for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
+        for(int i = 1; i <= SERVERS_SCARICO; i++) {
             sumService += this.sum.get(i).getService();
             this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
             this.sum.get(i).setServed(0);
@@ -483,7 +483,7 @@ public class ControllerScarico {
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
 
-        meanUtilization = sumService/(this.batchDuration*SERVERS_ACCETTAZIONE);
+        meanUtilization = sumService/(this.batchDuration*SERVERS_SCARICO);
         statScarico.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
