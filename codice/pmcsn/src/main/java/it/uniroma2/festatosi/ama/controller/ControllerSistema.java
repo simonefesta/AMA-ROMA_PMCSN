@@ -158,21 +158,21 @@ public class ControllerSistema {
         }
 
         ((ControllerScarico) controllerList.get(0)).printStats(); //scarico
-        //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
         for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
             ((ControllerOfficine) controllerList.get(i+2)).printStats();
         }
         ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout
 
 
-        System.out.println("Popolazione: "+ eventHandler.getNumber());
+        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
         System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
         System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
         System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
         System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
         System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
     }
@@ -193,10 +193,9 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
 
-        while (((ControllerAccettazione)controllerList.get(1)).getJobInBatch() < B * K
-        || ((ControllerScarico)controllerList.get(0)).getJobInBatch() < B * K) {
+        while (/*((ControllerAccettazione)controllerList.get(1)).getJobInBatch() < B * K
+            ||*/ ((ControllerScarico)controllerList.get(0)).getJobInBatch() < B * K) {
             numVeicoliSys=eventHandler.getNumber();
-
             eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista

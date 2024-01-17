@@ -30,14 +30,13 @@ public class ControllerScarico {
 
     private final List<MsqSum> sum=new ArrayList<>(SERVERS_SCARICO+2);
     private final MsqT time=new MsqT();
-    private final List<EventListEntry> eventListScarico=new ArrayList<>(SERVERS_SCARICO+2);
 
-    private List<EventListEntry> queueScarico=new LinkedList<>();
+    private final List<EventListEntry> queueScarico=new LinkedList<>();
 
-    private int jobInBatch=1;
+    private int jobInBatch=0;
     private double batchDuration=0;
     private int batchNumber=1;
-    private Statistics statScarico;
+    private final Statistics statScarico = new Statistics();;
 
     File datiScarico;
 
@@ -54,12 +53,13 @@ public class ControllerScarico {
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
         /*inizializza la lista degli eventi dello scarico*/
+        List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
         for(s=0; s<SERVERS_SCARICO+2; s++){
-            this.eventListScarico.add(s, new EventListEntry(0,0));
+            eventListScarico.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
         /*imposta a 1 l'evento di arrivo da fuori, si aprono le porte*/
-        this.eventListScarico.set(0, new EventListEntry(rnd.getJobArrival(0), 1, 1));
+        eventListScarico.set(0, new EventListEntry(rnd.getJobArrival(0), 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsScarico(eventListScarico);
@@ -76,12 +76,12 @@ public class ControllerScarico {
         * se le porte sono chiuse, la lista degli eventi arrivati dall'interno è vuota e sono stati processati
         * tutti gli eventi nel sistema si imposta a 0 la x nella event list in modo da non essere invocato nuovamente
         * */
-        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().size()==0 && this.number==0){
+        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().isEmpty() && this.number==0){
             eventHandler.getEventsSistema().get(0).setX(0);
             return;
         }
 
-        if (internalEventsScarico.size()>0){
+        if (!internalEventsScarico.isEmpty()){
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
@@ -130,7 +130,7 @@ public class ControllerScarico {
                 internalEventsScarico.remove(0);
                // System.out.println("interno");
                 vType=event.getVehicleType();
-                if(internalEventsScarico.size()==0){
+                if(internalEventsScarico.isEmpty()){
                     eventList.get(eventList.size()-1).setX(0);
                 }
             }
@@ -181,6 +181,10 @@ public class ControllerScarico {
                     eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
                     eventHandler.setEventsScarico(eventList);
                     eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                    //attivo di nuovo arrivi per accettazione
+                    eventHandler.getEventsAccettazione().get(0).setX(1);
+                    eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                    eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
                 }
             }
             else{
@@ -250,12 +254,12 @@ public class ControllerScarico {
         * se le porte sono chiuse, la lista degli eventi arrivati dall'interno è vuota e sono stati processati
         * tutti gli eventi nel sistema si imposta a 0 la x nella event list in modo da non essere invocato nuovamente
         * */
-        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().size()==0 && this.number==0){
+        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().isEmpty() && this.number==0){
             eventHandler.getEventsSistema().get(0).setX(0);
             return;
         }
 
-        if (internalEventsScarico.size()>0){
+        if (!internalEventsScarico.isEmpty()){
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
@@ -304,7 +308,7 @@ public class ControllerScarico {
                 internalEventsScarico.remove(0);
                 //System.out.println("interno");
                 vType=event.getVehicleType();
-                if(internalEventsScarico.size()==0){
+                if(internalEventsScarico.isEmpty()){
                     eventList.get(eventList.size()-1).setX(0);
                 }
             }
@@ -366,6 +370,10 @@ public class ControllerScarico {
                     eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
                     eventHandler.setEventsScarico(eventList);
                     eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                    //attivo di nuovo arrivi per accettazione
+                    eventHandler.getEventsAccettazione().get(0).setX(1);
+                    eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                    eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
                 }
             }
             else{
@@ -449,7 +457,6 @@ public class ControllerScarico {
 
         System.out.println("Scarico");
         double meanUtilization;
-        statScarico = new Statistics();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ets = (this.area)/this.jobServed;
@@ -528,16 +535,16 @@ public class ControllerScarico {
         System.out.print("Statistiche per E[Tq] ");
         statScarico.setDevStd(statScarico.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
         System.out.println("Critical endpoints " + statScarico.getMeanDelay() + " +/- " + criticalValue * statScarico.getDevStd(0)/(Math.sqrt(K-1)));
-        System.out.print("statScaricoistiche per E[Nq] ");
+        System.out.print("statistiche per E[Nq] ");
         statScarico.setDevStd(statScarico.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
         System.out.println("Critical endpoints " + statScarico.getPopMediaCoda() + " +/- " + criticalValue * statScarico.getDevStd(1)/(Math.sqrt(K-1)));
-        System.out.print("statScaricoistiche per rho ");
+        System.out.print("statistiche per rho ");
         statScarico.setDevStd(statScarico.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
         System.out.println("Critical endpoints " + statScarico.getMeanUtilization() + " +/- " + criticalValue * statScarico.getDevStd(2)/(Math.sqrt(K-1)));
-        System.out.print("statScaricoistiche per E[Ts] ");
+        System.out.print("statistiche per E[Ts] ");
         statScarico.setDevStd(statScarico.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
         System.out.println("Critical endpoints " + statScarico.getMeanWait() + " +/- " + criticalValue * statScarico.getDevStd(3)/(Math.sqrt(K-1)));
-        System.out.print("statScaricoistiche per E[Ns] ");
+        System.out.print("statistiche per E[Ns] ");
         statScarico.setDevStd(statScarico.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statScarico.getPopMediaSistema() + " +/- " + criticalValue * statScarico.getDevStd(4)/(Math.sqrt(K-1)));
     }

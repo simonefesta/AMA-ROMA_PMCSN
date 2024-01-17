@@ -153,11 +153,11 @@ public class ControllerCheckout {
                 //attivo di nuovo arrivi per scarico
                 eventHandler.getEventsScarico().get(0).setX(1);
                 eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
-                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventHandler.getEventsScarico()));
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire

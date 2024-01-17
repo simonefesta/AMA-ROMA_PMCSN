@@ -31,15 +31,14 @@ public class ControllerAccettazione {
 
     private final List<MsqSum> sum=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
     private final MsqT time=new MsqT();
-    private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
-    private List<EventListEntry> queueAccettazione=new LinkedList<>();
+    private final List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
-    private int jobInBatch=1;
+    private int jobInBatch=0;
     private double batchDuration=0;
     private int batchNumber=1;
-    private Statistics statAccettazione;
+    private final Statistics statAccettazione = new Statistics();;
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -55,8 +54,9 @@ public class ControllerAccettazione {
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
 
 
+        List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
-            this.eventListAccettazione.add(s, new EventListEntry(0,0));
+            eventListAccettazione.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
 
@@ -67,7 +67,7 @@ public class ControllerAccettazione {
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
 
         //inizializzo il primo evento con tempo pari a un primo arrivo.
-        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, 1));
+        eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
@@ -294,6 +294,8 @@ public class ControllerAccettazione {
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
+            System.out.println("Arrivo in accettazione "+this.jobInBatch);
+
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
                 System.out.println("batch "+batchNumber);
@@ -458,7 +460,6 @@ public class ControllerAccettazione {
 
         System.out.println("Accettazione");
         double meanUtilization;
-        statAccettazione = new Statistics();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ets = (this.area)/this.jobServed;
@@ -509,16 +510,16 @@ public class ControllerAccettazione {
         System.out.print("Statistiche per E[Tq] ");
         statAccettazione.setDevStd(statAccettazione.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
         System.out.println("Critical endpoints " + statAccettazione.getMeanDelay() + " +/- " + criticalValue * statAccettazione.getDevStd(0)/(Math.sqrt(K-1)));
-        System.out.print("statAccettazioneistiche per E[Nq] ");
+        System.out.print("statistiche per E[Nq] ");
         statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
         System.out.println("Critical endpoints " + statAccettazione.getPopMediaCoda() + " +/- " + criticalValue * statAccettazione.getDevStd(1)/(Math.sqrt(K-1)));
-        System.out.print("statAccettazioneistiche per rho ");
+        System.out.print("statistiche per rho ");
         statAccettazione.setDevStd(statAccettazione.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
         System.out.println("Critical endpoints " + statAccettazione.getMeanUtilization() + " +/- " + criticalValue * statAccettazione.getDevStd(2)/(Math.sqrt(K-1)));
-        System.out.print("statAccettazioneistiche per E[Ts] ");
+        System.out.print("statistiche per E[Ts] ");
         statAccettazione.setDevStd(statAccettazione.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
         System.out.println("Critical endpoints " + statAccettazione.getMeanWait() + " +/- " + criticalValue * statAccettazione.getDevStd(3)/(Math.sqrt(K-1)));
-        System.out.print("statAccettazioneistiche per E[Ns] ");
+        System.out.print("statistiche per E[Ns] ");
         statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statAccettazione.getPopMediaSistema() + " +/- " + criticalValue * statAccettazione.getDevStd(4)/(Math.sqrt(K-1)));
     }
