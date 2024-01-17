@@ -294,14 +294,13 @@ public class ControllerAccettazione {
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
-            System.out.println("Arrivo in accettazione "+this.jobInBatch);
-
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
+
 
                 getStatistics();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }

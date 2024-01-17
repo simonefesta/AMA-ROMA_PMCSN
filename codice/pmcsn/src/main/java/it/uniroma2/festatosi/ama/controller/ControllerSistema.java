@@ -193,8 +193,8 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
 
-        while (/*((ControllerAccettazione)controllerList.get(1)).getJobInBatch() < B * K
-            ||*/ ((ControllerScarico)controllerList.get(0)).getJobInBatch() < B * K) {
+        while (((ControllerAccettazione)controllerList.get(1)).getJobInBatch() < B * K
+            || ((ControllerScarico)controllerList.get(0)).getJobInBatch() < B * K) {
             numVeicoliSys=eventHandler.getNumber();
             eventList = this.eventHandler.getEventsSistema();
 

@@ -142,7 +142,7 @@ public class ControllerScarico {
 
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(2); //ottengo tempo di servizio
+                double service=this.rnd.getService(1); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -206,7 +206,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getService(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -322,16 +322,16 @@ public class ControllerScarico {
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+                
+                getStatistics();
                 System.out.println("batch "+batchNumber);
                 System.out.println("job in batch "+jobInBatch +"\n");
-
-                getStatistics();
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -395,7 +395,7 @@ public class ControllerScarico {
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getServiceBatch(2);
+                double service=this.rnd.getServiceBatch(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
