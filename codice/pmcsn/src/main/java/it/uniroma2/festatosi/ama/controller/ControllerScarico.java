@@ -322,7 +322,7 @@ public class ControllerScarico {
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
-                
+
                 getStatistics();
                 System.out.println("batch "+batchNumber);
                 System.out.println("job in batch "+jobInBatch +"\n");
@@ -531,7 +531,7 @@ public class ControllerScarico {
     public void printFinalStats() {
         Rvms rvms = new Rvms();
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
-        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.println("Scarico");
         System.out.print("Statistiche per E[Tq] ");
         statScarico.setDevStd(statScarico.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
         System.out.println("Critical endpoints " + statScarico.getMeanDelay() + " +/- " + criticalValue * statScarico.getDevStd(0)/(Math.sqrt(K-1)));
@@ -547,5 +547,6 @@ public class ControllerScarico {
         System.out.print("statistiche per E[Ns] ");
         statScarico.setDevStd(statScarico.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statScarico.getPopMediaSistema() + " +/- " + criticalValue * statScarico.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println();
     }
 }

@@ -505,7 +505,7 @@ public class ControllerAccettazione {
     public void printFinalStats() {
         Rvms rvms = new Rvms();
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
-        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.println("Accettazione");
         System.out.print("Statistiche per E[Tq] ");
         statAccettazione.setDevStd(statAccettazione.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
         System.out.println("Critical endpoints " + statAccettazione.getMeanDelay() + " +/- " + criticalValue * statAccettazione.getDevStd(0)/(Math.sqrt(K-1)));
@@ -521,5 +521,6 @@ public class ControllerAccettazione {
         System.out.print("statistiche per E[Ns] ");
         statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statAccettazione.getPopMediaSistema() + " +/- " + criticalValue * statAccettazione.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println();
     }
 }

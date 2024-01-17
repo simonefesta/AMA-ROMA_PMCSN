@@ -257,8 +257,10 @@ public class ControllerSistema {
             this.time.setCurrent(this.time.getNext());
         }
 
+        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
         //stampo statistiche finali scarico
         ((ControllerScarico)controllerList.get(0)).printFinalStats();
+        //stampo statistiche finali accettazione
         ((ControllerAccettazione)controllerList.get(1)).printFinalStats();
 
         /*Rvms rvms = new Rvms();
