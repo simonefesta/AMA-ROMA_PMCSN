@@ -224,6 +224,7 @@ public class ControllerSistema {
         }
 
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+
         printFinalStas();
 
         /*Rvms rvms = new Rvms();
@@ -280,9 +281,7 @@ public class ControllerSistema {
 
     private void printFinalStas() {
         for(Controller controller:controllerList){
-            if(controller.getJobInBatch()<=B*K){
-                controller.printFinalStats();
-            }
+            controller.printFinalStats();
         }
         /*//stampo statistiche finali scarico
         ((ControllerScarico)controllerList.get(0)).printFinalStats();
