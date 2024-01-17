@@ -7,24 +7,17 @@ import it.uniroma2.festatosi.ama.controller.ControllerSistema;
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
     public static void main(String[] args) throws Exception {
-        //System.out.println("START");
-
-        /*ControllerAccettazione accettazione = new ControllerAccettazione();
-        accettazione.baseSimulation();
-        accettazione.printStats();
-        ControllerGommista gommista=new ControllerGommista();
-        gommista.baseSimulation();
-        gommista.printStats();
-        ControllerScarico scarico=new ControllerScarico();
-        scarico.baseSimulation();
-        scarico.printStats();*/
 
         long seed = 123456789;
 
         ControllerSistema sistema=new ControllerSistema(seed);
         sistema.selectSeed(seed);
-        sistema.simulation(1); //0 finita, 1 infinita
-//        sistema.baseSimulation();
+        /*  Utilizzo di sistema.simulation(int type)
+         *  @ type = 0; simulazione finita, servizi gaussiani.
+         *         = 1; simulazione infinita, servizi esponenziali
+         *         = 2; simulazione infinita con servizi gaussiani troncati
+         */
+        sistema.simulation(1);
 
 
     }

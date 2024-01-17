@@ -52,7 +52,7 @@ public class ControllerScarico implements Controller{
         //System.out.println(rngs.getSeed());
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiScaricoBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+        datiScaricoBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -244,7 +244,7 @@ public class ControllerScarico implements Controller{
         }
     }
 
-    public void infiniteSimulation() throws Exception {
+    public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per lo Scarico
         List<EventListEntry> eventList = this.eventHandler.getEventsScarico();
@@ -325,14 +325,16 @@ public class ControllerScarico implements Controller{
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
 
                 getStatistics();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
-                double service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
+
+                double service;
+                if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
+                else service = this.rnd.getService(1);
+
                 //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -396,7 +398,9 @@ public class ControllerScarico implements Controller{
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getServiceBatch(1);
+                double service;
+                if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
+                else service = this.rnd.getService(1);
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -454,9 +458,9 @@ public class ControllerScarico implements Controller{
         return (s);
     }
 
-    private void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(){
 
-        System.out.println("Scarico");
+        System.out.println("\n\nScarico, batch: " + batchNumber);
         double meanUtilization;
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);

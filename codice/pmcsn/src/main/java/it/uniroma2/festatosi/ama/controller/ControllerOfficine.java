@@ -28,7 +28,7 @@ public class ControllerOfficine implements Controller{
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListOfficina;
 
-    int numeroOfficine = 5;
+
     File datiOfficina;
     File datiOfficinaBatch;
 
@@ -56,7 +56,7 @@ public class ControllerOfficine implements Controller{
         rngs.plantSeeds(seed);
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiOfficinaBatch = DataExtractor.initializeFile(rngs.getSeed(),this.name+"Batch");
+        datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -236,7 +236,12 @@ public class ControllerOfficine implements Controller{
         eventHandler.getEventsSistema().get(this.id+2).setT(eventHandler.getMinTime(eventList));
     }
 
-public void infiniteSimulation() throws Exception {
+    /**
+     *
+     * @param typeOfService = 0 se esponenziale (per verifica), 1 altrimenti.
+     *
+     */
+    public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per l'officina
         List<EventListEntry> eventList = this.eventHandler.getEventsOfficina(this.id);
@@ -252,13 +257,6 @@ public void infiniteSimulation() throws Exception {
         }
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
-        //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
-       /* System.out.println(this.name + " stampe");
-        for(EventListEntry ev: eventList){
-            System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
-        }
-        System.out.println(this.name + " fine stampa\n\n");*/
-
 
 
         //imposta il tempo del prossimo evento
@@ -293,14 +291,14 @@ public void infiniteSimulation() throws Exception {
 
 
                 getStatistics();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }
             
             if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
-                double service = this.rnd.getServiceBatch(3+this.id); //ottengo tempo di servizio
+                double service;
+                if  (typeOfService == 0) service =  this.rnd.getServiceBatch(3+this.id); //ottengo tempo di servizio
+                else service = this.rnd.getService(3+this.id);
                 this.s = findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -308,9 +306,6 @@ public void infiniteSimulation() throws Exception {
 
 
                 double sum =event.getT() + service;
-                //imposta nella lista degli eventi che il server s è busy
-               // System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
-                //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
 
 
                 eventList.get(s).setT(sum);
@@ -369,11 +364,12 @@ public void infiniteSimulation() throws Exception {
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
                 }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                //System.out.println("inviato scarico " + this.name);
 
                 if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
-                    double service = this.rnd.getServiceBatch(3+this.id);
+                    double service;
+                    if  (typeOfService == 0) service =  this.rnd.getServiceBatch(3+this.id); //ottengo tempo di servizio
+                    else service = this.rnd.getService(3+this.id);
 
                     //incremento tempo di servizio totale ed eventi totali gestiti
                     sum.get(s).incrementService(service);
@@ -452,9 +448,9 @@ public void infiniteSimulation() throws Exception {
         System.out.println("\n");
     }
 
-    private void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(){
 
-        System.out.println(this.name);
+        System.out.println("\n\n" + this.name + ", batch: " + batchNumber);
         double meanUtilization;
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);

@@ -53,7 +53,7 @@ public class ControllerAccettazione implements Controller {
         //System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiAccettazioneBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
+        datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
 
         List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -241,8 +241,12 @@ public class ControllerAccettazione implements Controller {
 
     }
 
+    /**
+     *
+     * @param typeOfService = 0 servizi esponenziali (per verifica), 1 servizi normali
+     */
 
-    public void infiniteSimulation() throws Exception {
+    public void infiniteSimulation(int typeOfService) throws Exception {
 
         int e;
 
@@ -266,9 +270,7 @@ public class ControllerAccettazione implements Controller {
         this.time.setNext(eventList.get(e).getT());
         //si calcola l'area dell'integrale
         this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
-        double deltaT = this.time.getNext()-this.time.getCurrent();
-        //System.out.println("deltaT è " + deltaT + " = " + this.time.getNext()+" + " + this.time.getCurrent() + " mentre number " + this.number);
-        // System.out.println("thisarea " + this.area);
+
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
 
@@ -300,14 +302,17 @@ public class ControllerAccettazione implements Controller {
 
 
                 getStatistics();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                double service=this.rnd.getServiceBatch(0); //ottengo tempo di servizio
+
+                double service;
+
+                if (typeOfService == 0)  service = this.rnd.getServiceBatch(0); //ottengo tempo di servizio
+                else service = this.rnd.getService(0);
+
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -378,7 +383,9 @@ public class ControllerAccettazione implements Controller {
 
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getServiceBatch(0);
+                double service;
+                if (typeOfService == 0) service=this.rnd.getServiceBatch(0);
+                else service = this.rnd.getService(0);
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
@@ -456,9 +463,9 @@ public class ControllerAccettazione implements Controller {
         System.out.println("\n");
     }
 
-    private void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(){
 
-        System.out.println("Accettazione");
+        System.out.println(" \n\nAccettazione, batch: " + batchNumber);
         double meanUtilization;
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);

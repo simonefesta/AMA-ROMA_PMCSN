@@ -94,13 +94,19 @@ public class ControllerSistema {
     public void simulation(int type) throws Exception {
         switch (type){
             case 0:
+                System.out.println("\nAvvio simulazione transiente, servizi gaussiani.");
                 baseSimulation();
                 break;
             case 1:
-                infiniteSimulation();
+                System.out.println("\nAvvio simulazione orizzonte infinito, servizi esponenziali.");
+                infiniteSimulation(0);  //batch con servizi esponenziali
+                break;
+            case 2:
+                System.out.println("\nAvvio simulazione orizzonte infinito, servizi gaussiani.");
+                infiniteSimulation(1);  //batch con servizi normali
                 break;
             default:
-                throw new Exception("Type deve essere 0 o 1");
+                throw new Exception("Type deve essere 0, 1 o 2");
         }
     }
 
@@ -162,7 +168,7 @@ public class ControllerSistema {
     }
 
 
-    public void infiniteSimulation() throws Exception {
+    public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         MsqT time=new MsqT();
         time.setCurrent(START);
@@ -197,7 +203,7 @@ public class ControllerSistema {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
-            controllerList.get(e).infiniteSimulation();
+            controllerList.get(e).infiniteSimulation(typeOfService);
 
             /*if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
 
@@ -223,7 +229,7 @@ public class ControllerSistema {
             this.time.setCurrent(this.time.getNext());
         }
 
-        System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.println("\n\n*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
 
         printFinalStas();
 

@@ -17,8 +17,13 @@ public class Constants {
     // ---- SERVICE RATES  [sec] ----
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 10*60;
+
+    /*public static final double[][] officina_SR = {{5400, 3600, 7200},{5400, 3600, 10800},{5400, 3600, 7200},
+            {5400, 3600, 10800},{5400, 3600, 10800}};// {media, lowerBound, upperBound} per i servizi
+
+*/
     public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
-            {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi
+            {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi*/
     public static final double checkout_SR = 15*60;//20*60;
 
     public static double STOP_FINITE = 86400; /*  terminazione lavoro giornaliero (24 ore in secondi) */

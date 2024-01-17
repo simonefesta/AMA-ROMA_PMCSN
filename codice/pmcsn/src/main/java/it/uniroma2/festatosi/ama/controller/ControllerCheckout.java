@@ -51,7 +51,7 @@ public class ControllerCheckout implements Controller{
         rngs.plantSeeds(seed);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiCheckoutBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+        datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -212,7 +212,12 @@ public class ControllerCheckout implements Controller{
 
     }
 
-    public void infiniteSimulation() throws Exception {
+    /**
+     *
+      @param typeOfService = 0 servizi esponenziali, 1 servizi normali
+
+     **/
+    public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per il checkout
         List<EventListEntry> eventList = this.eventHandler.getEventsCheckout();
@@ -263,8 +268,6 @@ public class ControllerCheckout implements Controller{
 
 
                 getStatistics();
-                System.out.println("batch "+batchNumber);
-                System.out.println("job in batch "+jobInBatch +"\n");
                 this.batchNumber++;
                 this.time.setBatch(this.time.getCurrent());
             }
@@ -276,7 +279,11 @@ public class ControllerCheckout implements Controller{
                     this.eventHandler.setEventsCheckout(eventList);
                 }*/
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
-                double service=this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+
+                double service;
+                if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+                else service = this.rnd.getService(2);
+
                 //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -327,7 +334,9 @@ public class ControllerCheckout implements Controller{
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getServiceBatch(2);
+                double service;
+                if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+                else service = this.rnd.getService(2);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
@@ -351,24 +360,10 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-            //System.out.println("aggiunta centro scarico");
 
-            //System.out.println("size chck "+queueCheckout.size());
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
-        /*
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println("check "+ ev.getX()+" "+ev.getT());
-        }
-        System.out.println("chk "+this.number);
-        System.out.println("chk 2 "+this.jobServed);
 
-        //}
-        for (EventListEntry ev:
-                eventList) {
-            System.out.println("ev ck "+ev.getX()+" "+ev.getT());
-        }*/
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 
@@ -424,9 +419,9 @@ public class ControllerCheckout implements Controller{
         System.out.println("\n");
     }
 
-    private void getStatistics(/*double batchTime, double batchNumber*/){
+    private void getStatistics(){
 
-        System.out.println(this.getClass().getSimpleName());
+        System.out.println("\n\nCheckout, batch: " + batchNumber);
         double meanUtilization;
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
