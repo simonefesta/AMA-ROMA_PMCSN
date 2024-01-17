@@ -31,10 +31,9 @@ public class ControllerOfficine {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListOfficina;
 
-    boolean firstArrive = false;
-
 
     File datiOfficina;
+    File datiOfficinaBatch;
 
     private List<EventListEntry> queueOfficina=new LinkedList<>();
 
@@ -54,15 +53,12 @@ public class ControllerOfficine {
         rngs.plantSeeds(seed);
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
-        //this.time.setCurrent(eventListOfficina.get(0).getT())
-        //System.out.println("primo tempo " + this.time.getCurrent());
 
-        //this.eventListOfficina.set(0,new EventListEntry(this.time.getCurrent(), 0));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsOfficina(this.id, eventListOfficina);
@@ -107,11 +103,11 @@ public class ControllerOfficine {
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
         //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
-        System.out.println(this.name + " stampe");
+       /* System.out.println(this.name + " stampe");
         for(EventListEntry ev: eventList){
             System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
         }
-        System.out.println(this.name + " fine stampa\n\n");
+        System.out.println(this.name + " fine stampa\n\n");*/
 
 
 
@@ -134,15 +130,15 @@ public class ControllerOfficine {
 
                 //this.time.setCurrent(event.getT());
 
-                System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
+              //  System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
 
                 this.number++; //se è un arrivo incremento il numero di jobs nel sistema
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-                System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
+                //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
 
                 if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
-                    double service = this.rnd.getService(1); //ottengo tempo di servizio
+                    double service = this.rnd.getService(3+this.id); //ottengo tempo di servizio
                     this.s = findOneServerIdle(eventList); //ottengo l'indice di un server libero
                     //incrementa i tempi di servizio e il numero di job serviti
                     sum.get(s).incrementService(service);
@@ -151,7 +147,7 @@ public class ControllerOfficine {
 
                     double sum =event.getT() + service;
                     //imposta nella lista degli eventi che il server s è busy
-                    System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
+                   // System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
                     //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
 
 
@@ -165,7 +161,7 @@ public class ControllerOfficine {
                     this.eventHandler.setEventsOfficina(this.id, eventList);
                 } else {
                     queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
-                    System.out.println(this.name + " in attesa di essere servito at " + event.getT());
+                    //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
                 }
                 if (internalEventsOfficina.size() == 0) {
                     this.eventListOfficina.get(0).setX(0);
@@ -184,20 +180,13 @@ public class ControllerOfficine {
                 this.jobServed++;
 
 
-
-
                 this.s = e; //il server con index e è quello che si libera
 
                 EventListEntry event = eventList.get(s);
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-                System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
-
-
-
-
-
+               //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
                 //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
@@ -211,11 +200,11 @@ public class ControllerOfficine {
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
                 }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                System.out.println("inviato scarico " + this.name);
+                //System.out.println("inviato scarico " + this.name);
 
                 if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
-                    double service = this.rnd.getService(1);
+                    double service = this.rnd.getService(3+this.id);
 
                     //incremento tempo di servizio totale ed eventi totali gestiti
                     sum.get(s).incrementService(service);
@@ -241,6 +230,148 @@ public class ControllerOfficine {
 
         eventHandler.getEventsSistema().get(this.id+2).setT(eventHandler.getMinTime(eventList));
     }
+
+
+    public void infiniteSimulation() throws Exception {
+        int e;
+        //prende la lista di eventi per l'officina
+        List<EventListEntry> eventList = this.eventHandler.getEventsOfficina(this.id);
+        List<EventListEntry> internalEventsOfficina=eventHandler.getInternalEventsOfficina(this.id);
+
+        /*
+         *il ciclo continua finché non si verificano entrambe queste condizioni:
+         * -eventList[0].x=0 (close door),
+         * -number>0 ci sono ancora eventi nel sistema
+         */
+        if (internalEventsOfficina.size()>0){
+            eventList.get(0).setT(internalEventsOfficina.get(0).getT());
+        }
+        //prende l'indice del primo evento nella lista
+        e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
+        //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
+       /* System.out.println(this.name + " stampe");
+        for(EventListEntry ev: eventList){
+            System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
+        }
+        System.out.println(this.name + " fine stampa\n\n");*/
+
+
+
+        //imposta il tempo del prossimo evento
+        this.time.setNext(eventList.get(e).getT());
+        //System.out.println(this.name + " next event " + this.time.getCurrent());
+        //si calcola l'area dell'integrale
+        this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+        //imposta il tempo corrente a quello dell'evento corrente
+        this.time.setCurrent(this.time.getNext());
+        // System.out.println(this.name + " current " + this.time.getCurrent());
+
+
+        if (e == 0) { // controllo se l'evento è un arrivo
+            EventListEntry event = internalEventsOfficina.get(e);
+
+            internalEventsOfficina.remove(0);
+            int vType = event.getVehicleType();
+            eventList.set(0, new EventListEntry(event.getT(), event.getX(), vType));
+
+            //this.time.setCurrent(event.getT());
+
+            //  System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
+
+            this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            DataExtractor.writeBatchStat(datiOfficinaBatch, (int) BatchSimulation.getNBatch(), this.number);
+            DataExtractor.writeBatchStat(datiSistemaBatch, (int) BatchSimulation.getNBatch(), eventHandler.getNumber());
+            //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
+
+            if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
+                double service = this.rnd.getService(1); //ottengo tempo di servizio
+                this.s = findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                //incrementa i tempi di servizio e il numero di job serviti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+
+                double sum =event.getT() + service;
+                //imposta nella lista degli eventi che il server s è busy
+                // System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
+                //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
+
+
+                eventList.get(s).setT(sum);
+                eventList.get(s).setX(1);
+                eventList.get(s).setVehicleType(vType);
+
+                eventHandler.getEventsSistema().get(this.id + 2).setT(sum);
+
+                //aggiorna la lista nell'handler
+                this.eventHandler.setEventsOfficina(this.id, eventList);
+            } else {
+                queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
+                //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
+            }
+            if (internalEventsOfficina.size() == 0) {
+                this.eventListOfficina.get(0).setX(0);
+            }
+
+
+        } else { //evento di fine servizio
+            //decrementa il numero di eventi nel nodo considerato
+            this.number--;
+            //aumenta il numero di job serviti
+            this.jobServed++;
+
+
+            this.s = e; //il server con index e è quello che si libera
+
+            EventListEntry event = eventList.get(s);
+
+            DataExtractor.writeBatchStat(datiOfficinaBatch, (int) BatchSimulation.getNBatch(), this.number);
+            DataExtractor.writeBatchStat(datiSistemaBatch, (int) BatchSimulation.getNBatch(), eventHandler.getNumber());
+            //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
+
+            //aggiunta dell'evento alla coda dello scarico
+            eventHandler.getInternalEventsScarico()
+                    .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+            if (eventHandler.getEventsScarico().get(eventHandler.getEventsScarico().size() - 1).getT() > event.getT() ||
+                    eventHandler.getEventsScarico().get(eventHandler.getEventsScarico().size() - 1).getX() == 0) {
+                eventHandler.getEventsScarico().set(eventHandler.getEventsScarico().size() - 1,
+                        new EventListEntry(event.getT(), 1, event.getVehicleType()));
+            }
+            if (eventHandler.getEventsSistema().get(0).getT() > event.getT() || eventHandler.getEventsSistema().get(0).getX() == 0) {
+                eventHandler.getEventsSistema().get(0).setT(event.getT());
+            }
+            eventHandler.getEventsSistema().get(0).setX(1);
+            //System.out.println("inviato scarico " + this.name);
+
+            if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
+                //se ci sono ottengo un nuovo tempo di servizio
+                double service = this.rnd.getService(1);
+
+                //incremento tempo di servizio totale ed eventi totali gestiti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+                //imposta il tempo alla fine del servizio
+                eventList.get(s).setT(event.getT()+ service);
+                eventList.get(s).setVehicleType(queueOfficina.get(0).getVehicleType());
+                queueOfficina.remove(0);
+                //aggiorna la lista degli eventi di officina
+                this.eventHandler.setEventsOfficina(this.id, eventList);
+            } else {
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+
+                if (internalEventsOfficina.size() == 0 && this.number == 0) {
+                    this.eventHandler.getEventsSistema().get(this.id + 2).setX(0);
+                }
+                //aggiorna la lista
+                this.eventHandler.setEventsOfficina(this.id, eventList);
+            }
+        }
+
+        eventHandler.getEventsSistema().get(this.id+2).setT(eventHandler.getMinTime(eventList));
+    }
+
 
 
 
