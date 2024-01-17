@@ -5,39 +5,48 @@ import static it.uniroma2.festatosi.ama.model.Constants.K;
 public class Statistics {
 
     private double meanDelay; // attesa media in coda, ovvero E[Tq]
-    private double meanUtilization;  // utilizzo rho = lambda/mu = lambda * E[S]
-    private double popMediaCoda; // E[Nq]
-
     private double meanWait;  // attesa media nel centro, ovvero E[Ts] = E[Tq] + E[S_i]
 
-    private double varianceEtq; //varianza per E[Tq]
-    private double varianceEnq; //varianza per E[Nq]
-    private double varianceUtilization; //varianza per utilizzazione rho
+    private double meanUtilization;  // utilizzo rho = lambda/mu = lambda * E[S]
 
-    /* vettori contenenti i risultati dei singoli batch */
-    private double[] batchMedia;
+    private double popMediaCoda;  //Enq
+    private double popMediaSistema; //Ens
 
-    private double[] batchPopolazioneCoda;
-    private double[] batchMeanUtilization;
+
+
+    private double devEtq; //dev std per Etq
+    private double devEts; //dev std per Ets
+
+    private double devEnq; //dev std per Enq
+    private double devEns; //dev std per Enq
+    private double devRho; //dev std per Rho
+
+    private final double[] batchPopolazioneCoda;
+    private final double[] batchTempoCoda;
+    private final double[] batchPopolazioneSistema;
+    private final double[] batchTempoSistema;
+    private final double[] batchUtilizzazione;
 
     private static Statistics instance;
     // Costruttore privato per evitare inizializzazione diretta
-    private Statistics() {
+    public Statistics() {
         meanDelay = 0;
         meanUtilization = 0;
-        batchMedia = new double[K + 1];
+        batchUtilizzazione = new double[K+1];
         batchPopolazioneCoda = new double[K+1];
-        batchMeanUtilization = new double[K+1];
+        batchTempoCoda = new double[K+1];
+        batchPopolazioneSistema = new double[K+1];
+        batchTempoSistema = new double[K+1];
     }
 
 
-    // Metodo per ottenere l'istanza del singleton
+    /*// Metodo per ottenere l'istanza del singleton
     public static Statistics getInstance() {
         if (instance == null) {
             instance = new Statistics();
         }
         return instance;
-    }
+    }*/
 
     /*
       Set e Get di E[Tq] del singolo batch
@@ -68,16 +77,23 @@ public class Statistics {
         this.meanWait = meanWait;
     }
 
-    public double getVariance(int type) {
-        if (type == 0)  return varianceEtq;
-        else if (type == 1) return varianceEnq;
-        else return varianceUtilization;
+    public double getMeanWait() {
+        return this.meanWait;
+    }
+
+    public double getDevStd(int type) {
+        if (type == 0)  return devEtq;
+        else if ( type == 1) return devEnq;
+        else if (type == 2) return devRho;
+        else if (type == 3) return devEts;
+        else if (type == 4) return devEns;
+        else return -1;
     }
 
     /*
         Varianza calcolata prendendo in ingresso tutte le medie campionarie nel vettore
      */
-    public void setVariance(double[] batchMedia, int type) {  // type 0: Etq, type 1 : Enq, type 2: rho
+    public void setDevStd(double[] batchMedia, int type) {  // type 0: Etq, type 1 : Enq, type 2 = rho
 
         if (batchMedia.length == 0) {
             System.out.println("Il vettore è vuoto, impossibile calcolare la varianza.");
@@ -88,10 +104,12 @@ public class Statistics {
         for (double elemento : batchMedia) {
             media += elemento;
         }
-        media /= batchMedia.length;
+        media /= K/*batchMedia.length*/;
         if (type == 0) setMeanDelay(media);     // type 0: media E[Tq]
         else if (type == 1) setPopMediaCoda(media); //type 1: media E[Nq]
-        else if (type == 2) setMeanUtilization(media); // type 2: utilizzazione rho
+        else if (type == 2) setMeanUtilization(media);
+        else if (type == 3) setMeanWait(media);   //Ets
+        else if (type == 4) setPopMediaSistema(media);
 
         // Calcola la somma dei quadrati delle differenze dalla media
         double sommaQuadratiDifferenze = 0.0;
@@ -102,25 +120,23 @@ public class Statistics {
 
         // Calcola la varianza
 
-        double variance = sommaQuadratiDifferenze / batchMedia.length;
+        double devStd = Math.sqrt(sommaQuadratiDifferenze / K)/*batchMedia.length*/;
 
-
-        if (type == 0) varianceEtq = variance;
-        else if (type == 1) varianceEnq = variance;
-        else if (type == 2) varianceUtilization = variance;
+        if (type == 0) devEtq = devStd;
+        else if (type == 1) devEnq = devStd;
+        else if (type == 2) devRho = devStd;
+        else if (type == 3) devEts = devStd;
+        else if (type == 4) devEns = devStd;
 
     }
 
+    private void setPopMediaSistema(double media) {
+        this.popMediaSistema = media;
 
-    /*
-            Set e Get dei singoli E[Tq] nel vettore di batch
-     */
-    public void setBatchMeanDelayArray( double media, int index){
-        batchMedia[index] = media;
     }
 
-    public double[] getBatchMeanDelayArray(){
-        return batchMedia;
+    public double getPopMediaSistema() {
+       return this.popMediaSistema;
     }
 
 
@@ -143,13 +159,38 @@ public class Statistics {
         this.popMediaCoda = popMediaCoda;
     }
 
-
-    /* Metodi get e set per MeanUtilization */
-    public double[] getBatchMeanUtilization() {
-        return batchMeanUtilization;
+ 
+    public double[] getBatchUtilizzazione() {
+        return batchUtilizzazione;
     }
 
-    public void setBatchMeanUtilization(double BatchMeanUtilizationValue, int index) {
-        batchMeanUtilization[index] = BatchMeanUtilizationValue;
+    public void setBatchUtilizzazione(double utilizzazione, int index) {
+        this.batchUtilizzazione[index] = utilizzazione;
     }
+
+    public double[] getBatchPopolazioneSistema() {
+        return this.batchPopolazioneSistema;
+    }
+
+    public void setBatchPopolazioneSistema(double batchPopSistema, int index) {
+        this.batchPopolazioneSistema[index] = batchPopSistema;
+    }
+
+    public double[] getBatchTempoCoda() {
+        return batchTempoCoda;
+    }
+
+    public void setBatchTempoCoda( double tempoCoda, int index) {
+        this.batchTempoCoda[index] = tempoCoda;
+    }
+
+    public double[] getBatchTempoSistema() {
+        return batchTempoSistema;
+    }
+
+    public void setBatchTempoSistema(double tempoSistema, int index) {
+        this.batchTempoSistema[index] = tempoSistema;
+    }
+
+
 }

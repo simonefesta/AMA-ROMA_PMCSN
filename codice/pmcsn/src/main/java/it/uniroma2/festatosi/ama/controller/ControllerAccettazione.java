@@ -3,10 +3,7 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
-import it.uniroma2.festatosi.ama.utils.RandomDistribution;
-import it.uniroma2.festatosi.ama.utils.Rngs;
-import it.uniroma2.festatosi.ama.utils.Statistics;
+import it.uniroma2.festatosi.ama.utils.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,7 +16,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
 /**
  * Rappresenta la msq per l'accettazione
  */
-public class ControllerAccettazione {
+public class ControllerAccettazione implements Controller {
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
@@ -34,12 +31,14 @@ public class ControllerAccettazione {
 
     private final List<MsqSum> sum=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
     private final MsqT time=new MsqT();
-    private final List<EventListEntry> eventListAccettazione=new ArrayList<>(SERVERS_ACCETTAZIONE+1);
 
-    private List<EventListEntry> queueAccettazione=new LinkedList<>();
+    private final List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
-    File datiAccettazioneBatch;
+    private int jobInBatch=0;
+    private double batchDuration=0;
+    private int batchNumber=1;
+    private final Statistics statAccettazione = new Statistics();;
 
     public ControllerAccettazione(long seed) throws Exception {
 
@@ -50,12 +49,14 @@ public class ControllerAccettazione {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(seed);
 
+        //System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
 
+
+        List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
-            this.eventListAccettazione.add(s, new EventListEntry(0,0));
+            eventListAccettazione.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
 
@@ -66,7 +67,7 @@ public class ControllerAccettazione {
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
 
         //inizializzo il primo evento con tempo pari a un primo arrivo.
-        this.eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, 1));
+        eventListAccettazione.set(0, new EventListEntry(firstArrival, 1, 1));
 
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsAccettazione(eventListAccettazione);
@@ -283,18 +284,29 @@ public class ControllerAccettazione {
             }
 
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
+            this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
-            System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
-            //DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
-            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
+            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+
+
+                getStatistics();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(0); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(0); //ottengo tempo di servizio
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -309,6 +321,7 @@ public class ControllerAccettazione {
             }else{
                 queueAccettazione.add(event);
             }
+
         }
         else{ //evento di fine servizio
             //decrementa il numero di eventi nel nodo considerato
@@ -317,8 +330,8 @@ public class ControllerAccettazione {
             this.jobServed++;
             //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-           //DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.number);
-            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 
@@ -364,7 +377,7 @@ public class ControllerAccettazione {
 
             if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(0);
+                double service=this.rnd.getServiceBatch(0);
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
@@ -442,37 +455,42 @@ public class ControllerAccettazione {
         System.out.println("\n");
     }
 
-    public void getStatistics(double batchTime, double batchNumber){
+    private void getStatistics(/*double batchTime, double batchNumber*/){
 
+        System.out.println("Accettazione");
         double meanUtilization;
-        Statistics statAccettazione = Statistics.getInstance();
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
-        System.out.println("Area E[Ns]: " + this.area/(batchTime)); //  Da msq è definita come area/t_Current
-        System.out.println("Attesa/Wait nel sistema E[Ts] : " + this.area/jobServed );
-        //statAccettazione.setMeanWait(this.area/jobServed);
+        double Ens = this.area/(this.batchDuration);
+        double Ets = (this.area)/this.jobServed;
+        System.out.println("E[Ns]: " + Ens + " Ets " + Ets); //  Da msq è definita come area/t_Current
+        statAccettazione.setBatchPopolazioneSistema(Ens, batchNumber); //metto dentro il vettore Ens del batch
+        statAccettazione.setBatchTempoSistema(Ets, batchNumber); //Metto dentro il vettore Ets del batch
+
 
         double sumService = 0; //qui metto la somma dei service time
 
         // Salviamo i tempi di servizio in una variabile di appoggio
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
-
             sumService += this.sum.get(i).getService();
-            //meanUtilization+=this.sum.get(i).getService();
             this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
+            this.sum.get(i).setServed(0);
         }
 
+        double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        double Enq = (this.area-sumService)/(this.batchDuration);
 
-        double Etq = (this.area-sumService)/this.jobServed;             //E[Tq] = area/nCompletamenti (cosi definito)
-        statAccettazione.setBatchMeanDelayArray(Etq,(int) batchNumber); //metto E[Tq] nel vettore, specificando l'indice di batch
-
-        double Enq = (this.area-sumService)/(batchTime);
-        statAccettazione.setBatchPopolazioneCodaArray(Enq , (int) batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+        statAccettazione.setBatchPopolazioneCodaArray(Enq ,  batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+        statAccettazione.setBatchTempoCoda(Etq, batchNumber);
 
         System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
 
-        meanUtilization = sumService/(batchTime*SERVERS_ACCETTAZIONE);
-        DataExtractor.writeBatchStat(datiAccettazioneBatch,(int) BatchSimulation.getNBatch(),this.area/(batchTime));
-        statAccettazione.setBatchMeanUtilization(meanUtilization, (int) batchNumber);
+
+        meanUtilization = sumService/(this.batchDuration*SERVERS_ACCETTAZIONE);
+        statAccettazione.setBatchUtilizzazione(meanUtilization, batchNumber);
+
+        System.out.println("MeanUtilization "+ meanUtilization);
+
+
 
          this.area = 0;
          this.jobServed = 0;
@@ -480,4 +498,29 @@ public class ControllerAccettazione {
     }
 
 
+    public int getJobInBatch() {
+        return this.jobInBatch;
+    }
+
+    public void printFinalStats() {
+        Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
+        System.out.println("Accettazione");
+        System.out.print("Statistiche per E[Tq] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
+        System.out.println("Critical endpoints " + statAccettazione.getMeanDelay() + " +/- " + criticalValue * statAccettazione.getDevStd(0)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Nq] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statAccettazione.getPopMediaCoda() + " +/- " + criticalValue * statAccettazione.getDevStd(1)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per rho ");
+        statAccettazione.setDevStd(statAccettazione.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statAccettazione.getMeanUtilization() + " +/- " + criticalValue * statAccettazione.getDevStd(2)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Ts] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
+        System.out.println("Critical endpoints " + statAccettazione.getMeanWait() + " +/- " + criticalValue * statAccettazione.getDevStd(3)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Ns] ");
+        statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
+        System.out.println("Critical endpoints " + statAccettazione.getPopMediaSistema() + " +/- " + criticalValue * statAccettazione.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println();
+    }
 }

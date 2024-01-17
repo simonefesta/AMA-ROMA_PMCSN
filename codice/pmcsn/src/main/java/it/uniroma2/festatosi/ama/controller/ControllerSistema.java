@@ -4,14 +4,14 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
+import it.uniroma2.festatosi.ama.utils.DataExtractor;
+import it.uniroma2.festatosi.ama.utils.Rngs;
 
-import it.uniroma2.festatosi.ama.utils.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static it.uniroma2.festatosi.ama.controller.BatchSimulation.*;
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 /*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
 /**
@@ -30,7 +30,7 @@ public class ControllerSistema {
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListSistema=new ArrayList<>(NODES_SISTEMA);
 
-    private List<Object> controllerList=new ArrayList<>(NODES_SISTEMA);
+    private List<Controller> controllerList=new ArrayList<>(NODES_SISTEMA);
 
     long seed;
 
@@ -129,47 +129,34 @@ public class ControllerSistema {
             this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
-            if (e > 7) {
+            if (e < 0 || e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
-            if (e == 0) {
-                ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
-                scarico.baseSimulation();
-                ////System.out.println(e);
-            } else if (e == 1) {
-                ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
-                accettazione.baseSimulation();
-                ////System.out.println(e);
-            }else if(e==7){
-                ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
-                checkout.baseSimulation();
-                ////System.out.println(e);
-            }else{
-                ControllerOfficine officina= (ControllerOfficine) controllerList.get(e);
-                officina.baseSimulation();
-            }
-
+            controllerList.get(e).baseSimulation();
 
             eventList=eventHandler.getEventsSistema();
         }
 
-        ((ControllerScarico) controllerList.get(0)).printStats(); //scarico
-        //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+        for(Controller controller: controllerList){
+            controller.printStats();
+        }
+        /*((ControllerScarico) controllerList.get(0)).printStats(); //scarico
+        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
         for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
             ((ControllerOfficine) controllerList.get(i+2)).printStats();
         }
-        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout
+        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout*/
 
 
-        System.out.println("Popolazione: "+ eventHandler.getNumber());
+        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
         System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
         System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
         System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
         System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
         System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
         System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
     }
@@ -182,6 +169,7 @@ public class ControllerSistema {
         time.setNext(START);
         double batchDuration;
         int numVeicoliSys;
+        DataExtractor.initializeFile(seed, "Infinite_simulation");
 
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -189,9 +177,8 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
 
-        while (getJobInBatch() < B * K) {
+        while (checkWhile()) {
             numVeicoliSys=eventHandler.getNumber();
-
             eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista
@@ -206,30 +193,13 @@ public class ControllerSistema {
             //this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
-            if (e > 7) {
+            if (e < 0 || e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
-            if (e == 0) {
-                ControllerScarico scarico = (ControllerScarico) controllerList.get(e);
-                scarico.infiniteSimulation();
-//                scarico.baseSimulation();
-                ////System.out.println(e);
-            } else if (e == 1) {
-                ControllerAccettazione accettazione = (ControllerAccettazione) controllerList.get(e);
-                accettazione.infiniteSimulation();
-                //accettazione.baseSimulation();
-                ////System.out.println(e);
-            } else if (e == 7) {
-                ControllerCheckout checkout = (ControllerCheckout) controllerList.get(e);
-                checkout.infiniteSimulation();
-                ////System.out.println(e);
-            } else {
-                ControllerOfficine officina = (ControllerOfficine) controllerList.get(e);
-                officina.infiniteSimulation();
-            }
+            controllerList.get(e).infiniteSimulation();
 
-            if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
+            /*if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
 
                 batchDuration= this.time.getCurrent()-this.time.getBatch();
                 System.out.println("\nbatch duration "+ batchDuration + " con " + getJobInBatch() + " job");
@@ -246,32 +216,43 @@ public class ControllerSistema {
 
 
                 this.time.setBatch(this.time.getCurrent());
-            }
+            }*/
             //System.out.println("");
 
            // eventList = eventHandler.getEventsSistema();
             this.time.setCurrent(this.time.getNext());
         }
 
-        Rvms rvms = new Rvms();
-        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
-
-        Statistics stat = Statistics.getInstance();       //finiti i batch
         System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
 
-        System.out.print("Statistiche per E[Tq]: ");
-        stat.setVariance(stat.getBatchMeanDelayArray(), 0);     // calcolo la varianza per Etq
-        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getVariance(0)/(Math.sqrt(K-1)));
+        printFinalStas();
 
-        System.out.print("Statistiche per E[Nq]: ");
-        stat.setVariance(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la varianza per Enq
-        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getVariance(1)/(Math.sqrt(K-1)));
+        /*Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);*/
 
-        System.out.print("Statistiche per Rho: ");
-        stat.setVariance(stat.getBatchMeanUtilization(),2);     // calcolo la varianza per Enq
-        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getVariance(2)/(Math.sqrt(K-1)));
+        //Statistics stat = Statistics.getInstance();       //finiti i batch
+        /*System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+        System.out.print("Statistiche per E[Tq] ");
+        stat.setDevStd(stat.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
+        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Nq] ");
+        stat.setDevStd(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getDevStd(1)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per rho ");
+        stat.setDevStd(stat.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getDevStd(2)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Ts] ");
+        stat.setDevStd(stat.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
+        System.out.println("Critical endpoints " + stat.getMeanWait() + " +/- " + criticalValue * stat.getDevStd(3)/(Math.sqrt(K-1)));
+        System.out.print("Statistiche per E[Ns] ");
+        stat.setDevStd(stat.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
+        System.out.println("Critical endpoints " + stat.getPopMediaSistema() + " +/- " + criticalValue * stat.getDevStd(4)/(Math.sqrt(K-1)));*/
 
 
+       /* System.out.println("MeanDelay Etq");
+        for(double mean : stat.getBatchMeanDelayArray()){
+            System.out.print(mean+" ");
+        }*/
 
 
 
@@ -294,9 +275,41 @@ public class ControllerSistema {
         System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
-        String autoLagFile = DataExtractor.convertCsvToTxt();
-        Acs.calculate(autoLagFile);
 
+
+    }
+
+    private void printFinalStas() {
+        for(Controller controller:controllerList){
+            controller.printFinalStats();
+        }
+        /*//stampo statistiche finali scarico
+        ((ControllerScarico)controllerList.get(0)).printFinalStats();
+        //stampo statistiche finali accettazione
+        ((ControllerAccettazione)controllerList.get(1)).printFinalStats();*/
+    }
+
+    private boolean checkWhile() {
+        for(Controller controller:controllerList){
+            if(controller.getJobInBatch()<=B*K){
+                return true;
+            }
+        }
+        return false;
+        /*ControllerScarico scarico=(ControllerScarico) controllerList.get(0);
+        ControllerAccettazione accettazione=(ControllerAccettazione)controllerList.get(1);
+        for(int i=2; i<controllerList.size()-1;i++){
+            ControllerOfficine officina=(ControllerOfficine) controllerList.get(i);
+            if(officina.getJobInBatch()<=B*K){
+                return true;
+            }
+        }
+        ControllerCheckout checkout=(ControllerCheckout) controllerList.get(7);
+        if(accettazione.getJobInBatch()<=B*K){
+            return true;
+        }else if(scarico.getJobInBatch()<=B*K){
+            return true;
+        } else return checkout.getJobInBatch() <= B * K;*/
     }
 
     /**

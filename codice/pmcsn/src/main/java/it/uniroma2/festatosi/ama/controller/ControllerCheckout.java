@@ -3,9 +3,7 @@ package it.uniroma2.festatosi.ama.controller;
 import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
-import it.uniroma2.festatosi.ama.utils.RandomDistribution;
-import it.uniroma2.festatosi.ama.utils.Rngs;
+import it.uniroma2.festatosi.ama.utils.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +16,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
 /**
  * rappresenta la msq per il checkout
  */
-public class ControllerCheckout {
+public class ControllerCheckout implements Controller{
     long number =0;                 /*number in the node*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
@@ -36,7 +34,10 @@ public class ControllerCheckout {
     private List<EventListEntry> queueCheckout=new LinkedList<>();
 
     File datiCheckout;
-    File datiCheckoutBatch;
+    private int jobInBatch=0;
+    private Statistics statCheckout=new Statistics();
+    private int batchNumber=1;
+    private double batchDuration=0;
 
     public ControllerCheckout(long seed) throws IOException {
 
@@ -49,7 +50,6 @@ public class ControllerCheckout {
         rngs.plantSeeds(seed);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-        datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
@@ -90,7 +90,7 @@ public class ControllerCheckout {
         //System.out.println("gom "+e);
         //System.out.println("size "+internalEventsCheckout.size());
 
-        if(internalEventsCheckout.size()==0 && e==0) {
+        if(internalEventsCheckout.isEmpty() && e==0) {
             eventHandler.getEventsSistema().get(7).setX(0);
             System.out.println("ck served "+this.jobServed);
             return;
@@ -155,16 +155,16 @@ public class ControllerCheckout {
                 //attivo di nuovo arrivi per scarico
                 eventHandler.getEventsScarico().get(0).setX(1);
                 eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
-                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventHandler.getEventsScarico()));
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(3);
+                double service=this.rnd.getService(2);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
@@ -188,14 +188,28 @@ public class ControllerCheckout {
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
+            //System.out.println("aggiunta centro scarico");
+
+            //System.out.println("size chck "+queueCheckout.size());
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
+        /*
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println("check "+ ev.getX()+" "+ev.getT());
+        }
+        System.out.println("chk "+this.number);
+        System.out.println("chk 2 "+this.jobServed);
 
+        //}
+        for (EventListEntry ev:
+                eventList) {
+            System.out.println("ev ck "+ev.getX()+" "+ev.getT());
+        }*/
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 
     }
-
 
     public void infiniteSimulation() throws Exception {
         int e;
@@ -226,6 +240,7 @@ public class ControllerCheckout {
 
         if(internalEventsCheckout.size()==0 && e==0) {
             eventHandler.getEventsSistema().get(7).setX(0);
+            System.out.println("ck served "+this.jobServed);
             return;
         }
 
@@ -235,12 +250,32 @@ public class ControllerCheckout {
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
             //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+            
+            this.jobInBatch++;
+            
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-            //DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
-            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
 
+
+                getStatistics();
+                System.out.println("batch "+batchNumber);
+                System.out.println("job in batch "+jobInBatch +"\n");
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
+            
+            //System.out.println("ins check "+event);
+            //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
+                /*if(eventList.get(0).getT()>STOP && this.number==0){
+                    eventList.get(0).setX(0); //chiusura delle porte
+                    this.eventHandler.setEventsCheckout(eventList);
+                }*/
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(3); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -272,25 +307,26 @@ public class ControllerCheckout {
 
             EventListEntry event=eventList.get(s);
 
+            //System.out.println("uscito dal sistema "+this.number+" "+event);
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
 
             eventHandler.decrementVType(event.getVehicleType());
-            //DataExtractor.writeBatchStat(datiCheckoutBatch,(int) BatchSimulation.getNBatch(),this.number);
-            DataExtractor.writeSingleStat(datiSistemaBatch,(int) BatchSimulation.getNBatch(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                 //attivo di nuovo arrivi per scarico
                 eventHandler.getEventsScarico().get(0).setX(1);
                 eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
-                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventHandler.getEventsScarico()));
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
-                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getServiceBatch(2);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
@@ -307,22 +343,35 @@ public class ControllerCheckout {
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
-                if(internalEventsCheckout.size()==0 && this.number==0){
+                if(internalEventsCheckout.isEmpty() && this.number==0){
                     this.eventHandler.getEventsSistema().get(7).setX(0);
                 }
                 //aggiorna la lista
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
+            //System.out.println("aggiunta centro scarico");
 
+            //System.out.println("size chck "+queueCheckout.size());
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
+        /*
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println("check "+ ev.getX()+" "+ev.getT());
+        }
+        System.out.println("chk "+this.number);
+        System.out.println("chk 2 "+this.jobServed);
 
+        //}
+        for (EventListEntry ev:
+                eventList) {
+            System.out.println("ev ck "+ev.getX()+" "+ev.getT());
+        }*/
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 
     }
-
 
     /**
      * Ritorna l'indice del server libero da più tempo
@@ -374,4 +423,72 @@ public class ControllerCheckout {
         System.out.println("\n");
     }
 
+    private void getStatistics(/*double batchTime, double batchNumber*/){
+
+        System.out.println(this.getClass().getSimpleName());
+        double meanUtilization;
+        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
+        double Ens = this.area/(this.batchDuration);
+        double Ets = (this.area)/this.jobServed;
+        System.out.println("E[Ns]: " + Ens + " Ets " + Ets); //  Da msq è definita come area/t_Current
+        statCheckout.setBatchPopolazioneSistema(Ens, batchNumber); //metto dentro il vettore Ens del batch
+        statCheckout.setBatchTempoSistema(Ets, batchNumber); //Metto dentro il vettore Ets del batch
+
+
+        double sumService = 0; //qui metto la somma dei service time
+
+        // Salviamo i tempi di servizio in una variabile di appoggio
+        for(int i = 1; i <= SERVERS_CHECKOUT; i++) {
+            sumService += this.sum.get(i).getService();
+            this.sum.get(i).setService(0); //azzero il servizio i-esimo, altrimenti per ogni batch conterà anche i precedenti batch
+            this.sum.get(i).setServed(0);
+        }
+
+        double Etq = (this.area-sumService)/this.jobServed;             /// E[Tq] = area/nCompletamenti (cosi definito)
+        double Enq = (this.area-sumService)/(this.batchDuration);
+
+        statCheckout.setBatchPopolazioneCodaArray(Enq ,  batchNumber); // E[Nq] = area/DeltaT (cosi definito)
+        statCheckout.setBatchTempoCoda(Etq, batchNumber);
+
+        System.out.println("Delay E[Tq]: " + Etq + " ; E[Nq] " + Enq);
+
+
+        meanUtilization = sumService/(this.batchDuration*SERVERS_CHECKOUT);
+        statCheckout.setBatchUtilizzazione(meanUtilization, batchNumber);
+
+        System.out.println("MeanUtilization "+ meanUtilization);
+
+
+
+        this.area = 0;
+        this.jobServed = 0;
+
+    }
+
+    public int getJobInBatch() {
+        return this.jobInBatch;
+    }
+
+    public void printFinalStats() {
+        Rvms rvms = new Rvms();
+        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);
+        System.out.println(this.getClass().getSimpleName());
+        System.out.print("Statistiche per E[Tq] ");
+        statCheckout.setDevStd(statCheckout.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
+        System.out.println("Critical endpoints " + statCheckout.getMeanDelay() + " +/- " + criticalValue * statCheckout.getDevStd(0)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Nq] ");
+        statCheckout.setDevStd(statCheckout.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statCheckout.getPopMediaCoda() + " +/- " + criticalValue * statCheckout.getDevStd(1)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per rho ");
+        statCheckout.setDevStd(statCheckout.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
+        System.out.println("Critical endpoints " + statCheckout.getMeanUtilization() + " +/- " + criticalValue * statCheckout.getDevStd(2)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Ts] ");
+        statCheckout.setDevStd(statCheckout.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
+        System.out.println("Critical endpoints " + statCheckout.getMeanWait() + " +/- " + criticalValue * statCheckout.getDevStd(3)/(Math.sqrt(K-1)));
+        System.out.print("statistiche per E[Ns] ");
+        statCheckout.setDevStd(statCheckout.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
+        System.out.println("Critical endpoints " + statCheckout.getPopMediaSistema() + " +/- " + criticalValue * statCheckout.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println();
+    }
+    
 }

@@ -17,7 +17,6 @@ public class Constants {
     // ---- SERVICE RATES  [sec] ----
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 10*60;
-    //public static final double officina_SR = 5400;// 1 ora e mezza
     public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
             {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi
     public static final double checkout_SR = 15*60;//20*60;
@@ -60,7 +59,7 @@ public class Constants {
     public static final double P3 = 0.09;
 
     // ---- SKIPP PROB ----
-    // probabilità difetto tipologia "elettrauto"
+    // probabilità difetto tipologia "elettrauti"
     public static final double P4 = 0.1;
 
     // probabilità difetto tipologia "carpenteria meccanica"
@@ -80,16 +79,14 @@ public class Constants {
 
 
     // numero di veicoli per ogni tipo
-    public static final int VEICOLI1 = 76; //veicoli piccoli
-    public static final int VEICOLI2 = 59; //veicoli grandi
+    public static final int VEICOLI1 = 103; //veicoli piccoli #40
+    public static final int VEICOLI2 = 79; //veicoli grandi #59
 
     public static File datiSistema;
-    public static File datiSistemaBatch;
 
     static {
         try {
             datiSistema = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
-            datiSistemaBatch = DataExtractor.initializeFileBatch((new Rngs()).getSeed(), "SistemaBatch");
         } catch (IOException e) {
             System.out.println("Problema nell'inizializzazione del file coi dati del Sistema.");
         }
@@ -100,7 +97,7 @@ public class Constants {
         Batch Means
      */
     public static final int B=1080; //numero di job nel singolo batch
-    public static final int K=96; //numero di batch
+    public static final int K=64; //numero di batch
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05
 

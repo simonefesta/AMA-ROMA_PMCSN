@@ -131,4 +131,28 @@ public class RandomDistribution {
         }
     }
 
+    public double getServiceBatch(int typeOfService) throws Exception {
+        rngs.selectStream(3);
+
+        switch (typeOfService) {
+            case 0:  //accettazione
+                return Exponential(accettazione_SR);
+            case 1: //scarico
+                return Exponential(scarico_SR);
+            case 2: //checkout
+                return Exponential(checkout_SR);
+            case 3:  //gommista
+            case 4:  //carrozzeria
+            case 5:  //elettrauto
+            case 6:  //carpenteria
+            case 7:  //meccanica
+                return Exponential(officina_SR[typeOfService-3][0]);
+            default:
+                throw new Exception("Tipo di servizio non supportato dal sistema");
+        }
+    }
+
+
+
 }
+
