@@ -275,7 +275,7 @@ public class ControllerCheckout implements Controller{
                     this.eventHandler.setEventsCheckout(eventList);
                 }*/
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
-                double service=this.rnd.getService(2); //ottengo tempo di servizio
+                double service=this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -326,7 +326,7 @@ public class ControllerCheckout implements Controller{
 
             if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
-                double service=this.rnd.getService(2);
+                double service=this.rnd.getServiceBatch(2);
                 //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
@@ -343,7 +343,7 @@ public class ControllerCheckout implements Controller{
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
-                if(internalEventsCheckout.size()==0 && this.number==0){
+                if(internalEventsCheckout.isEmpty() && this.number==0){
                     this.eventHandler.getEventsSistema().get(7).setX(0);
                 }
                 //aggiorna la lista
