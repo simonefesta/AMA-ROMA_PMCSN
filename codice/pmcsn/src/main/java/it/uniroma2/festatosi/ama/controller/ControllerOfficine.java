@@ -5,7 +5,6 @@ import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 import it.uniroma2.festatosi.ama.utils.*;
 
-import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -29,10 +28,11 @@ public class ControllerOfficine implements Controller{
     private final MsqT time=new MsqT();
     private final List<EventListEntry> eventListOfficina;
 
-    boolean firstArrive = false;
-
-
+    int numeroOfficine = 5;
     File datiOfficina;
+    File datiOfficinaBatch;
+
+    // Creazione del vettore di file
 
     private final List<EventListEntry> queueOfficina=new LinkedList<>();
     private int jobInBatch=0;
@@ -56,7 +56,7 @@ public class ControllerOfficine implements Controller{
         rngs.plantSeeds(seed);
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiOfficinaBatch = DataExtractor.initializeFile(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -486,6 +486,8 @@ public void infiniteSimulation() throws Exception {
         statOfficina.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
+
+        DataExtractor.writeBatchStat(datiOfficinaBatch, (int) BatchSimulation.getNBatch(), Ens);
 
 
 

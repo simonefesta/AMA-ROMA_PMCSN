@@ -35,6 +35,7 @@ public class ControllerAccettazione implements Controller {
     private final List<EventListEntry> queueAccettazione=new LinkedList<>();
 
     File datiAccettazione;
+    File datiAccettazioneBatch;
     private int jobInBatch=0;
     private double batchDuration=0;
     private int batchNumber=1;
@@ -52,7 +53,7 @@ public class ControllerAccettazione implements Controller {
         //System.out.println(rngs.getSeed());
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiAccettazioneBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
 
         List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -489,10 +490,15 @@ public class ControllerAccettazione implements Controller {
         statAccettazione.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
+        DataExtractor.writeBatchStat(datiAccettazioneBatch,(int)BatchSimulation.getNBatch(),Ens);
 
 
 
-         this.area = 0;
+
+
+
+
+        this.area = 0;
          this.jobServed = 0;
 
     }

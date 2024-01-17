@@ -34,6 +34,7 @@ public class ControllerCheckout implements Controller{
     private List<EventListEntry> queueCheckout=new LinkedList<>();
 
     File datiCheckout;
+    File datiCheckoutBatch;
     private int jobInBatch=0;
     private Statistics statCheckout=new Statistics();
     private int batchNumber=1;
@@ -50,7 +51,7 @@ public class ControllerCheckout implements Controller{
         rngs.plantSeeds(seed);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiCheckoutBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -457,6 +458,8 @@ public class ControllerCheckout implements Controller{
         statCheckout.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
+
+        DataExtractor.writeBatchStat(datiCheckoutBatch,(int)BatchSimulation.getNBatch(),Ens);
 
 
 

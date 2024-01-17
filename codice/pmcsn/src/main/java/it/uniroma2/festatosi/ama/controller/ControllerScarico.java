@@ -39,6 +39,7 @@ public class ControllerScarico implements Controller{
     private final Statistics statScarico = new Statistics();;
 
     File datiScarico;
+    File datiScaricoBatch;
 
     public ControllerScarico(long seed) throws Exception {
 
@@ -51,7 +52,7 @@ public class ControllerScarico implements Controller{
         //System.out.println(rngs.getSeed());
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
-
+        datiScaricoBatch = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -487,6 +488,8 @@ public class ControllerScarico implements Controller{
         statScarico.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
+        DataExtractor.writeBatchStat(datiScaricoBatch,(int)BatchSimulation.getNBatch(),Ens);
+
 
 
 
