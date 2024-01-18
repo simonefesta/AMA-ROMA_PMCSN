@@ -18,12 +18,12 @@ public class Constants {
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 10*60;
 
-    public static final double[][] officina_SR = {{5400, 3600, 7200},{5400, 3600, 10800},{5400, 3600, 7200},
-            {5400, 3600, 10800},{5400, 3600, 10800}};// {media, lowerBound, upperBound} per i servizi
+    public static final double[][] officina_SR = {{3600, 1800, 5400},{5400, 3600, 7200},{5400, 3600, 7200},
+            {5400, 3600, 7200},{5400, 3600, 7200}};// {media, lowerBound, upperBound} per i servizi*/
 
 
-/*    public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
-            {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi*/
+    /*public static final double[][] officina_SR = {{1500, 1800, 3600},{1500, 1800, 3600},{1500, 1800, 3600},
+            {1500, 1800, 3600},{1500, 1800, 3600}};// media lowerBound e upperBound per i servizi*/
     public static final double checkout_SR = 15*60;//20*60;
 
     public static double STOP_FINITE = 86400; /*  terminazione lavoro giornaliero (24 ore in secondi) */
@@ -104,7 +104,7 @@ public class Constants {
         Batch Means
      */
     public static final int B=1080; //numero di job nel singolo batch
-    public static final int K=64; //numero di batch
+    public static final int K=96; //numero di batch
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05
 

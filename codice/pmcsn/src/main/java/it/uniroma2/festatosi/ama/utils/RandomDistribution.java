@@ -113,12 +113,12 @@ public class RandomDistribution {
 
         switch (typeOfService) {
             case 0:  //accettazione
-                return rvms.idfTruncatedNormal(accettazione_SR, 500, 400, 1200, rngs.random());
+                return rvms.idfTruncatedNormal(accettazione_SR, 100, 300, 900, rngs.random());
 
             case 1: //scarico
-                return rvms.idfTruncatedNormal(scarico_SR, 500, 480, 1200, rngs.random());
+                return rvms.idfTruncatedNormal(scarico_SR, 450, 480, 900, rngs.random());
             case 2: //checkout
-                return rvms.idfTruncatedNormal(checkout_SR, 600, 600, 1200, rngs.random());
+                return rvms.idfTruncatedNormal(checkout_SR, 450, 600, 1200, rngs.random());
             case 3:  //gommista
             case 4:  //carrozzeria
             case 5:  //elettrauto
