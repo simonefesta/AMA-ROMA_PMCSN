@@ -18,11 +18,11 @@ public class Constants {
     public static final double accettazione_SR = 10*60;
     public static final double scarico_SR = 10*60;
 
-    /*public static final double[][] officina_SR = {{5400, 3600, 7200},{5400, 3600, 10800},{5400, 3600, 7200},
+    public static final double[][] officina_SR = {{5400, 3600, 7200},{5400, 3600, 10800},{5400, 3600, 7200},
             {5400, 3600, 10800},{5400, 3600, 10800}};// {media, lowerBound, upperBound} per i servizi
 
-*/
-    public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
+
+/*    public static final double[][] officina_SR = {{5400, 1800, 3600},{5400, 1800, 3600},{5400, 1800, 3600},
             {5400, 1800, 3600},{5400, 1800, 3600}};// media lowerBound e upperBound per i servizi*/
     public static final double checkout_SR = 15*60;//20*60;
 
