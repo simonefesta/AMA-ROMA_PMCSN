@@ -350,8 +350,7 @@ public class ControllerAccettazione implements Controller {
             this.jobServed++;
             //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            //DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
 
             this.s=e; //il server con index e è quello che si libera
 
@@ -359,6 +358,9 @@ public class ControllerAccettazione implements Controller {
 
             if(event.getVehicleType()==1) this.numberV1--;
             else this.numberV2--;
+
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             double rndRouting= rngs.random();
             int off;

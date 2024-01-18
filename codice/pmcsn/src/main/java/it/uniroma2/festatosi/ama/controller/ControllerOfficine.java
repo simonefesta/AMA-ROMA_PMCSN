@@ -189,7 +189,6 @@ public class ControllerOfficine implements Controller{
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
-               //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
                 //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
