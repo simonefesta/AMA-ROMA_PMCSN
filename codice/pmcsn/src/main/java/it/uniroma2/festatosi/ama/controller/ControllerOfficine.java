@@ -56,17 +56,15 @@ public class ControllerOfficine implements Controller{
         Rngs rngs = new Rngs();
 
         rngs.plantSeeds(SEED);
-        System.out.println(rngs.getSeed());
 
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
+        //datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
-        //this.time.setCurrent(eventListOfficina.get(0).getT())
-        //System.out.println("primo tempo " + this.time.getCurrent());
+
 
         //this.eventListOfficina.set(0,new EventListEntry(this.time.getCurrent(), 0));
 
@@ -112,12 +110,6 @@ public class ControllerOfficine implements Controller{
         }
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_OFFICINA[this.id]);
-        //System.out.println(this.name + " next entry is " + eventList.get(e).getT());
-       /* System.out.println(this.name + " stampe");
-        for(EventListEntry ev: eventList){
-            System.out.println(e + " list "+this.name+" "+ ev.getT()+" "+ev.getX());
-        }
-        System.out.println(this.name + " fine stampa\n\n");*/
 
 
 
@@ -138,19 +130,22 @@ public class ControllerOfficine implements Controller{
             int vType = event.getVehicleType();
             eventList.set(0, new EventListEntry(event.getT(), event.getX(), vType));
 
-            //this.time.setCurrent(event.getT());
 
-            //System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
             
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
-            if(vType==1) this.numberV1++;
-            else this.numberV2++;
+            if(vType==1) {
+                           this.numberV1++;
+            }
+            else {
+                    this.numberV2++;
+            }
 
-            DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-            DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-            //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
-            
+            DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+
+
             if (this.number <= SERVERS_OFFICINA[this.id]) { //controllo se ci sono server liberi
                 double service = this.rnd.getService(3+this.id); //ottengo tempo di servizio
                 this.s = findOneServerIdle(eventList); //ottengo l'indice di un server libero
@@ -161,9 +156,6 @@ public class ControllerOfficine implements Controller{
 
                 double sum =event.getT() + service;
                 //imposta nella lista degli eventi che il server s è busy
-               // System.out.println(this.name + " SERVIZIO on server : " + s + " actual time " + event.getT() +  " service " + service + " total is " + sum);
-                //System.out.println(this.name + "IN CAUSE servizio " + this.time.getCurrent() + "or " + time.getCurrent() + " or " + eventList.get(e).getT());
-
 
                 eventList.get(s).setT(sum);
                 eventList.get(s).setX(1);
@@ -171,21 +163,15 @@ public class ControllerOfficine implements Controller{
 
                 eventHandler.getEventsSistema().get(this.id + 2).setT(sum);
 
-                //aggiorna la lista nell'handler
+                //aggiorna la lista nell' handler
                 this.eventHandler.setEventsOfficina(this.id, eventList);
             } else {
                 queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
-                //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
             }
             if (internalEventsOfficina.isEmpty()) {
                 this.eventListOfficina.get(0).setX(0);
             }
-           /* eventList.get(e).setT(0);
-            eventList.get(e).setX(0);
 
-            this.eventHandler.setEventsOfficina(this.id, eventList);*/
-            //eventHandler.getEventsOfficina(this.id).get(0).setT(0);
-           // eventHandler.getEventsOfficina(this.id).get(0).setX(0);
 
         } else { //evento di fine servizio
                 //decrementa il numero di eventi nel nodo considerato
@@ -200,8 +186,9 @@ public class ControllerOfficine implements Controller{
                 if(event.getVehicleType()==1) this.numberV1--;
                 else this.numberV2--;
 
-                DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-                DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
+
+                DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
+                DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
                //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
 
                 //aggiunta dell'evento alla coda dello scarico
@@ -297,8 +284,8 @@ public class ControllerOfficine implements Controller{
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
-            DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-            DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
+            //DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
             //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
             
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
@@ -338,21 +325,13 @@ public class ControllerOfficine implements Controller{
             if (internalEventsOfficina.isEmpty()) {
                 this.eventListOfficina.get(0).setX(0);
             }
-           /* eventList.get(e).setT(0);
-            eventList.get(e).setX(0);
 
-            this.eventHandler.setEventsOfficina(this.id, eventList);*/
-            //eventHandler.getEventsOfficina(this.id).get(0).setT(0);
-           // eventHandler.getEventsOfficina(this.id).get(0).setX(0);
 
         } else { //evento di fine servizio
                 //decrementa il numero di eventi nel nodo considerato
                 this.number--;
                 //aumenta il numero di job serviti
                 this.jobServed++;
-
-
-
 
                 this.s = e; //il server con index e è quello che si libera
 
@@ -361,13 +340,8 @@ public class ControllerOfficine implements Controller{
                 if(event.getVehicleType()==1) this.numberV1--;
                 else this.numberV2--;
 
-                DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
-                DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
-               //System.out.println(this.name + " Uscita a " + event.getT() + " popolazione " + this.number);
-
-
-
-
+                DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
+                //DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
 
 
                 //aggiunta dell'evento alla coda dello scarico

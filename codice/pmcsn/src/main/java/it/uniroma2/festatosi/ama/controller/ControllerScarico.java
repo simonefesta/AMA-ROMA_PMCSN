@@ -54,7 +54,7 @@ public class ControllerScarico implements Controller{
 
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        datiScaricoBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
         for(s=0; s<SERVERS_SCARICO+2; s++){
@@ -64,7 +64,7 @@ public class ControllerScarico implements Controller{
         /*imposta a 1 l'evento di arrivo da fuori, si aprono le porte*/
         eventListScarico.set(0, new EventListEntry(rnd.getJobArrival(0), 1, 1));
 
-        //viene settata la lista di eventi nell'handler
+        //viene settata la lista di eventi nell' handler
         this.eventHandler.setEventsScarico(eventListScarico);
     }
 
@@ -88,11 +88,7 @@ public class ControllerScarico implements Controller{
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
-        /*System.out.println("scarico evlist");
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println("scarico "+ev.getT()+" "+ev.getX());
-        }*/
+
 
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
@@ -104,7 +100,6 @@ public class ControllerScarico implements Controller{
         this.time.setCurrent(this.time.getNext());
 
         if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
-            //System.out.println("e scarico: "+e);
             int vType;
             EventListEntry event;
             if(e==0) { //arrivo dall'esterno
@@ -131,7 +126,6 @@ public class ControllerScarico implements Controller{
             }else{ //arrivo dall'interno del sistema
                 event=internalEventsScarico.get(0);
                 internalEventsScarico.remove(0);
-               // System.out.println("interno");
                 vType=event.getVehicleType();
                 if(internalEventsScarico.isEmpty()){
                     eventList.get(eventList.size()-1).setX(0);
@@ -141,12 +135,15 @@ public class ControllerScarico implements Controller{
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
 
-            if(vType==1) this.numberV1++;
-            else this.numberV2++;
+            if(vType==1) {
+                            this.numberV1++;
+            }
+            else {
+                this.numberV2++;
+            }
 
-            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
-
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(1); //ottengo tempo di servizio
@@ -160,7 +157,7 @@ public class ControllerScarico implements Controller{
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
 
-                //aggiorna la lista nell'handler
+                //aggiorna la lista nell' handler
                 this.eventHandler.setEventsScarico(eventList);
             }else{
                 queueScarico.add(event);
@@ -169,6 +166,7 @@ public class ControllerScarico implements Controller{
         else{ //evento di fine servizio
             //decrementa il numero di eventi nel nodo considerato
             this.number--;
+
 
             //aumenta il numero di job serviti
             this.jobServed++;
@@ -180,7 +178,9 @@ public class ControllerScarico implements Controller{
             if(event.getVehicleType()==1) this.numberV1--;
             else this.numberV2--;
 
-            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
 
             //logica di routing
             double rndRouting= rngs.random();
@@ -211,8 +211,8 @@ public class ControllerScarico implements Controller{
                 eventHandler.getEventsSistema().get(7).setT(event.getT());
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
-
-            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+            // quest'ultima write è necessaria, altrimenti il sistema termina con un veicolo ancora presente.
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(), eventHandler.getNumberV1(), eventHandler.getNumberV2());
 
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
@@ -331,8 +331,8 @@ public class ControllerScarico implements Controller{
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
-            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -378,7 +378,7 @@ public class ControllerScarico implements Controller{
             if(event.getVehicleType()==1) this.numberV1--;
             else this.numberV2--;
 
-            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
 
             //logica di routing
             double rndRouting= rngs.random();
@@ -410,7 +410,7 @@ public class ControllerScarico implements Controller{
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
 
-            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire

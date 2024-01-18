@@ -10,7 +10,7 @@ import java.io.IOException;
 public class Constants {
 
 
-    public static final long SEED = 1234567L;
+    public static final long SEED = 123456789L;
 
 
 
@@ -101,7 +101,7 @@ public class Constants {
     static {
         try {
             datiSistema = DataExtractor.initializeFile((new Rngs()).getSeed(), "Sistema");
-            datiSistemaBatch = DataExtractor.initializeFile((new Rngs()).getSeed(), "SistemaBatch");
+            //datiSistemaBatch = DataExtractor.initializeFile((new Rngs()).getSeed(), "SistemaBatch");
         } catch (IOException e) {
             System.out.println("Problema nell'inizializzazione del file coi dati del Sistema.");
         }

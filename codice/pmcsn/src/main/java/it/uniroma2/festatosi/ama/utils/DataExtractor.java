@@ -26,8 +26,8 @@ public class DataExtractor{
         //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
-            writer.write("seed " + seed + ";" + "Tempo" + ";" + "Popolazione" + ";" + name + "\n");
-            writer.write(";" + "0" + ";" + "0" + ";\n");
+            writer.write("seed " + seed + ";" + "Tempo" + ";" + "Popolazione" + ";" + "PopolazioneVeicoliPiccoli" +";" + "PopolazioneVeicoliGrandi"+ ";" + name + "\n");
+            writer.write(";" + "0" + ";" + "0" + ";" + "0" + ";" + "0" + ";" + "\n");
         }
         return fileInTarget;
     }
@@ -62,9 +62,9 @@ public class DataExtractor{
 
 
 
-        public static void writeSingleStat(File fileInTarget, double time, double value) {
+        public static void writeSingleStat(File fileInTarget, double time, double value, double valueV1, double valueV2) {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget, true))) {
-                writer.write(";" + time + ";" + value + "\n");
+                writer.write(";" + time + ";" + value + ";" +valueV1 + ";" + valueV2 + "\n");
             } catch (IOException e) {
                 System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
             }

@@ -53,13 +53,13 @@ public class ControllerCheckout implements Controller{
         rngs.plantSeeds(SEED);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+        //datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
         }
 
-//        EventListEntry event= eventHandler.getInternalEventsCheckout().get(0);
         this.eventListCheckout.set(0,new EventListEntry(this.time.getCurrent(),1));
 
         //viene settata la lista di eventi nell'handler
@@ -79,7 +79,7 @@ public class ControllerCheckout implements Controller{
          */
 
 
-        //while(eventHandler.getInternalEventsCheckout().size()>0 || this.number>0){
+
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_CHECKOUT);
         //imposta il tempo del prossimo evento
@@ -89,9 +89,7 @@ public class ControllerCheckout implements Controller{
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
 
-        //System.out.println("area "+area);
-        //System.out.println("gom "+e);
-        //System.out.println("size "+internalEventsCheckout.size());
+
 
         if(internalEventsCheckout.isEmpty() && e==0) {
             eventHandler.getEventsSistema().get(7).setX(0);
@@ -104,21 +102,19 @@ public class ControllerCheckout implements Controller{
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-            //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
-            if(vType==1) this.numberV1++;
-            else this.numberV2++;
+            if(vType==1) {
+                            this.numberV1++;
+                         }
+            else {
+                          this.numberV2++;
+            }
 
-            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
-            //System.out.println("ins check "+event);
-            //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
-                /*if(eventList.get(0).getT()>STOP && this.number==0){
-                    eventList.get(0).setX(0); //chiusura delle porte
-                    this.eventHandler.setEventsCheckout(eventList);
-                }*/
+
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(2); //ottengo tempo di servizio
                 //this.rnd.decrementVehicle(vType);
@@ -152,15 +148,19 @@ public class ControllerCheckout implements Controller{
 
             EventListEntry event=eventList.get(s);
 
-            if(event.getVehicleType()==1) this.numberV1--;
-            else this.numberV2--;
+            if(event.getVehicleType()==1) {
+                                           this.numberV1--;
 
-
-            //System.out.println("uscito dal sistema "+this.number+" "+event);
-            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
+            }
+            else {
+                    this.numberV2--;
+            }
 
             eventHandler.decrementVType(event.getVehicleType());
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
+
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(event.getT()< STOP_FINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                 //attivo di nuovo arrivi per scarico
@@ -199,24 +199,10 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-            //System.out.println("aggiunta centro scarico");
 
-            //System.out.println("size chck "+queueCheckout.size());
             //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
-        /*
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println("check "+ ev.getX()+" "+ev.getT());
-        }
-        System.out.println("chk "+this.number);
-        System.out.println("chk 2 "+this.jobServed);
 
-        //}
-        for (EventListEntry ev:
-                eventList) {
-            System.out.println("ev ck "+ev.getX()+" "+ev.getT());
-        }*/
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
 
@@ -250,10 +236,6 @@ public class ControllerCheckout implements Controller{
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
 
-        //System.out.println("area "+area);
-        //System.out.println("gom "+e);
-        //System.out.println("size "+internalEventsCheckout.size());
-
         if(internalEventsCheckout.size()==0 && e==0) {
             eventHandler.getEventsSistema().get(7).setX(0);
             System.out.println("ck served "+this.jobServed);
@@ -274,8 +256,8 @@ public class ControllerCheckout implements Controller{
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
-            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
             
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -286,12 +268,7 @@ public class ControllerCheckout implements Controller{
                 this.time.setBatch(this.time.getCurrent());
             }
             
-            //System.out.println("ins check "+event);
-            //se tempo maggiore della chiusura delle porte e numero di job nel sistema nullo, chiudo le porte
-                /*if(eventList.get(0).getT()>STOP && this.number==0){
-                    eventList.get(0).setX(0); //chiusura delle porte
-                    this.eventHandler.setEventsCheckout(eventList);
-                }*/
+
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
 
                 double service;
@@ -333,11 +310,10 @@ public class ControllerCheckout implements Controller{
             else this.numberV2--;
 
 
-            //System.out.println("uscito dal sistema "+this.number+" "+event);
-            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
 
             eventHandler.decrementVType(event.getVehicleType());
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                 //attivo di nuovo arrivi per scarico

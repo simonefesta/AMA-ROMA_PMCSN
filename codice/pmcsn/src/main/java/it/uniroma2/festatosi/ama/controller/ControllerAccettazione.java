@@ -54,7 +54,7 @@ public class ControllerAccettazione implements Controller {
 
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
+        //datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
 
         List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -105,9 +105,6 @@ public class ControllerAccettazione implements Controller {
         if(e==0){ // controllo se l'evento è un arrivo
 
             eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1)); // genero il tempo del prossimo arrivo come tempo attuale + interrarivo random
-            //System.out.println("time is " + time + " = "+ this.time.getCurrent() + " + " + random);
-
-            //System.out.println("Tempo nuovo arrivo accettazione "+eventList.get(0).getT());
 
             int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
@@ -117,16 +114,19 @@ public class ControllerAccettazione implements Controller {
             }
             this.number++; //poiché sto processando un arrivo, la popolazione aumenta
 
-            if(vType==1) this.numberV1++;
-            else this.numberV2++;
+            if(vType==1) {
+                            this.numberV1++;
+            }
+            else {
+                            this.numberV2++;
+            }
 
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
-            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione incrementa " + this.number +"\n");
-            //System.out.println("Arrivo accettazione at time: " + event.getT()+  " popolazione " + this.number +);
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV1);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
                 //eventHandler.getEventsSistema().get(0).setX(0);
@@ -142,7 +142,6 @@ public class ControllerAccettazione implements Controller {
                 sum.get(s).incrementService(service);
                 sum.get(s).incrementServed();
                 //imposta nella lista degli eventi che il server s è busy
-                //System.out.println("SERVIZIO on server : " + s + " actual time " + this.time.getCurrent() +  " service " + service + " total is " + sum);
                 eventList.get(s).setT(this.time.getCurrent() +service);
                 eventList.get(s).setX(1);
                 eventList.get(s).setVehicleType(vType);
@@ -158,20 +157,22 @@ public class ControllerAccettazione implements Controller {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            //System.out.println("job served " +this.jobServed);
 
-            // System.out.println("[accettazione] jobServer" +this.jobServed);
-            //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
 
 
-            if(event.getVehicleType()==1) this.numberV1--;
-            else this.numberV2--;
+            if(event.getVehicleType()==1) {
+                                            this.numberV1--;
+                                            }
+            else {
+                    this.numberV2--;
+            }
+
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
 
 
@@ -245,7 +246,6 @@ public class ControllerAccettazione implements Controller {
 
         if(this.number==0 && this.time.getCurrent()> STOP_FINITE){
             this.eventHandler.getEventsAccettazione().get(0).setX(0);
-            //return;
         }
 
     }
@@ -307,8 +307,9 @@ public class ControllerAccettazione implements Controller {
 
 
             //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
+            //DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -349,8 +350,8 @@ public class ControllerAccettazione implements Controller {
             this.jobServed++;
             //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
             //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            //DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
+            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
             this.s=e; //il server con index e è quello che si libera
 

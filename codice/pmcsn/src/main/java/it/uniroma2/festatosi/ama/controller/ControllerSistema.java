@@ -113,11 +113,7 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
-           // System.out.println("evl sys");
-            for (EventListEntry ev:
-                 eventList) {
-                System.out.println(ev.getX()+" "+ev.getT());
-            }
+
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
