@@ -4,7 +4,6 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 
@@ -32,15 +31,10 @@ public class ControllerSistema {
 
     private List<Controller> controllerList=new ArrayList<>(NODES_SISTEMA);
 
-    long seed;
 
+    
 
-
-    public void selectSeed(long seed){
-        this.seed = seed;
-    }
-
-    public ControllerSistema(long seed) throws Exception {
+    public ControllerSistema() throws Exception {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
@@ -48,11 +42,12 @@ public class ControllerSistema {
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
 
-        rngs.plantSeeds(seed);
+        rngs.plantSeeds(SEED);
 
-        ControllerAccettazione accettazione = new ControllerAccettazione(rngs.getSeed());
-        ControllerCheckout checkout= new ControllerCheckout(rngs.getSeed());
-        ControllerScarico scarico=new ControllerScarico(rngs.getSeed());
+
+        ControllerAccettazione accettazione = new ControllerAccettazione();
+        ControllerCheckout checkout= new ControllerCheckout();
+        ControllerScarico scarico=new ControllerScarico();
 
         controllerList.addAll(Arrays.asList(scarico, accettazione));
         /*
@@ -78,7 +73,7 @@ public class ControllerSistema {
         this.sum.add(1, new MsqSum());
         //inizializzo la eventList del sistema, creo le entry per le varie officine
         for (int i=0;i<SERVERS_OFFICINA.length;i++) {
-            controllerList.add(new ControllerOfficine(i,rngs.getSeed()));
+            controllerList.add(new ControllerOfficine(i));
             this.eventListSistema.add(i+2, new EventListEntry(0, 0));
             this.sum.add(i + 2, new MsqSum());
         }

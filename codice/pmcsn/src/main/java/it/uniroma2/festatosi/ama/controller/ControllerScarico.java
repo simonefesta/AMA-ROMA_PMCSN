@@ -41,17 +41,17 @@ public class ControllerScarico implements Controller{
     File datiScarico;
     File datiScaricoBatch;
 
-    public ControllerScarico(long seed) throws Exception {
+    public ControllerScarico() throws Exception {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(seed);
-        //System.out.println(rngs.getSeed());
+        rngs.plantSeeds(SEED);
 
-        datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+
+        datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
         datiScaricoBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);

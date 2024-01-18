@@ -40,7 +40,7 @@ public class ControllerCheckout implements Controller{
     private int batchNumber=1;
     private double batchDuration=0;
 
-    public ControllerCheckout(long seed) throws IOException {
+    public ControllerCheckout() throws IOException {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
@@ -48,9 +48,9 @@ public class ControllerCheckout implements Controller{
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
 
-        rngs.plantSeeds(seed);
+        rngs.plantSeeds(SEED);
 
-        datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+        datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
         datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
