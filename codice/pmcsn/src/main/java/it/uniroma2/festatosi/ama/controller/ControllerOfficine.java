@@ -14,6 +14,8 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 public class ControllerOfficine implements Controller{
     long number =0;                 /*number in the node*/
+    long numberV1 =0;                 /*number in the node v1*/
+    long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/
@@ -105,7 +107,7 @@ public class ControllerOfficine implements Controller{
          * -eventList[0].x=0 (close door),
          * -number>0 ci sono ancora eventi nel sistema
          */
-        if (internalEventsOfficina.size()>0){
+        if (!internalEventsOfficina.isEmpty()){
             eventList.get(0).setT(internalEventsOfficina.get(0).getT());
         }
         //prende l'indice del primo evento nella lista
@@ -141,6 +143,10 @@ public class ControllerOfficine implements Controller{
             //System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
             
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
             DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
             //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
@@ -190,6 +196,9 @@ public class ControllerOfficine implements Controller{
                 this.s = e; //il server con index e è quello che si libera
 
                 EventListEntry event = eventList.get(s);
+
+                if(event.getVehicleType()==1) this.numberV1--;
+                else this.numberV2--;
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
@@ -284,6 +293,10 @@ public class ControllerOfficine implements Controller{
             
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
             DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
             //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
@@ -344,6 +357,9 @@ public class ControllerOfficine implements Controller{
                 this.s = e; //il server con index e è quello che si libera
 
                 EventListEntry event = eventList.get(s);
+
+                if(event.getVehicleType()==1) this.numberV1--;
+                else this.numberV2--;
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number);
                 DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());

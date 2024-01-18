@@ -18,6 +18,8 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
 
 public class ControllerScarico implements Controller{
     long number =0;                 /*number in the node*/
+    long numberV1 =0;                 /*number in the node v1*/
+    long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/
@@ -138,6 +140,10 @@ public class ControllerScarico implements Controller{
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
             DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
@@ -170,6 +176,10 @@ public class ControllerScarico implements Controller{
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
 
             //logica di routing
@@ -318,6 +328,9 @@ public class ControllerScarico implements Controller{
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             this.jobInBatch++;
 
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
             DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
 
@@ -361,6 +374,10 @@ public class ControllerScarico implements Controller{
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number);
 
             //logica di routing

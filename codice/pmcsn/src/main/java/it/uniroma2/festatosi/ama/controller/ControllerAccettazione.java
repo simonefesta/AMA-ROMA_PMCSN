@@ -18,6 +18,8 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  */
 public class ControllerAccettazione implements Controller {
     long number =0;                 /*number in the node*/
+    long numberV1 =0;                 /*number in the node v1*/
+    long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/
@@ -114,6 +116,10 @@ public class ControllerAccettazione implements Controller {
                 return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
             }
             this.number++; //poiché sto processando un arrivo, la popolazione aumenta
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
 
@@ -162,6 +168,10 @@ public class ControllerAccettazione implements Controller {
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
 
 
 
@@ -288,6 +298,10 @@ public class ControllerAccettazione implements Controller {
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
@@ -341,6 +355,9 @@ public class ControllerAccettazione implements Controller {
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(e);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
 
             double rndRouting= rngs.random();
             int off;

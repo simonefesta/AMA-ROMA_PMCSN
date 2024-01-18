@@ -18,6 +18,8 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  */
 public class ControllerCheckout implements Controller{
     long number =0;                 /*number in the node*/
+    long numberV1 =0;                 /*number in the node v1*/
+    long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/
@@ -104,6 +106,10 @@ public class ControllerCheckout implements Controller{
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
             //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
 
@@ -145,6 +151,10 @@ public class ControllerCheckout implements Controller{
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(s);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
 
             //System.out.println("uscito dal sistema "+this.number+" "+event);
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
@@ -260,6 +270,10 @@ public class ControllerCheckout implements Controller{
             this.jobInBatch++;
             
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
             
@@ -301,7 +315,7 @@ public class ControllerCheckout implements Controller{
                 queueCheckout.add(eventList.get(0));
                 //System.out.println("messo in coda "+queueCheckout.size());
             }
-            if(internalEventsCheckout.size()==0){
+            if(internalEventsCheckout.isEmpty()){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
             }
         }
@@ -314,6 +328,10 @@ public class ControllerCheckout implements Controller{
             this.s=e; //il server con index e è quello che si libera
 
             EventListEntry event=eventList.get(s);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
 
             //System.out.println("uscito dal sistema "+this.number+" "+event);
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number);
