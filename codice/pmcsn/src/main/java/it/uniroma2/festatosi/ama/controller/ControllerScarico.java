@@ -263,6 +263,8 @@ public class ControllerScarico implements Controller{
         //lista degli eventi dello scarico che arrivano dalle officine
         List<EventListEntry> internalEventsScarico=eventHandler.getInternalEventsScarico();
 
+        datiScaricoBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName()+"Batch");
+
         /*
         * se le porte sono chiuse, la lista degli eventi arrivati dall'interno è vuota e sono stati processati
         * tutti gli eventi nel sistema si imposta a 0 la x nella event list in modo da non essere invocato nuovamente

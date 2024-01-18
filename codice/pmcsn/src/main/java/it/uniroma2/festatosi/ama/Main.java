@@ -19,7 +19,7 @@ public class Main {
          *         = 1; simulazione infinita, servizi esponenziali
          *         = 2; simulazione infinita con servizi gaussiani troncati
          */
-        sistema.simulation(0);
+        sistema.simulation(1);
 
 
     }

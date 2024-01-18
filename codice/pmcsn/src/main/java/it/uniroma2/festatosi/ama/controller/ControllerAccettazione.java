@@ -264,6 +264,8 @@ public class ControllerAccettazione implements Controller {
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
 
+        datiAccettazioneBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName()+"Batch");
+
         /*
          *il ciclo continua finché non si verificano entrambe queste condizioni:
          * -eventList[0].x=0 (close door),
