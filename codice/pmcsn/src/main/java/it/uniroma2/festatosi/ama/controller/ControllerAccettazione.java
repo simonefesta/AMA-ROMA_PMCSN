@@ -41,18 +41,17 @@ public class ControllerAccettazione implements Controller {
     private int batchNumber=1;
     private final Statistics statAccettazione = new Statistics();;
 
-    public ControllerAccettazione(long seed) throws Exception {
+    public ControllerAccettazione() throws Exception {
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
-        rngs.plantSeeds(seed);
+        rngs.plantSeeds(SEED);
 
-        //System.out.println(rngs.getSeed());
 
-        datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+        datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
         datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
 
         List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);

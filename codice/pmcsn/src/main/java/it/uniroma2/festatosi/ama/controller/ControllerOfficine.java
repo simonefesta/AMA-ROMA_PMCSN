@@ -40,7 +40,7 @@ public class ControllerOfficine implements Controller{
     private double batchDuration=0;
     private int batchNumber=1;
 
-    public ControllerOfficine(int id, long seed) throws Exception {
+    public ControllerOfficine(int id) throws Exception {
         this.id=id;
         sum=new ArrayList<>(SERVERS_OFFICINA[id]+1);
         eventListOfficina=new ArrayList<>(SERVERS_OFFICINA[this.id]+1);
@@ -53,9 +53,11 @@ public class ControllerOfficine implements Controller{
         /*istanza della classe per creare multi-stream di numeri random*/
         Rngs rngs = new Rngs();
 
-        rngs.plantSeeds(seed);
+        rngs.plantSeeds(SEED);
+        System.out.println(rngs.getSeed());
 
-        datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il seed al file delle statistiche, oltre che il nome del centro
+
+        datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
         datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));

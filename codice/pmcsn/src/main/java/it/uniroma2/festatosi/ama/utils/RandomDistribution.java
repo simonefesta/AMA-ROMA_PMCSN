@@ -28,7 +28,7 @@ public class RandomDistribution {
         this.intTime=0;
         this.leaveTime=0;
         this.serviceTime=0;
-        this.rngs.plantSeeds(123456789);
+        this.rngs.plantSeeds(SEED);
     }
 
     public static RandomDistribution getInstance(){

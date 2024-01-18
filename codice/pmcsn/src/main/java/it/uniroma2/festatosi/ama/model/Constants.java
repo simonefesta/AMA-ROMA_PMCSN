@@ -9,6 +9,14 @@ import java.io.IOException;
 // Qui introduciamo le probabilità e costanti varie
 public class Constants {
 
+
+    public static final long SEED = 1234567L;
+
+
+
+
+
+
     // ---- ARRIVAL RATES [req/sec]----
 
     public static final double LAMBDA = 0.0055; //è circa 60 mezzi in 3 ore, bisogna ragionarci su!
