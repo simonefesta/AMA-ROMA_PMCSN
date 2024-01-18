@@ -24,6 +24,8 @@ public class ControllerAccettazione implements Controller {
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/
     private double area=0.0;        /*time integrated number in the node*/
+    private double area1=0.0;        /*time integrated number in the node*/
+    private double area2=0.0;        /*time integrated number in the node*/
 
 
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
@@ -279,7 +281,8 @@ public class ControllerAccettazione implements Controller {
         this.time.setNext(eventList.get(e).getT());
         //si calcola l'area dell'integrale
         this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
-
+        this.area1=this.area1+(this.time.getNext()-this.time.getCurrent())*this.numberV1;
+        this.area2=this.area2+(this.time.getNext()-this.time.getCurrent())*this.numberV2;
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
 
@@ -488,6 +491,8 @@ public class ControllerAccettazione implements Controller {
         double meanUtilization;
         //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
+        double Ens1 = this.area1/(this.batchDuration);
+        double Ens2 = this.area2/(this.batchDuration);
         double Ets = (this.area)/this.jobServed;
         System.out.println("E[Ns]: " + Ens + " Ets " + Ets); //  Da msq è definita come area/t_Current
         statAccettazione.setBatchPopolazioneSistema(Ens, batchNumber); //metto dentro il vettore Ens del batch
@@ -516,7 +521,7 @@ public class ControllerAccettazione implements Controller {
         statAccettazione.setBatchUtilizzazione(meanUtilization, batchNumber);
 
         System.out.println("MeanUtilization "+ meanUtilization);
-        DataExtractor.writeBatchStat(datiAccettazioneBatch,batchNumber,Ens);
+        DataExtractor.writeBatchStat(datiAccettazioneBatch,batchNumber,Ens,Ens1,Ens2);
 
 
 

@@ -70,9 +70,9 @@ public class DataExtractor{
             }
         }
 
-    public static void writeBatchStat(File fileInTarget, int batch, double value) {
+    public static void writeBatchStat(File fileInTarget, int batch, double value, double valueV1, double valueV2) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget, true))) {
-            writer.write(";" + batch + ";" + value + "\n");
+            writer.write(";" + batch + ";" + value + ";" +valueV1 + ";" + valueV2+ "\n");
         } catch (IOException e) {
             System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
         }
