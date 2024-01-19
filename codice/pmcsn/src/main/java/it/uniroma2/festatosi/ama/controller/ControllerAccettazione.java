@@ -435,6 +435,181 @@ public class ControllerAccettazione implements Controller {
 
     }
 
+    @Override
+    public void betterBaseSimulation() throws Exception {
+        int e;
+        //prende la lista di eventi per l'accettazione
+        List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
+
+        /*
+         *il ciclo continua finché non si verificano entrambe queste condizioni:
+         * -eventList[0].x=0 (close door),
+         * -number>0 ci sono ancora eventi nel sistema
+         */
+
+        if(eventList.get(0).getX()==0 && this.number==0){
+            eventHandler.getEventsSistema().get(1).setX(0);
+            return;
+        }
+        //prende l'indice del primo evento nella lista
+        e=EventListEntry.getNextEvent(eventList, SERVERS_ACCETTAZIONE);
+
+        //imposta il tempo del prossimo evento
+        this.time.setNext(eventList.get(e).getT());
+        //si calcola l'area dell'integrale
+        this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+        //imposta il tempo corrente a quello dell'evento corrente
+        this.time.setCurrent(this.time.getNext());
+
+
+        if(e==0){ // controllo se l'evento è un arrivo
+
+            eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1)); // genero il tempo del prossimo arrivo come tempo attuale + interrarivo random
+
+            int vType=rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
+            if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
+                eventList.get(0).setX(0);
+                eventHandler.setEventsAccettazione(eventList);
+                return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
+            }
+            this.number++; //poiché sto processando un arrivo, la popolazione aumenta
+
+            if(vType==1) {
+                this.numberV1++;
+            }
+            else {
+                this.numberV2++;
+            }
+
+            EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
+
+
+
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV1);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+            if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
+                //eventHandler.getEventsSistema().get(0).setX(0);
+                eventList.get(0).setX(0); //chiusura delle porte
+                this.eventHandler.setEventsAccettazione(eventList);
+                //return;
+            }
+
+            if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi per servire il job che sto analizzando
+                double service=this.rnd.getService(0); //ottengo tempo di servizio
+                this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                //incrementa i tempi di servizio e il numero di job serviti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+                //imposta nella lista degli eventi che il server s è busy
+                eventList.get(s).setT(this.time.getCurrent() +service);
+                eventList.get(s).setX(1);
+                eventList.get(s).setVehicleType(vType);
+
+                //aggiorna la lista nell' handler
+                this.eventHandler.setEventsAccettazione(eventList);
+            }else{
+                queueAccettazione.add(event);
+            }
+        }
+        else{ //evento di fine servizio
+            //decrementa il numero di eventi nel nodo considerato
+            this.number--;
+            //aumenta il numero di job serviti
+            this.jobServed++;
+
+
+            this.s=e; //il server con index e è quello che si libera
+
+            EventListEntry event=eventList.get(e);
+
+
+            if(event.getVehicleType()==1) {
+                this.numberV1--;
+            }
+            else {
+                this.numberV2--;
+            }
+
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+
+
+            //Logica di routing
+
+            double rndRouting= rngs.random();
+            int off;
+            if(rndRouting<=(P2+P3+P4+P5+P6)) {
+                if(rndRouting<=P2){
+                    off=0;
+                    //System.out.println("Goto gommista");
+                }
+                else if(rndRouting<=(P2+P3)){
+                    off=1;
+                    //System.out.println("Goto carrozziere");
+                }
+                else if(rndRouting<=(P2+P3+P4)){
+                    off=2;
+                    //System.out.println("goto elettrauto");
+                }
+                else if(rndRouting<=(P2+P3+P4+P5)){
+                    off=3;
+                    //System.out.println("goto carpentiere");
+                }
+                else{
+                    off=4;
+                    //System.out.println("goto meccanico");
+                }
+
+                //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
+                eventHandler.getInternalEventsOfficina(off).add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                if(eventHandler.getEventsSistema().get(off+2).getT()>eventList.get(e).getT() || eventHandler.getEventsSistema().get(off+2).getX()==0){
+                    eventHandler.getEventsSistema().get(off+2).setT(eventList.get(e).getT());
+                }
+                eventHandler.getEventsSistema().get(off+2).setX(1);
+                eventHandler.getEventsOfficina(off).get(0).setX(1);
+            } else{
+                eventHandler.decrementVType(event.getVehicleType());
+                //System.out.println("abbandono");
+                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
+            }
+
+
+            if(this.number>=SERVERS_ACCETTAZIONE){ //controllo se ci sono altri eventi da gestire
+                int eventIndex= eventHandler.getNextEventFromQueue(queueAccettazione);
+                //se ci sono altri job nel sistema, dovrò generare altri tempi di servizio
+                double service=this.rnd.getService(0);
+                //incremento tempo di servizio totale ed eventi totali gestiti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+                //imposta il tempo alla fine del servizio
+
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setVehicleType(queueAccettazione.get(eventIndex).getVehicleType());
+                queueAccettazione.remove(eventIndex);
+                //aggiorna la lista degli eventi di accettazione
+                this.eventHandler.setEventsAccettazione(eventList);
+            }else{
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+                //aggiorna la lista
+                this.eventHandler.setEventsAccettazione(eventList);
+            }
+
+
+            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
+
+        }
+
+        eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventList));
+
+        if(this.number==0 && this.time.getCurrent()> STOP_FINITE){
+            this.eventHandler.getEventsAccettazione().get(0).setX(0);
+        }
+    }
+
     /**
      * Ritorna l'indice del server libero da più tempo
      *
@@ -483,11 +658,6 @@ public class ControllerAccettazione implements Controller {
 
         }
         System.out.println("\n");
-    }
-
-    @Override
-    public void betterBaseSimulation() {
-
     }
 
     private void getStatistics(){

@@ -21,7 +21,7 @@ public class Main {
          *         = 3; simulazione finita, modello migliorativo, servizi gaussiani
          *         = 4; simulazione infinita, modello migliorativo, servizi gaussiani
          */
-        sistema.simulation(1);
+        sistema.simulation(3);
 
 
     }
