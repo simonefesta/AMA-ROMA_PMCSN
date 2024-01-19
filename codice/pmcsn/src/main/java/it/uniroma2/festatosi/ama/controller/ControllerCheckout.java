@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+
+
 import static it.uniroma2.festatosi.ama.model.Constants.*;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationAccettazione;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationCheckout;
 
 /**
  * rappresenta la msq per il checkout
@@ -36,6 +40,8 @@ public class ControllerCheckout implements Controller{
     private final List<EventListEntry> eventListCheckout=new ArrayList<>(SERVERS_CHECKOUT+1);
 
     private List<EventListEntry> queueCheckout=new LinkedList<>();
+    private final Rngs rngs=new Rngs();
+
 
     File datiCheckout;
     File datiCheckoutBatch;
@@ -49,10 +55,7 @@ public class ControllerCheckout implements Controller{
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
-        /*istanza della classe per creare multi-stream di numeri random*/
-        Rngs rngs = new Rngs();
 
-        rngs.plantSeeds(SEED);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
         datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
@@ -694,14 +697,21 @@ public class ControllerCheckout implements Controller{
         System.out.println("Checkout\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCheckout().get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        double Ets = this.area / this.jobServed;
+        double Ens = this.area / this.time.getCurrent();
+        System.out.println("  avg wait ........... = " + Ets);
+        System.out.println("  avg # in node ...... = " + Ens);
 
         for(int i = 1; i <= SERVERS_CHECKOUT; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+
+        double Etq = this.area / this.jobServed;
+        double Enq = this.area / this.time.getCurrent();
+
+        System.out.println("  avg delay .......... = " + Etq);
+
+        System.out.println("  avg # in queue ..... = " + Enq);
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_CHECKOUT; i++) {
@@ -716,6 +726,8 @@ public class ControllerCheckout implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
+
+        DataExtractor.writeReplicationStat(replicationCheckout,Ets, Ens, Etq, Enq);
         System.out.println("\n");
     }
 

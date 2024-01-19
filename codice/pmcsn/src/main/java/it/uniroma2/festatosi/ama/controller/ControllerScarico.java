@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationCheckout;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationScarico;
 
 /**
  * Rappresenta la msq per lo scarico
@@ -49,10 +51,6 @@ public class ControllerScarico implements Controller{
 
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
-
-        /*istanza della classe per creare multi-stream di numeri random*/
-        Rngs rngs = new Rngs();
-        rngs.plantSeeds(SEED);
 
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
@@ -898,15 +896,20 @@ public class ControllerScarico implements Controller{
     public void printStats() {
         System.out.println("Scarico\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
+        double Ets = this.area / this.jobServed;
+        double Ens = this.area / this.time.getCurrent();
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsScarico().get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        System.out.println("  avg wait ........... = " + Ets);
+        System.out.println("  avg # in node ...... = " + Ens);
 
         for(int i = 1; i <= SERVERS_SCARICO; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+
+        double Etq = this.area / this.jobServed;
+        double Enq = this.area / this.time.getCurrent();
+        System.out.println("  avg delay .......... = " + Etq);
+        System.out.println("  avg # in queue ..... = " + Enq);
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("server\tutilization\t\t\tavg service\t\t\tshare");
         for(int i = 1; i <= SERVERS_SCARICO; i++) {
@@ -921,6 +924,8 @@ public class ControllerScarico implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
+        DataExtractor.writeReplicationStat(replicationScarico,Ets, Ens, Etq, Enq);
+
         System.out.println("\n");
     }
 

@@ -287,6 +287,10 @@ public class EventHandler {
         return arr;
     }
 
+    public int setArr(int arrivals){
+        return arr = 0;
+    }
+
     /*aggiunta variabile per la gestione della priorità dinamica*/
     public int getPriorityClass() {
         return priorityClass;

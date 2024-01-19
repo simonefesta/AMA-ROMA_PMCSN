@@ -59,6 +59,33 @@ public class DataExtractor{
         return fileInTarget;
     }
 
+    public static File initializeFileReplication(long seed, String name) throws IOException {
+        String currentDirectory = System.getProperty("user.dir");
+        String targetDirectoryName = "target";
+        String fileName = name + ".csv";
+        String targetDirectoryPath = currentDirectory + File.separator + targetDirectoryName + File.separator + "graphs" + File.separator + seed + File.separator+"ReplicationStats";
+
+        File targetDirectory = new File(targetDirectoryPath);
+
+        if (!targetDirectory.exists()) {
+            boolean directoryCreated = targetDirectory.mkdirs();
+            if (directoryCreated) {
+                System.out.println("La cartella 'seed_" + seed + "' è stata creata in 'target'.");
+            } else {
+                System.out.println("Impossibile creare la cartella 'seed_" + seed + "' in 'target'.");
+            }
+        }
+
+        File fileInTarget = new File(targetDirectory, fileName);
+        //System.out.println("CREO :" + fileName + " ");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
+            writer.write("Ets" + ";" + "Ens" + ";" + "Etq" +";" + "Enq"+ "\n");
+
+        }
+        return fileInTarget;
+    }
+
 
 
 
@@ -78,6 +105,19 @@ public class DataExtractor{
         }
     }
 
+    public static void writeReplicationStat(File fileInTarget, double ets, double ens, double etq, double enq) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget, true))) {
+            writer.write(";" + ets + ";" + ens + ";" +etq + ";" + enq + "\n");
+        } catch (IOException e) {
+            System.out.println("Si è verificato un errore durante la scrittura nel file CSV: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     *
+     * Usata per vedere valori di autolag, per adesso è abbastanza statica.
+     */
     public static String convertCsvToTxt(/*String inputCsvPath, String outputTxtPath*/) throws IOException {
         String inputCsvPath = "target/graphs/123456789/ControllerAccettazioneBatch.csv";
         String outputTxtPath = "target/graphs/123456789/AutocorrelazioneAccettazioneBatch.txt";

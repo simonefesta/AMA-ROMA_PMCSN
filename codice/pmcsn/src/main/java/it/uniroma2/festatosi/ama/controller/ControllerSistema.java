@@ -152,6 +152,7 @@ public class ControllerSistema {
         }
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+        eventHandler.setArr(0);
     }
 
 

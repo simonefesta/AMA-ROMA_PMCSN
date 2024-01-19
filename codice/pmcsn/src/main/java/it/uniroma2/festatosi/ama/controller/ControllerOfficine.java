@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationScarico;
 
 public class ControllerOfficine implements Controller{
     long number =0;                 /*number in the node*/
@@ -23,6 +24,8 @@ public class ControllerOfficine implements Controller{
     private double area1=0.0;        /*time integrated number in the node*/
     private double area2=0.0;        /*time integrated number in the node*/
     private String name;
+    private final Rngs rngs=new Rngs();
+
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
 
     private final RandomDistribution rnd=RandomDistribution.getInstance();
@@ -54,10 +57,6 @@ public class ControllerOfficine implements Controller{
         /*ottengo l'istanza di EventHandler per la gestione degli eventi*/
         this.eventHandler=EventHandler.getInstance();
 
-        /*istanza della classe per creare multi-stream di numeri random*/
-        Rngs rngs = new Rngs();
-
-        rngs.plantSeeds(SEED);
 
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
@@ -715,14 +714,19 @@ public class ControllerOfficine implements Controller{
         System.out.println(this.name+"\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsOfficina(this.id).get(0).getT() / this.jobServed);
-        System.out.println("  avg wait ........... = " + this.area / this.jobServed);
-        System.out.println("  avg # in node ...... = " + this.area / this.time.getCurrent());
+        double Ets = this.area / this.jobServed;
+        double Ens = this.area / this.time.getCurrent();
+        System.out.println("  avg wait ........... = " + Ets);
+        System.out.println("  avg # in node ...... = " + Ens);
 
         for(int i = 1; i <= SERVERS_OFFICINA[this.id]; i++) {
             this.area -= this.sum.get(i).getService();
         }
-        System.out.println("  avg delay .......... = " + this.area / this.jobServed);
-        System.out.println("  avg # in queue ..... = " + this.area / this.time.getCurrent());
+        double Etq = this.area / this.jobServed;
+        double Enq = this.area / this.time.getCurrent();
+
+        System.out.println("  avg delay .......... = " + Etq);
+        System.out.println("  avg # in queue ..... = " + Enq);
         System.out.println("\nthe server statistics are:\n\n");
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_OFFICINA[this.id]; i++) {
@@ -737,6 +741,9 @@ public class ControllerOfficine implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
+
+        DataExtractor.writeReplicationStat(ReplicationHelper.getReplicationFile(this.name),Ets, Ens, Etq, Enq);
+
         System.out.println("\n");
     }
 
