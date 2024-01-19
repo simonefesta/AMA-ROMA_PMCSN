@@ -485,6 +485,11 @@ public class ControllerAccettazione implements Controller {
         System.out.println("\n");
     }
 
+    @Override
+    public void betterBaseSimulation() {
+
+    }
+
     private void getStatistics(){
 
         System.out.println(" \n\nAccettazione, batch: " + batchNumber);

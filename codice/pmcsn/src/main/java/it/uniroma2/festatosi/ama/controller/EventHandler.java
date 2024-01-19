@@ -39,6 +39,7 @@ public class EventHandler {
     private int numberV1=0; /*conta i veicoli del primo tipo nel sistema*/
     private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
     private int arr=0;
+    private int priorityClass=1; /*indica quale veicolo ha la priorità*/
 
     private EventHandler() {
         /*event list per i vari msq*/
@@ -284,5 +285,27 @@ public class EventHandler {
 
     public int getArr(){
         return arr;
+    }
+
+    /*aggiunta variabile per la gestione della priorità dinamica*/
+    public int getPriorityClass() {
+        return priorityClass;
+    }
+
+    public void setPriorityClassV1() {
+        this.priorityClass = 1;
+    }
+
+    public void setPriorityClassV2() {
+        this.priorityClass = 2;
+    }
+
+    public int getNextEventFromQueue(List<EventListEntry> queue){
+        for(int i=0;i<queue.size();i++){
+            if(queue.get(i).getVehicleType()==this.priorityClass){
+                return i;
+            }
+        }
+        return 0;
     }
 }

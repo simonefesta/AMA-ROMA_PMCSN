@@ -239,6 +239,7 @@ public class ControllerOfficine implements Controller{
      * @param typeOfService = 0 se esponenziale (per verifica), 1 altrimenti.
      *
      */
+    @Override
     public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per l'officina
@@ -393,7 +394,10 @@ public class ControllerOfficine implements Controller{
         eventHandler.getEventsSistema().get(this.id+2).setT(eventHandler.getMinTime(eventList));
     }
 
+    @Override
+    public void betterBaseSimulation() {
 
+    }
 
     /**
      * Ritorna l'indice del server libero da più tempo

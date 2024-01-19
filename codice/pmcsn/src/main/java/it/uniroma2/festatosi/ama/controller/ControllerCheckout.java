@@ -68,6 +68,7 @@ public class ControllerCheckout implements Controller{
         this.eventHandler.setEventsCheckout(eventListCheckout);
     }
 
+    @Override
     public void baseSimulation() throws Exception {
         int e;
         //prende la lista di eventi per il checkout
@@ -194,7 +195,7 @@ public class ControllerCheckout implements Controller{
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
-                if(internalEventsCheckout.size()==0 && this.number==0){
+                if(internalEventsCheckout.isEmpty() && this.number==0){
                     this.eventHandler.getEventsSistema().get(7).setX(0);
                 }
                 //aggiorna la lista
@@ -215,6 +216,7 @@ public class ControllerCheckout implements Controller{
       @param typeOfService = 0 servizi esponenziali, 1 servizi normali
 
      **/
+    @Override
     public void infiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per il checkout
@@ -364,6 +366,12 @@ public class ControllerCheckout implements Controller{
 
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
+
+    }
+
+
+    @Override
+    public void betterBaseSimulation() {
 
     }
 

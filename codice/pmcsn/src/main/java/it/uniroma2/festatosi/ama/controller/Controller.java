@@ -10,4 +10,6 @@ public interface Controller {
 
     void printFinalStats();
     void printStats() throws Exception;
+
+    void betterBaseSimulation() throws Exception;
 }

@@ -324,7 +324,7 @@ public class ControllerSistema {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
-            controllerList.get(e).baseSimulation();
+            controllerList.get(e).betterBaseSimulation();
 
             eventList=eventHandler.getEventsSistema();
         }

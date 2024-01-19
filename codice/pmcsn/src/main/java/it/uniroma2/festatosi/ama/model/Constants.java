@@ -93,7 +93,9 @@ public class Constants {
 
     // numero di veicoli per ogni tipo
     public static final int VEICOLI1 = 103; //veicoli piccoli #40
+    public static final int MAX_VEICOLI1 =53; //veicoli piccoli nel sistema al massimo
     public static final int VEICOLI2 = 79; //veicoli grandi #59
+    public static final int MAX_VEICOLI2 = 30; //veicoli grandi nel sistema al massimo
 
     public static File datiSistema;
     public static File datiSistemaBatch;
