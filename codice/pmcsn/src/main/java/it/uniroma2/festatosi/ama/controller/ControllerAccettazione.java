@@ -313,8 +313,8 @@ public class ControllerAccettazione implements Controller {
 
             //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
 
-            //DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number);
-            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(), eventHandler.getNumberV1(), eventHandler.getNumberV2());
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -529,10 +529,10 @@ public class ControllerAccettazione implements Controller {
 
 
 
-
-
+        this.area1 = 0;
+        this.area2 = 0;
         this.area = 0;
-         this.jobServed = 0;
+        this.jobServed = 0;
 
     }
 

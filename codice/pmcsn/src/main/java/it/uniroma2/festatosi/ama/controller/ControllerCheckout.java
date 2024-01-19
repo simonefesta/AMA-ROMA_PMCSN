@@ -263,8 +263,8 @@ public class ControllerCheckout implements Controller{
             else this.numberV2++;
 
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
-            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
-            
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
 
@@ -281,7 +281,6 @@ public class ControllerCheckout implements Controller{
                 if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 else service = this.rnd.getService(2);
 
-                //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -315,11 +314,12 @@ public class ControllerCheckout implements Controller{
             if(event.getVehicleType()==1) this.numberV1--;
             else this.numberV2--;
 
+            eventHandler.decrementVType(event.getVehicleType());
 
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
-            eventHandler.decrementVType(event.getVehicleType());
-            //DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber());
+
 
             if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
                 //attivo di nuovo arrivi per scarico
@@ -423,7 +423,7 @@ public class ControllerCheckout implements Controller{
 
         System.out.println("\n\nCheckout, batch: " + batchNumber);
         double meanUtilization;
-        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
+
         double Ens = this.area/(this.batchDuration);
         double Ens1 = this.area1/(this.batchDuration);
         double Ens2 = this.area2/(this.batchDuration);
@@ -460,6 +460,8 @@ public class ControllerCheckout implements Controller{
 
 
 
+        this.area1 = 0;
+        this.area2 = 0;
         this.area = 0;
         this.jobServed = 0;
 

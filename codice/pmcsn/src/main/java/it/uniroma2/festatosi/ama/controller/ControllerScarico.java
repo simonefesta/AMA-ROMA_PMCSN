@@ -338,7 +338,8 @@ public class ControllerScarico implements Controller{
             else this.numberV2++;
 
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
-            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -385,6 +386,8 @@ public class ControllerScarico implements Controller{
             else this.numberV2--;
 
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
 
             //logica di routing
             double rndRouting= rngs.random();
@@ -521,7 +524,8 @@ public class ControllerScarico implements Controller{
 
 
 
-
+        this.area1 = 0;
+        this.area2 = 0;
         this.area = 0;
         this.jobServed = 0;
 

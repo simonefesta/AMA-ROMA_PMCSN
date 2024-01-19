@@ -122,7 +122,6 @@ public class ControllerOfficine implements Controller{
         this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
-       // System.out.println(this.name + " current " + this.time.getCurrent());
 
 
         if (e == 0) { // controllo se l'evento è un arrivo
@@ -290,7 +289,8 @@ public class ControllerOfficine implements Controller{
             else this.numberV2++;
 
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
-            //DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
             //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
             
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
@@ -346,10 +346,11 @@ public class ControllerOfficine implements Controller{
                 else this.numberV2--;
 
                 DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
-                //DataExtractor.writeSingleStat(datiSistema, event.getT(), eventHandler.getNumber());
+                DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
 
-                //aggiunta dell'evento alla coda dello scarico
+
+               //aggiunta dell'evento alla coda dello scarico
                 eventHandler.getInternalEventsScarico()
                         .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
                 if (eventHandler.getEventsScarico().get(eventHandler.getEventsScarico().size() - 1).getT() > event.getT() ||
@@ -485,7 +486,8 @@ public class ControllerOfficine implements Controller{
         DataExtractor.writeBatchStat(datiOfficinaBatch, batchNumber, Ens, Ens1, Ens2);
 
 
-
+        this.area1 = 0;
+        this.area2 = 0;
         this.area = 0;
         this.jobServed = 0;
 
