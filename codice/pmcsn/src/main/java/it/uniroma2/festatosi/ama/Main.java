@@ -22,7 +22,7 @@ public class Main {
          *         = 4; simulazione infinita, modello migliorativo, servizi esponenziali.
          *         = 5; simulazione infinita, modello migliorativo, servizi gaussiani troncati.
          */
-        sistema.simulation(4);
+        sistema.simulation(2);
 
 
     }
