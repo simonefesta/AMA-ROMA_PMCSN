@@ -221,7 +221,7 @@ public class ControllerCheckout implements Controller{
         List<EventListEntry> eventList = this.eventHandler.getEventsCheckout();
         List<EventListEntry> internalEventsCheckout=eventHandler.getInternalEventsCheckout();
 
-        datiCheckoutBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName()+"Batch");
+        datiCheckoutBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName());
 
         /*
          *il ciclo continua finchè non si verificano entrambe queste condizioni:

@@ -246,7 +246,7 @@ public class ControllerOfficine implements Controller{
         List<EventListEntry> eventList = this.eventHandler.getEventsOfficina(this.id);
         List<EventListEntry> internalEventsOfficina=eventHandler.getInternalEventsOfficina(this.id);
 
-        datiOfficinaBatch=DataExtractor.initializeFileBatch(SEED, this.name+"Batch");
+        datiOfficinaBatch=DataExtractor.initializeFileBatch(SEED, this.name);
 
         /*
          *il ciclo continua finché non si verificano entrambe queste condizioni:
