@@ -100,6 +100,14 @@ public class ControllerSistema {
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi gaussiani.");
                 infiniteSimulation(1);  //batch con servizi normali
                 break;
+            case 3:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
+                betterBaseSimulation();
+                break;
+            case 4:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi gaussiani.");
+                betterInfiniteSimulation();
+                break;
             default:
                 throw new Exception("Type deve essere 0, 1 o 2");
         }
@@ -222,7 +230,7 @@ public class ControllerSistema {
 
         System.out.println("\n\n*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
 
-        printFinalStas();
+        printFinalStats();
 
         /*Rvms rvms = new Rvms();
         double criticalValue = rvms.idfStudent(K-1,1- alpha/2);*/
@@ -276,14 +284,10 @@ public class ControllerSistema {
 
     }
 
-    private void printFinalStas() {
+    private void printFinalStats() {
         for(Controller controller:controllerList){
             controller.printFinalStats();
         }
-        /*//stampo statistiche finali scarico
-        ((ControllerScarico)controllerList.get(0)).printFinalStats();
-        //stampo statistiche finali accettazione
-        ((ControllerAccettazione)controllerList.get(1)).printFinalStats();*/
     }
 
     private boolean checkWhile() {
@@ -293,21 +297,118 @@ public class ControllerSistema {
             }
         }
         return false;
-        /*ControllerScarico scarico=(ControllerScarico) controllerList.get(0);
-        ControllerAccettazione accettazione=(ControllerAccettazione)controllerList.get(1);
-        for(int i=2; i<controllerList.size()-1;i++){
-            ControllerOfficine officina=(ControllerOfficine) controllerList.get(i);
-            if(officina.getJobInBatch()<=B*K){
-                return true;
-            }
-        }
-        ControllerCheckout checkout=(ControllerCheckout) controllerList.get(7);
-        if(accettazione.getJobInBatch()<=B*K){
-            return true;
-        }else if(scarico.getJobInBatch()<=B*K){
-            return true;
-        } else return checkout.getJobInBatch() <= B * K;*/
     }
+
+    public void betterBaseSimulation() throws Exception {
+        int e;
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+         */
+        while(getNextEvent(eventList)!=-1) {
+
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+            // System.out.println("servito "+e);
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e < 0 || e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            controllerList.get(e).baseSimulation();
+
+            eventList=eventHandler.getEventsSistema();
+        }
+
+        for(Controller controller: controllerList){
+            controller.printStats();
+        }
+        /*((ControllerScarico) controllerList.get(0)).printStats(); //scarico
+        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
+            ((ControllerOfficine) controllerList.get(i+2)).printStats();
+        }
+        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout*/
+
+
+        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
+        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
+        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
+        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
+        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
+
+        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+    }
+
+
+    public void betterInfiniteSimulation() throws Exception {
+        int e;
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+         */
+        while(getNextEvent(eventList)!=-1) {
+
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+            // System.out.println("servito "+e);
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e < 0 || e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            controllerList.get(e).baseSimulation();
+
+            eventList=eventHandler.getEventsSistema();
+        }
+
+        for(Controller controller: controllerList){
+            controller.printStats();
+        }
+        /*((ControllerScarico) controllerList.get(0)).printStats(); //scarico
+        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
+        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
+            ((ControllerOfficine) controllerList.get(i+2)).printStats();
+        }
+        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout*/
+
+
+        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
+        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
+        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
+        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
+        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
+        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
+        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
+        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
+
+        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+    }
+
+
+
+
 
     /**
      * Seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse

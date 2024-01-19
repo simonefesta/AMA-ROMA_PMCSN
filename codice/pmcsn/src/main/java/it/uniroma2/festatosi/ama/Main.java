@@ -18,6 +18,8 @@ public class Main {
          *  @ type = 0; simulazione finita, servizi gaussiani.
          *         = 1; simulazione infinita, servizi esponenziali
          *         = 2; simulazione infinita con servizi gaussiani troncati
+         *         = 3; simulazione finita, modello migliorativo, servizi gaussiani
+         *         = 4; simulazione infinita, modello migliorativo, servizi gaussiani
          */
         sistema.simulation(1);
 
