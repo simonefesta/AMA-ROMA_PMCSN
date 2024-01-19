@@ -61,7 +61,7 @@ public class ControllerOfficine implements Controller{
 
 
         datiOfficina = DataExtractor.initializeFile(rngs.getSeed(),this.name); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        //datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
+        datiOfficinaBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.name+"Batch");
         for(s=0; s<=SERVERS_OFFICINA[this.id]; s++){
             this.eventListOfficina.add(s, new EventListEntry(0,0));
             this.sum.add(s, new MsqSum());
@@ -245,7 +245,6 @@ public class ControllerOfficine implements Controller{
         List<EventListEntry> eventList = this.eventHandler.getEventsOfficina(this.id);
         List<EventListEntry> internalEventsOfficina=eventHandler.getInternalEventsOfficina(this.id);
 
-        datiOfficinaBatch=DataExtractor.initializeFileBatch(SEED, this.name);
 
         /*
          *il ciclo continua finché non si verificano entrambe queste condizioni:

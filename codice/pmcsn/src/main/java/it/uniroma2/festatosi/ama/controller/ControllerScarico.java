@@ -56,6 +56,7 @@ public class ControllerScarico implements Controller{
 
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
+        datiScaricoBatch=DataExtractor.initializeFileBatch(rngs.getSeed(), this.getClass().getSimpleName());
 
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
@@ -263,7 +264,6 @@ public class ControllerScarico implements Controller{
         //lista degli eventi dello scarico che arrivano dalle officine
         List<EventListEntry> internalEventsScarico=eventHandler.getInternalEventsScarico();
 
-        datiScaricoBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName());
 
         /*
         * se le porte sono chiuse, la lista degli eventi arrivati dall'interno è vuota e sono stati processati

@@ -56,7 +56,7 @@ public class ControllerAccettazione implements Controller {
 
 
         datiAccettazione = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        //datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
+        datiAccettazioneBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+ "Batch");
 
         List<EventListEntry> eventListAccettazione = new ArrayList<>(SERVERS_ACCETTAZIONE + 1);
         for(s=0; s<SERVERS_ACCETTAZIONE+1; s++){
@@ -263,8 +263,6 @@ public class ControllerAccettazione implements Controller {
 
         //prende la lista di eventi per l'accettazione
         List<EventListEntry> eventList = this.eventHandler.getEventsAccettazione();
-
-        datiAccettazioneBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName());
 
         /*
          *il ciclo continua finché non si verificano entrambe queste condizioni:

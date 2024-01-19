@@ -55,7 +55,7 @@ public class ControllerCheckout implements Controller{
         rngs.plantSeeds(SEED);
 
         datiCheckout = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        //datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
+        datiCheckoutBatch = DataExtractor.initializeFileBatch(rngs.getSeed(),this.getClass().getSimpleName()+"Batch");
 
         for(s=0; s<SERVERS_CHECKOUT+1; s++){
             this.eventListCheckout.add(s, new EventListEntry(0,0));
@@ -220,8 +220,6 @@ public class ControllerCheckout implements Controller{
         //prende la lista di eventi per il checkout
         List<EventListEntry> eventList = this.eventHandler.getEventsCheckout();
         List<EventListEntry> internalEventsCheckout=eventHandler.getInternalEventsCheckout();
-
-        datiCheckoutBatch=DataExtractor.initializeFileBatch(SEED, this.getClass().getSimpleName());
 
         /*
          *il ciclo continua finchè non si verificano entrambe queste condizioni:
