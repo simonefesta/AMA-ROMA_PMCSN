@@ -53,8 +53,8 @@ public class DataExtractor{
         //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
-            writer.write("seed " + seed + ";" + "Batch" + ";" + "Popolazione" + ";" + name + "\n");
-            writer.write(";" + "0" + ";" + "0" + ";\n");
+            writer.write("seed " + seed + ";" + "Batch" + ";" + "Popolazione" + ";" + "PopolazioneVeicoliPiccoli" +";" + "PopolazioneVeicoliGrandi"+ ";" + name + "\n");
+            writer.write(";" + "0" + ";" + "0" + ";" + "0" + ";" + "0" + ";" + "\n");
         }
         return fileInTarget;
     }
