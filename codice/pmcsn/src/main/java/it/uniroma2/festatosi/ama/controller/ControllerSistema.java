@@ -272,23 +272,30 @@ public class ControllerSistema {
 
     public void betterInfiniteSimulation(int typeOfService) throws Exception {
         int e;
+        MsqT time=new MsqT();
+        time.setCurrent(START);
+        time.setNext(START);
+
+
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
         /*
          * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
          */
-        while(getNextEvent(eventList)!=-1) {
+
+        while (checkWhile()) {
+            eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-            // System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
+            //System.out.println(" time event is " + eventList.get(e).getT());
             //si calcola l'area dell'integrale
             this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
             //imposta il tempo corrente a quello dell'evento corrente
-            this.time.setCurrent(this.time.getNext());
+            //this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
             if (e < 0 || e > 7) {
@@ -296,15 +303,13 @@ public class ControllerSistema {
             }
 
             controllerList.get(e).betterInfiniteSimulation(typeOfService);
-
-            eventList=eventHandler.getEventsSistema();
+            this.time.setCurrent(this.time.getNext());
         }
 
-        for(Controller controller: controllerList){
-            controller.printStats();
-        }
+        System.out.println("\n\n*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
 
-        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+        printFinalStats();
+        System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
     }
 
     /**
