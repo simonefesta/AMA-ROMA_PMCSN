@@ -105,8 +105,12 @@ public class ControllerSistema {
                 betterBaseSimulation();
                 break;
             case 4:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi esponenziali.");
+                betterInfiniteSimulation(0);
+                break;
+            case 5:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi gaussiani.");
-                betterInfiniteSimulation();
+                betterInfiniteSimulation(1);
                 break;
             default:
                 throw new Exception("Type deve essere 0, 1 o 2");
@@ -217,6 +221,26 @@ public class ControllerSistema {
          */
         while(getNextEvent(eventList)!=-1) {
 
+
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+                eventHandler.setPriorityClassV1();
+                System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+                eventHandler.setPriorityClassV2();
+                System.out.println("priorità veicoli 2");
+            }
+
+            if(eventHandler.getNumberV1()>=MAX_VEICOLI1){
+                //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
+                System.out.println("superato il limite per i veicoli 1");
+            }
+
+            if(eventHandler.getNumberV2()>=MAX_VEICOLI2){
+                //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
+                System.out.println("superato il limite per i veicoli 2");
+            }
+
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
@@ -246,7 +270,7 @@ public class ControllerSistema {
     }
 
 
-    public void betterInfiniteSimulation() throws Exception {
+    public void betterInfiniteSimulation(int typeOfService) throws Exception {
         int e;
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -271,7 +295,7 @@ public class ControllerSistema {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
-            controllerList.get(e).baseSimulation();
+            controllerList.get(e).betterInfiniteSimulation(typeOfService);
 
             eventList=eventHandler.getEventsSistema();
         }
@@ -279,29 +303,9 @@ public class ControllerSistema {
         for(Controller controller: controllerList){
             controller.printStats();
         }
-        /*((ControllerScarico) controllerList.get(0)).printStats(); //scarico
-        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
-        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
-            ((ControllerOfficine) controllerList.get(i+2)).printStats();
-        }
-        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout*/
-
-
-        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
-        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
-        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
-        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
-        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
-        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
-        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
     }
-
-
-
-
 
     /**
      * Seleziona tra gli eventi di sistema quello con tempo più basso per farlo gestire dal controller di interesse

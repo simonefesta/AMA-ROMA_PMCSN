@@ -630,6 +630,203 @@ public class ControllerScarico implements Controller{
         }
     }
 
+    @Override
+    public void betterInfiniteSimulation(int typeOfService) throws Exception {
+        int e;
+        //prende la lista di eventi per lo Scarico
+        List<EventListEntry> eventList = this.eventHandler.getEventsScarico();
+        //lista degli eventi dello scarico che arrivano dalle officine
+        List<EventListEntry> internalEventsScarico=eventHandler.getInternalEventsScarico();
+
+
+        /*
+         * se le porte sono chiuse, la lista degli eventi arrivati dall'interno è vuota e sono stati processati
+         * tutti gli eventi nel sistema si imposta a 0 la x nella event list in modo da non essere invocato nuovamente
+         * */
+        if(eventList.get(0).getX()==0 && eventHandler.getInternalEventsScarico().isEmpty() && this.number==0){
+            eventHandler.getEventsSistema().get(0).setX(0);
+            return;
+        }
+
+        if (!internalEventsScarico.isEmpty()){
+            eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
+        }
+
+        /*System.out.println("scarico evlist");
+        for (EventListEntry ev:
+             eventList) {
+            System.out.println("scarico "+ev.getT()+" "+ev.getX());
+        }*/
+
+        //prende l'indice del primo evento nella lista
+        e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
+        //imposta il tempo del prossimo evento
+        this.time.setNext(eventList.get(e).getT());
+        //si calcola l'area dell'integrale
+        this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+        this.area1=this.area1+(this.time.getNext()-this.time.getCurrent())*this.numberV1;
+        this.area2=this.area2+(this.time.getNext()-this.time.getCurrent())*this.numberV2;
+        //imposta il tempo corrente a quello dell'evento corrente
+        this.time.setCurrent(this.time.getNext());
+
+        if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
+            //System.out.println("e scarico: "+e);
+            int vType;
+            EventListEntry event;
+            if(e==0) { //arrivo dall'esterno
+                vType = rnd.getExternalVehicleType(); //vedo quale tipo di veicolo sta arrivando
+                if (vType == Integer.MAX_VALUE) { //se i veicoli sono già tutti nel sistema il VType viene impostato a MAX
+                    eventList.get(0).setX(0);
+                    eventHandler.setEventsScarico(eventList);
+                    eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                    return; //se i veicoli sono già tutti presenti nel sistema non possono esserci altri arrivi
+                }
+
+                //viene creato l'evento in base alle informazioni ricavate
+                event = new EventListEntry(eventList.get(0).getT(), 1, vType);
+                //si imposta il tempo del prossimo arrivo
+                eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                //si imposta la event list di tutto il sistema con il tempo dell'evento corrente
+                eventHandler.getEventsSistema().get(0).setT(event.getT());
+
+
+                if (eventList.get(0).getT() > STOP_INFINITE) { //tempo maggiore della chiusura delle porte
+                    eventList.get(0).setX(0); //chiusura delle porte dall'esterno
+                    this.eventHandler.setEventsScarico(eventList);
+                }
+            }else{ //arrivo dall'interno del sistema
+                event=internalEventsScarico.get(0);
+                internalEventsScarico.remove(0);
+                //System.out.println("interno");
+                vType=event.getVehicleType();
+                if(internalEventsScarico.isEmpty()){
+                    eventList.get(eventList.size()-1).setX(0);
+                }
+            }
+
+            BatchSimulation.incrementJobInBatch();
+            this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+            this.jobInBatch++;
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+
+                getStatistics();
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
+
+            if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
+
+                double service;
+                if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
+                else service = this.rnd.getService(1);
+
+                //this.rnd.decrementVehicle(vType);
+                this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                //incrementa i tempi di servizio e il numero di job serviti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+                //imposta nella lista degli eventi che il server s è busy
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setX(1);
+                eventList.get(s).setVehicleType(vType);
+
+                //aggiorna la lista nell'handler
+                this.eventHandler.setEventsScarico(eventList);
+            }else{
+                queueScarico.add(event);
+            }
+        }
+        else{ //evento di fine servizio
+            //decrementa il numero di eventi nel nodo considerato
+            this.number--;
+
+            //aumenta il numero di job serviti
+            this.jobServed++;
+
+            this.s=e; //il server con index e è quello che si libera
+
+            EventListEntry event=eventList.get(e);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
+            DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+
+            //logica di routing
+            double rndRouting= rngs.random();
+            if(rndRouting<=P7){ //uscita dal sistema
+                //se il veicolo esce viene decrementato il numero di veicoli dello stesso tipo presenti nel sistema
+                eventHandler.decrementVType(event.getVehicleType());
+                if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                    eventList.get(0).setX(1);
+                    eventList.get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                    eventHandler.setEventsScarico(eventList);
+                    eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+                    //attivo di nuovo arrivi per accettazione
+                    eventHandler.getEventsAccettazione().get(0).setX(1);
+                    eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                    eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
+                }
+            }
+            else{
+                //aggiunta dell'evento alla coda del checkout
+                eventHandler.getInternalEventsCheckout()
+                        .add(new EventListEntry(event.getT(), event.getX(), event.getVehicleType()));
+                //impostata a 1 la x degli arrivi del checkout per dire che c'è un arrivo da gestire
+                eventHandler.getEventsCheckout().set(0,
+                        new EventListEntry(event.getT(), 1, event.getVehicleType()));
+
+                /*impostata la eventList del sistema in modo che quando arriva il suo turno il checkout
+                 * può prendere il controllo*/
+                eventHandler.getEventsSistema().get(7).setT(event.getT());
+                eventHandler.getEventsSistema().get(7).setX(1);
+            }
+
+            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
+
+
+            if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
+                int eventIndex= eventHandler.getNextEventFromQueue(queueScarico);
+                //se ci sono ottengo un nuovo tempo di servizio
+                double service;
+                if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
+                else service = this.rnd.getService(1);
+
+                //incremento tempo di servizio totale ed eventi totali gestiti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+                //imposta il tempo alla fine del servizio
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setVehicleType(queueScarico.get(eventIndex).getVehicleType());
+
+                //rimuovo dalla coda di scarico l'evento preso in gestione dal servente s
+                queueScarico.remove(eventIndex);
+
+                //aggiorna la lista degli eventi di Scarico
+                this.eventHandler.setEventsScarico(eventList);
+            }else{
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+                //aggiorna la lista
+                this.eventHandler.setEventsScarico(eventList);
+            }
+        }
+        eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventList));
+    }
+
+
     /**
      * Ritorna l'indice del server libero da più tempo
      *

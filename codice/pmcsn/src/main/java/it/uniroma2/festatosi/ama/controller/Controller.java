@@ -12,4 +12,6 @@ public interface Controller {
     void printStats() throws Exception;
 
     void betterBaseSimulation() throws Exception;
+
+    void betterInfiniteSimulation(int typeOfService) throws Exception;
 }

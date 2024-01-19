@@ -494,6 +494,161 @@ public class ControllerCheckout implements Controller{
                 queueCheckout.remove(eventIndex);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
+
+                //System.out.println("preso coda");
+
+            }else{
+                //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
+                eventList.get(e).setX(0);
+                if(internalEventsCheckout.isEmpty() && this.number==0){
+                    this.eventHandler.getEventsSistema().get(7).setX(0);
+                }
+                //aggiorna la lista
+                this.eventHandler.setEventsCheckout(eventList);
+            }
+
+
+            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
+        }
+
+
+        eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
+    }
+
+    @Override
+    public void betterInfiniteSimulation(int typeOfService) throws Exception {
+        int e;
+        //prende la lista di eventi per il checkout
+        List<EventListEntry> eventList = this.eventHandler.getEventsCheckout();
+        List<EventListEntry> internalEventsCheckout=eventHandler.getInternalEventsCheckout();
+
+        /*
+         *il ciclo continua finchè non si verificano entrambe queste condizioni:
+         * -eventList[0].x=0 (close door),
+         * -number>0 ci sono ancora eventi nel sistema
+         */
+
+
+        //while(eventHandler.getInternalEventsCheckout().size()>0 || this.number>0){
+        //prende l'indice del primo evento nella lista
+        e=EventListEntry.getNextEvent(eventList, SERVERS_CHECKOUT);
+        //imposta il tempo del prossimo evento
+        this.time.setNext(eventList.get(e).getT());
+        //si calcola l'area dell'integrale
+        this.area=this.area+(this.time.getNext()-this.time.getCurrent())*this.number;
+        this.area1=this.area1+(this.time.getNext()-this.time.getCurrent())*this.numberV1;
+        this.area2=this.area2+(this.time.getNext()-this.time.getCurrent())*this.numberV2;
+        //imposta il tempo corrente a quello dell'evento corrente
+        this.time.setCurrent(this.time.getNext());
+
+        if(internalEventsCheckout.isEmpty() && e==0) {
+            eventHandler.getEventsSistema().get(7).setX(0);
+            System.out.println("ck served "+this.jobServed);
+            return;
+        }
+
+        if(e==0){ // controllo se l'evento è un arrivo
+            EventListEntry event=internalEventsCheckout.get(0);
+            internalEventsCheckout.remove(0);
+            int vType=event.getVehicleType();
+            eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
+            //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
+
+            this.jobInBatch++;
+
+            this.number++; //se è un arrivo incremento il numero di jobs nel sistema
+
+            if(vType==1) this.numberV1++;
+            else this.numberV2++;
+
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+            if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
+                this.batchDuration= this.time.getCurrent()-this.time.getBatch();
+
+
+                getStatistics();
+                this.batchNumber++;
+                this.time.setBatch(this.time.getCurrent());
+            }
+
+
+            if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
+
+                double service;
+                if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+                else service = this.rnd.getService(2);
+
+
+                this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
+                //incrementa i tempi di servizio e il numero di job serviti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+                //imposta nella lista degli eventi che il server s è busy
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setX(1);
+                eventList.get(s).setVehicleType(vType);
+
+                //aggiorna la lista nell'handler
+                this.eventHandler.setEventsCheckout(eventList);
+            }else{
+                queueCheckout.add(eventList.get(0));
+                //System.out.println("messo in coda "+queueCheckout.size());
+            }
+            if(internalEventsCheckout.isEmpty()){
+                this.eventHandler.getEventsCheckout().get(0).setX(0);
+            }
+        }
+        else{ //evento di fine servizio
+            //decrementa il numero di eventi nel nodo considerato
+            this.number--;
+            //aumenta il numero di job serviti
+            this.jobServed++;
+
+            this.s=e; //il server con index e è quello che si libera
+
+            EventListEntry event=eventList.get(s);
+
+            if(event.getVehicleType()==1) this.numberV1--;
+            else this.numberV2--;
+
+            eventHandler.decrementVType(event.getVehicleType());
+
+            DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
+            DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
+
+
+
+            if(event.getT()< STOP_INFINITE && eventHandler.getNumber()==(VEICOLI1+VEICOLI2-1)){
+                //attivo di nuovo arrivi per scarico
+                eventHandler.getEventsScarico().get(0).setX(1);
+                eventHandler.getEventsScarico().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(0));
+                eventHandler.getEventsSistema().get(0).setT(eventHandler.getMinTime(eventHandler.getEventsScarico()));
+                //attivo di nuovo arrivi per accettazione
+                eventHandler.getEventsAccettazione().get(0).setX(1);
+                eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
+            }
+
+            if(this.number>=SERVERS_CHECKOUT){ //controllo se ci sono altri eventi da gestire
+                int eventIndex= eventHandler.getNextEventFromQueue(queueCheckout);
+                //se ci sono ottengo un nuovo tempo di servizio
+                double service;
+                if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
+                else service = this.rnd.getService(2);
+                //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
+
+                //incremento tempo di servizio totale ed eventi totali gestiti
+                sum.get(s).incrementService(service);
+                sum.get(s).incrementServed();
+
+                //imposta il tempo alla fine del servizio
+                eventList.get(s).setT(this.time.getCurrent()+service);
+                eventList.get(s).setVehicleType(queueCheckout.get(eventIndex).getVehicleType());
+                queueCheckout.remove(eventIndex);
+                //aggiorna la lista degli eventi di checkout
+                this.eventHandler.setEventsCheckout(eventList);
                 //System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
@@ -512,6 +667,7 @@ public class ControllerCheckout implements Controller{
 
         eventHandler.getEventsSistema().get(7).setT(eventHandler.getMinTime(eventList));
     }
+
 
     /**
      * Ritorna l'indice del server libero da più tempo
