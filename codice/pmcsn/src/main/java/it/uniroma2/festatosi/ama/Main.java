@@ -1,6 +1,7 @@
 package it.uniroma2.festatosi.ama;
 
 import it.uniroma2.festatosi.ama.controller.ControllerSistema;
+import it.uniroma2.festatosi.ama.controller.EventHandler;
 import it.uniroma2.festatosi.ama.utils.ReplicationHelper;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
@@ -43,6 +44,7 @@ public class Main {
             ControllerSistema sistema = new ControllerSistema();
             sistema.simulation(simulationType, 0);
         }
+        System.out.println("Numero di volte in cui è stato superato il limite di veicoli nel sistema: "+ EventHandler.getInstance().getSuperatoMax());
     }
 
 }

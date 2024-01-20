@@ -126,6 +126,19 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+            }
+
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+                eventHandler.setPriorityClassV1();
+                System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+                eventHandler.setPriorityClassV2();
+                System.out.println("priorità veicoli 2");
+            }
+
 
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
@@ -171,6 +184,19 @@ public class ControllerSistema {
         */
 
         while (checkWhile()) {
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+            }
+
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+                eventHandler.setPriorityClassV1();
+                System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+                eventHandler.setPriorityClassV2();
+                System.out.println("priorità veicoli 2");
+            }
+
             eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista
@@ -222,8 +248,9 @@ public class ControllerSistema {
          * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
          */
         while(getNextEvent(eventList)!=-1) {
-
-
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+            }
             if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
                 eventHandler.setPriorityClassV1();
                 System.out.println("priorità veicoli 1");
@@ -233,12 +260,12 @@ public class ControllerSistema {
                 System.out.println("priorità veicoli 2");
             }
 
-            if(eventHandler.getNumberV1()>=MAX_VEICOLI1){
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1){
                 //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
                 System.out.println("superato il limite per i veicoli 1");
             }
 
-            if(eventHandler.getNumberV2()>=MAX_VEICOLI2){
+            if(eventHandler.getNumberV2()>MAX_VEICOLI2){
                 //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
                 System.out.println("superato il limite per i veicoli 2");
             }
@@ -286,6 +313,20 @@ public class ControllerSistema {
          */
 
         while (checkWhile()) {
+
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+                eventHandler.setPriorityClassV1();
+                System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+                eventHandler.setPriorityClassV2();
+                System.out.println("priorità veicoli 2");
+            }
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+            }
+
             eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista

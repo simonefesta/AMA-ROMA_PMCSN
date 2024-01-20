@@ -40,6 +40,7 @@ public class EventHandler {
     private int numberV2=0; /*conta i veicoli del secondo tipo nel sistema*/
     private int arr=0;
     private int priorityClass=1; /*indica quale veicolo ha la priorità*/
+    private int superatoMax=0;
 
     private EventHandler() {
         /*event list per i vari msq*/
@@ -311,5 +312,13 @@ public class EventHandler {
             }
         }
         return 0;
+    }
+
+    public int getSuperatoMax(){
+        return this.superatoMax;
+    }
+
+    public void incrementSuperatoMax(){
+        this.superatoMax++;
     }
 }
