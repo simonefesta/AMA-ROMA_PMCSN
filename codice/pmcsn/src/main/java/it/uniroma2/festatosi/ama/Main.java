@@ -1,8 +1,6 @@
 package it.uniroma2.festatosi.ama;
 
 import it.uniroma2.festatosi.ama.controller.ControllerSistema;
-import it.uniroma2.festatosi.ama.utils.DataExtractor;
-import it.uniroma2.festatosi.ama.utils.RandomDistribution;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 import static it.uniroma2.festatosi.ama.model.Constants.REPLICATIONS;
@@ -19,7 +17,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
-        runSimulation(5);
+        runSimulation(0);
     }
 
     /**
@@ -37,11 +35,11 @@ public class Main {
 
             for (int i = 0; i < REPLICATIONS; i++) {
                 ControllerSistema sistema = new ControllerSistema();
-                sistema.simulation(simulationType);
+                sistema.simulation(simulationType, i);
             }
         } else {
             ControllerSistema sistema = new ControllerSistema();
-            sistema.simulation(simulationType);
+            sistema.simulation(simulationType, 0);
         }
     }
 

@@ -14,8 +14,7 @@ import java.util.List;
 
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
-import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationAccettazione;
-import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationCheckout;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.*;
 
 /**
  * rappresenta la msq per il checkout
@@ -693,7 +692,8 @@ public class ControllerCheckout implements Controller{
         return (s);
     }
 
-    public void printStats() {
+    public void printStats(int replicationIndex) {
+        double utilizzazione=0;
         System.out.println("Checkout\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsCheckout().get(0).getT() / this.jobServed);
@@ -716,6 +716,7 @@ public class ControllerCheckout implements Controller{
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_CHECKOUT; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            utilizzazione+=this.sum.get(i).getService() / (SERVERS_CHECKOUT*this.time.getCurrent());
             //System.out.println(i+"\t");
             //System.out.println("get service" + this.sumList[i].getService() + "\n");
             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
@@ -726,7 +727,11 @@ public class ControllerCheckout implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-
+        replicationStatisticsCheckout.setBatchTempoCoda(Etq, replicationIndex);
+        replicationStatisticsCheckout.setBatchPopolazioneSistema(Ens, replicationIndex);
+        replicationStatisticsCheckout.setBatchTempoSistema(Ets, replicationIndex);
+        replicationStatisticsCheckout.setBatchPopolazioneCodaArray(Enq, replicationIndex);
+        replicationStatisticsCheckout.setBatchUtilizzazione(utilizzazione, replicationIndex);
         DataExtractor.writeReplicationStat(replicationCheckout,Ets, Ens, Etq, Enq);
         System.out.println("\n");
     }

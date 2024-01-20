@@ -5,7 +5,6 @@ import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 import it.uniroma2.festatosi.ama.utils.*;
 
-import javax.xml.crypto.Data;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -13,6 +12,7 @@ import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationAccettazione;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationStatisticsAccettazione;
 
 
 /**
@@ -811,7 +811,8 @@ public class ControllerAccettazione implements Controller {
         return (s);
     }
 
-    public void printStats() {
+    public void printStats(int replicationIndex) {
+        double utilizzazione=0;
         System.out.println("Accettazione\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsAccettazione().get(0).getT() / this.jobServed);
@@ -831,6 +832,7 @@ public class ControllerAccettazione implements Controller {
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
             //System.out.println(i+"\t");
             //System.out.println("get service" + this.sumList[i].getService() + "\n");
             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
@@ -842,6 +844,11 @@ public class ControllerAccettazione implements Controller {
 
         }
         DataExtractor.writeReplicationStat(replicationAccettazione,Ets, Ens, Etq, Enq);
+        replicationStatisticsAccettazione.setBatchTempoCoda(Etq, replicationIndex);
+        replicationStatisticsAccettazione.setBatchPopolazioneSistema(Ens, replicationIndex);
+        replicationStatisticsAccettazione.setBatchTempoSistema(Ets, replicationIndex);
+        replicationStatisticsAccettazione.setBatchPopolazioneCodaArray(Enq, replicationIndex);
+        replicationStatisticsAccettazione.setBatchUtilizzazione(utilizzazione, replicationIndex);
         System.out.println("\n");
     }
 

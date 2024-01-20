@@ -9,7 +9,7 @@ public interface Controller {
     int getJobInBatch();
 
     void printFinalStats();
-    void printStats() throws Exception;
+    void printStats(int replicationIndex) throws Exception;
 
     void betterBaseSimulation() throws Exception;
 

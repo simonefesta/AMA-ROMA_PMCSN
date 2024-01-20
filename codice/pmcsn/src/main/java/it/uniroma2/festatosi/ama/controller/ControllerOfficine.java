@@ -9,9 +9,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
-import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationScarico;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.getReplicationStatistics;
 
 public class ControllerOfficine implements Controller{
     long number =0;                 /*number in the node*/
@@ -710,7 +711,8 @@ public class ControllerOfficine implements Controller{
         return (s);
     }
 
-    public void printStats() throws Exception {
+    public void printStats(int replicationIndex) throws Exception {
+        double utilizzazione=0;
         System.out.println(this.name+"\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         System.out.println("  avg interarrivals .. = " + this.eventHandler.getEventsOfficina(this.id).get(0).getT() / this.jobServed);
@@ -731,7 +733,8 @@ public class ControllerOfficine implements Controller{
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= SERVERS_OFFICINA[this.id]; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-             //System.out.println(i+"\t");
+            utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
+            //System.out.println(i+"\t");
              //System.out.println("get service" + this.sumList[i].getService() + "\n");
              //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
              //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
@@ -741,7 +744,11 @@ public class ControllerOfficine implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
-
+        Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchTempoCoda(Etq, replicationIndex);
+        Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchPopolazioneSistema(Ens, replicationIndex);
+        Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchTempoSistema(Ets, replicationIndex);
+        Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchPopolazioneCodaArray(Enq, replicationIndex);
+        Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchUtilizzazione(utilizzazione, replicationIndex);
         DataExtractor.writeReplicationStat(ReplicationHelper.getReplicationFile(this.name),Ets, Ens, Etq, Enq);
 
         System.out.println("\n");

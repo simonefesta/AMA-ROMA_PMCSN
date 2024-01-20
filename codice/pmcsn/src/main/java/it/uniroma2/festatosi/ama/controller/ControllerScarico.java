@@ -11,8 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
-import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationCheckout;
-import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationScarico;
+import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.*;
 
 /**
  * Rappresenta la msq per lo scarico
@@ -893,7 +892,8 @@ public class ControllerScarico implements Controller{
 
     }
 
-    public void printStats() {
+    public void printStats(int replicationIndex) {
+        double utilizzazione=0;
         System.out.println("Scarico\n\n");
         System.out.println("for " + this.jobServed + " jobs the service node statistics are:\n\n");
         double Ets = this.area / this.jobServed;
@@ -914,6 +914,7 @@ public class ControllerScarico implements Controller{
         System.out.println("server\tutilization\t\t\tavg service\t\t\tshare");
         for(int i = 1; i <= SERVERS_SCARICO; i++) {
             System.out.println("\t"+i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
+            utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
             //System.out.println(i+"\t");
             //System.out.println("get service" + this.sumList[i].getService() + "\n");
             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
@@ -924,6 +925,11 @@ public class ControllerScarico implements Controller{
             //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
+        replicationStatisticsScarico.setBatchTempoCoda(Etq, replicationIndex);
+        replicationStatisticsScarico.setBatchPopolazioneSistema(Ens, replicationIndex);
+        replicationStatisticsScarico.setBatchTempoSistema(Ets, replicationIndex);
+        replicationStatisticsScarico.setBatchPopolazioneCodaArray(Enq, replicationIndex);
+        replicationStatisticsScarico.setBatchUtilizzazione(utilizzazione, replicationIndex);
         DataExtractor.writeReplicationStat(replicationScarico,Ets, Ens, Etq, Enq);
 
         System.out.println("\n");

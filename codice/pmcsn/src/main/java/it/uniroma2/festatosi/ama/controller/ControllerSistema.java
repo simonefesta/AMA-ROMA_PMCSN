@@ -4,6 +4,7 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
+import it.uniroma2.festatosi.ama.utils.ReplicationHelper;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 
@@ -86,11 +87,11 @@ public class ControllerSistema {
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
-    public void simulation(int type) throws Exception {
+    public void simulation(int type, int replicationIndex) throws Exception {
         switch (type){
             case 0:
                 System.out.println("\nAvvio simulazione transiente, servizi gaussiani.");
-                baseSimulation();
+                baseSimulation(replicationIndex);
                 break;
             case 1:
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi esponenziali.");
@@ -102,7 +103,7 @@ public class ControllerSistema {
                 break;
             case 3:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
-                betterBaseSimulation();
+                betterBaseSimulation(replicationIndex);
                 break;
             case 4:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi esponenziali.");
@@ -117,7 +118,7 @@ public class ControllerSistema {
         }
     }
 
-    public void baseSimulation() throws Exception {
+    public void baseSimulation(int replicationIndex) throws Exception {
         int e;
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -148,8 +149,10 @@ public class ControllerSistema {
         }
 
         for(Controller controller: controllerList){
-            controller.printStats();
+            controller.printStats(replicationIndex);
         }
+
+        ReplicationHelper.printFinalStatistics();
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
         eventHandler.setArr(0);
@@ -213,7 +216,7 @@ public class ControllerSistema {
         return false;
     }
 
-    public void betterBaseSimulation() throws Exception {
+    public void betterBaseSimulation(int replicationIndex) throws Exception {
         int e;
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -264,7 +267,7 @@ public class ControllerSistema {
         }
 
         for(Controller controller: controllerList){
-            controller.printStats();
+            controller.printStats(replicationIndex);
         }
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
