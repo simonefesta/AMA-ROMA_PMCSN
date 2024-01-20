@@ -130,15 +130,7 @@ public class ControllerSistema {
                 eventHandler.incrementSuperatoMax();
             }
 
-            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
-                eventHandler.setPriorityClassV1();
-                System.out.println("priorità veicoli 1");
-            }
-            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
-                eventHandler.setPriorityClassV2();
-                System.out.println("priorità veicoli 2");
-            }
-
+        
 
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
@@ -151,7 +143,7 @@ public class ControllerSistema {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nesistema ci sono 7 code
             if (e < 0 || e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
@@ -188,14 +180,7 @@ public class ControllerSistema {
                 eventHandler.incrementSuperatoMax();
             }
 
-            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
-                eventHandler.setPriorityClassV1();
-                System.out.println("priorità veicoli 1");
-            }
-            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
-                eventHandler.setPriorityClassV2();
-                System.out.println("priorità veicoli 2");
-            }
+            
 
             eventList = this.eventHandler.getEventsSistema();
 
@@ -253,11 +238,11 @@ public class ControllerSistema {
             }
             if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
                 eventHandler.setPriorityClassV1();
-                System.out.println("priorità veicoli 1");
+                //System.out.println("priorità veicoli 1");
             }
             if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
                 eventHandler.setPriorityClassV2();
-                System.out.println("priorità veicoli 2");
+                //System.out.println("priorità veicoli 2");
             }
 
             if(eventHandler.getNumberV1()>MAX_VEICOLI1){
@@ -316,11 +301,11 @@ public class ControllerSistema {
 
             if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
                 eventHandler.setPriorityClassV1();
-                System.out.println("priorità veicoli 1");
+                //System.out.println("priorità veicoli 1");
             }
             if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
                 eventHandler.setPriorityClassV2();
-                System.out.println("priorità veicoli 2");
+                //System.out.println("priorità veicoli 2");
             }
 
             if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
