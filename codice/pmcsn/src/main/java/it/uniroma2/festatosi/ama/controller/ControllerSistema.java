@@ -152,8 +152,6 @@ public class ControllerSistema {
             controller.printStats(replicationIndex);
         }
 
-        ReplicationHelper.printFinalStatistics();
-
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
         eventHandler.setArr(0);
     }

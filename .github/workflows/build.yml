@@ -35,7 +35,7 @@ jobs:
     - name: Disegna grafici
       run: python codice/pmcsn/graph_drawer.py
       
-    - name: Upload csv files and graph images
-      uses: actions/upload-artifact@v3
-      with:
-        path: target/graphs
+    #- name: Upload csv files and graph images
+    #  uses: actions/upload-artifact@v3
+    #  with:
+    #    path: target/graphs
