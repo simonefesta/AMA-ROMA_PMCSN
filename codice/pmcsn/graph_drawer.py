@@ -49,7 +49,7 @@ def elabora_files_csv(directory_corrente):
 
                 percorso_file = os.path.join(cartella, filename)
 
-                if filename.endswith(".csv") and os.path.isfile(percorso_file):
+                if filename.endswith(".csv") and os.path.isfile(percorso_file) and ("Replication" not in percorso_file):
 
                     #inizializzo i valori di seguito, per ogni csv, nei primi due vettori metteremo i valori da plottare, gli ultimi 4 formano la legenda
                     valori_asse_x = []  
