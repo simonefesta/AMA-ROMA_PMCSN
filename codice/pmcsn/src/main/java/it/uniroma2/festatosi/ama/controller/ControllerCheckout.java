@@ -49,6 +49,7 @@ public class ControllerCheckout implements Controller{
     private Statistics statCheckout=new Statistics();
     private int batchNumber=1;
     private double batchDuration=0;
+    private int arrival=0;
 
     public ControllerCheckout() throws IOException {
 
@@ -262,6 +263,9 @@ public class ControllerCheckout implements Controller{
             
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+            if (typeOfService==0) {
+                arrival++;
+            }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
@@ -565,6 +569,9 @@ public class ControllerCheckout implements Controller{
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+            if (typeOfService==0){
+                arrival++;
+            }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
@@ -812,7 +819,9 @@ public class ControllerCheckout implements Controller{
         System.out.print("statistiche per E[Ns] ");
         statCheckout.setDevStd(statCheckout.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statCheckout.getPopMediaSistema() + " +/- " + criticalValue * statCheckout.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println("Visite: "+arrival/(double)eventHandler.getTotArrival());
+        System.out.println("Domanda: "+arrival/(double)eventHandler.getTotArrival()*checkout_SR);
         System.out.println();
     }
-    
+
 }

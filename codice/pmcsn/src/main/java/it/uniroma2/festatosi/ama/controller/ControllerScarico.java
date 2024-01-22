@@ -42,7 +42,9 @@ public class ControllerScarico implements Controller{
     private int jobInBatch=0;
     private double batchDuration=0;
     private int batchNumber=1;
-    private final Statistics statScarico = new Statistics();;
+    private final Statistics statScarico = new Statistics();
+
+    private int arrival=0;
 
     File datiScarico;
     File datiScaricoBatch;
@@ -329,6 +331,11 @@ public class ControllerScarico implements Controller{
             BatchSimulation.incrementJobInBatch();
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             this.jobInBatch++;
+
+            if (typeOfService==0) {
+                arrival++;
+                eventHandler.incrementTotArrival();
+            }
 
             if(vType==1) this.numberV1++;
             else this.numberV2++;
@@ -711,6 +718,10 @@ public class ControllerScarico implements Controller{
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
             this.jobInBatch++;
 
+            if (typeOfService==0){
+                arrival++;
+                eventHandler.incrementTotArrival();
+            }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
@@ -964,6 +975,8 @@ public class ControllerScarico implements Controller{
         System.out.print("statistiche per E[Ns] ");
         statScarico.setDevStd(statScarico.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statScarico.getPopMediaSistema() + " +/- " + criticalValue * statScarico.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println("Visite: "+arrival/(double)eventHandler.getTotArrival());
+        System.out.println("Domanda: "+arrival/(double)eventHandler.getTotArrival()*scarico_SR);
         System.out.println();
     }
 }

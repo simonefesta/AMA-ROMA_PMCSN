@@ -4,6 +4,11 @@ package it.uniroma2.festatosi.ama.controller;
 public interface Controller {
     void baseSimulation() throws Exception;
 
+    /**
+     * Simulazione infinita
+     * @param typeOfService 0:esponenziali, 1: normali troncate
+     * @throws Exception
+     */
     void infiniteSimulation(int typeOfService) throws Exception;
 
     int getJobInBatch();

@@ -48,6 +48,7 @@ public class ControllerOfficine implements Controller{
     private final Statistics statOfficina=new Statistics();
     private double batchDuration=0;
     private int batchNumber=1;
+    private int arrival=0;
 
     public ControllerOfficine(int id) throws Exception {
         this.id=id;
@@ -289,6 +290,9 @@ public class ControllerOfficine implements Controller{
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+            if (typeOfService==0) {
+                arrival++;
+            }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
@@ -587,6 +591,9 @@ public class ControllerOfficine implements Controller{
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
+            if (typeOfService==0){
+                arrival++;
+            }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
@@ -831,6 +838,8 @@ public class ControllerOfficine implements Controller{
         System.out.print("statistiche per E[Ns] ");
         statOfficina.setDevStd(statOfficina.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statOfficina.getPopMediaSistema() + " +/- " + criticalValue * statOfficina.getDevStd(4)/(Math.sqrt(K-1)));
+        System.out.println("Visite: "+arrival/(double)eventHandler.getTotArrival());
+        System.out.println("Domanda: "+arrival/(double)eventHandler.getTotArrival()*officina_SR[this.id][0]);
         System.out.println();
         System.out.println("Counter ingressi: "+this.counter);
     }
