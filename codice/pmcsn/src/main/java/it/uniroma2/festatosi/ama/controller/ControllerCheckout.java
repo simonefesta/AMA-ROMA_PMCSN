@@ -175,6 +175,7 @@ public class ControllerCheckout implements Controller{
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setX(1);
                 eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
@@ -331,6 +332,7 @@ public class ControllerCheckout implements Controller{
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setX(1);
                 eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
@@ -477,6 +479,7 @@ public class ControllerCheckout implements Controller{
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setX(1);
                 eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
@@ -630,6 +633,7 @@ public class ControllerCheckout implements Controller{
                 //attivo di nuovo arrivi per accettazione
                 eventHandler.getEventsAccettazione().get(0).setX(1);
                 eventHandler.getEventsAccettazione().get(0).setT(this.time.getCurrent()+this.rnd.getJobArrival(1));
+                eventHandler.getEventsSistema().get(1).setX(1);
                 eventHandler.getEventsSistema().get(1).setT(eventHandler.getMinTime(eventHandler.getEventsAccettazione()));
             }
 
