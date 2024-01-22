@@ -308,7 +308,6 @@ public class ControllerAccettazione implements Controller {
 
             if (typeOfService==0) {
                 arrival++;
-                eventHandler.incrementTotArrival();
             }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
@@ -668,7 +667,6 @@ public class ControllerAccettazione implements Controller {
 
             if (typeOfService==0){
                 arrival++;
-                eventHandler.incrementTotArrival();
             }
             if(vType==1) this.numberV1++;
             else this.numberV2++;
