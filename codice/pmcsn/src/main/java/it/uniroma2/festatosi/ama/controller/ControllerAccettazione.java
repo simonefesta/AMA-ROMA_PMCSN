@@ -19,6 +19,7 @@ import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationStati
  * Rappresenta la msq per l'accettazione
  */
 public class ControllerAccettazione implements Controller {
+    public static long  counter = 0;
     long number =0;                 /*number in the node*/
     long numberV1 =0;                 /*number in the node v1*/
     long numberV2 =0;                 /*number in the node v2*/
@@ -123,6 +124,7 @@ public class ControllerAccettazione implements Controller {
             else {
                             this.numberV2++;
             }
+
 
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
 
@@ -305,6 +307,9 @@ public class ControllerAccettazione implements Controller {
 
             if(vType==1) this.numberV1++;
             else this.numberV2++;
+
+            counter++;
+            ControllerSistema.counter++;
 
             //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
@@ -926,5 +931,6 @@ public class ControllerAccettazione implements Controller {
         statAccettazione.setDevStd(statAccettazione.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statAccettazione.getPopMediaSistema() + " +/- " + criticalValue * statAccettazione.getDevStd(4)/(Math.sqrt(K-1)));
         System.out.println();
+        System.out.println("Counter ingressi: "+this.counter);
     }
 }

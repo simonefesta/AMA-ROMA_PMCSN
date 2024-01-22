@@ -16,6 +16,7 @@ import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.getReplicationSt
 
 public class ControllerOfficine implements Controller{
     long number =0;                 /*number in the node*/
+    public static long counter = 0;
     long numberV1 =0;                 /*number in the node v1*/
     long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
@@ -141,6 +142,9 @@ public class ControllerOfficine implements Controller{
             else {
                     this.numberV2++;
             }
+
+            counter++;
+            ControllerSistema.counter++;
 
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
@@ -287,6 +291,9 @@ public class ControllerOfficine implements Controller{
 
             if(vType==1) this.numberV1++;
             else this.numberV2++;
+
+            counter++;
+            ControllerSistema.counter++;
 
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
@@ -825,6 +832,7 @@ public class ControllerOfficine implements Controller{
         statOfficina.setDevStd(statOfficina.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
         System.out.println("Critical endpoints " + statOfficina.getPopMediaSistema() + " +/- " + criticalValue * statOfficina.getDevStd(4)/(Math.sqrt(K-1)));
         System.out.println();
+        System.out.println("Counter ingressi: "+this.counter);
     }
 
 }

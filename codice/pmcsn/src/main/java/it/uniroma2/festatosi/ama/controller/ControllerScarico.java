@@ -19,6 +19,7 @@ import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.*;
 
 public class ControllerScarico implements Controller{
     long number =0;                 /*number in the node*/
+    public static long counter = 0;
     long numberV1 =0;                 /*number in the node v1*/
     long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
@@ -134,7 +135,8 @@ public class ControllerScarico implements Controller{
             }
 
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
-
+            counter++;
+            ControllerSistema.counter++;
 
             if(vType==1) {
                             this.numberV1++;
@@ -330,6 +332,9 @@ public class ControllerScarico implements Controller{
 
             if(vType==1) this.numberV1++;
             else this.numberV2++;
+
+            counter++;
+            ControllerSistema.counter++;
 
             DataExtractor.writeSingleStat(datiScarico,event.getT(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());

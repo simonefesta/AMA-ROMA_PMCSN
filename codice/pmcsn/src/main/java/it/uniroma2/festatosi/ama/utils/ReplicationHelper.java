@@ -1,5 +1,10 @@
 package it.uniroma2.festatosi.ama.utils;
 
+import it.uniroma2.festatosi.ama.controller.ControllerAccettazione;
+import it.uniroma2.festatosi.ama.controller.ControllerCheckout;
+import it.uniroma2.festatosi.ama.controller.ControllerOfficine;
+import it.uniroma2.festatosi.ama.controller.ControllerScarico;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -104,6 +109,11 @@ public  class ReplicationHelper {
             System.out.println("Critical endpoints " + stats.getPopMediaSistema() + " +/- " + criticalValue * stats.getDevStd(4) / (Math.sqrt(K - 1)));
             System.out.println();
         }
+        System.out.println("Counter ingressi accettazione: "+ ControllerAccettazione.counter);
+        System.out.println("Counter ingressi scarico: "+ ControllerScarico.counter);
+        System.out.println("Counter ingressi checkout: "+ ControllerCheckout.counter);
+
+
     }
 
 

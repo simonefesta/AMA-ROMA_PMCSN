@@ -21,6 +21,7 @@ import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.*;
  */
 public class ControllerCheckout implements Controller{
     long number =0;                 /*number in the node*/
+    public static long counter = 0;
     long numberV1 =0;                 /*number in the node v1*/
     long numberV2 =0;                 /*number in the node v2*/
     int e;                          /*next event index*/
@@ -115,7 +116,7 @@ public class ControllerCheckout implements Controller{
             else {
                           this.numberV2++;
             }
-
+            counter++;
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
@@ -263,6 +264,9 @@ public class ControllerCheckout implements Controller{
 
             if(vType==1) this.numberV1++;
             else this.numberV2++;
+
+            counter++;
+            ControllerSistema.counter++;
 
             DataExtractor.writeSingleStat(datiCheckout,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());

@@ -19,6 +19,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  */
 public class ControllerSistema {
     long number =0;                 /*number in the node*/
+    public static long counter;
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/ //TODO incrementarlo ogni volta che un evento esce dal sistema
@@ -159,6 +160,7 @@ public class ControllerSistema {
         }
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+        System.out.println("count arrivi "+ ControllerSistema.counter);
         eventHandler.setArr(0);
     }
 
