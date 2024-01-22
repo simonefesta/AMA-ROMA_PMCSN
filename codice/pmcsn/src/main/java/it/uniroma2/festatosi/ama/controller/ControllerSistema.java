@@ -83,7 +83,7 @@ public class ControllerSistema {
         this.eventListSistema.add(7, new EventListEntry(0,0));
         this.sum.add(7, new MsqSum());
 
-        //viene settata la lista di eventi nell'handler
+        //viene settata la lista di eventi nell' handler
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
@@ -128,9 +128,10 @@ public class ControllerSistema {
         while(getNextEvent(eventList)!=-1) {
             if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
                 eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
             }
 
-        
 
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
@@ -143,8 +144,8 @@ public class ControllerSistema {
             //imposta il tempo corrente a quello dell'evento corrente
             this.time.setCurrent(this.time.getNext());
 
-            //Se l'indice calcolato è maggiore di 7 ritorna errore, nesistema ci sono 7 code
-            if (e < 0 || e > 7) {
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
@@ -178,9 +179,9 @@ public class ControllerSistema {
         while (checkWhile()) {
             if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
                 eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
             }
-
-            
 
             eventList = this.eventHandler.getEventsSistema();
 
@@ -235,24 +236,34 @@ public class ControllerSistema {
         while(getNextEvent(eventList)!=-1) {
             if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
                 eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
             }
-            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
                 eventHandler.setPriorityClassV1();
-                //System.out.println("priorità veicoli 1");
+                System.out.println("priorità veicoli 1");
             }
-            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
                 eventHandler.setPriorityClassV2();
-                //System.out.println("priorità veicoli 2");
+                System.out.println("priorità veicoli 2");
             }
 
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
+                if ( (eventHandler.getNumberV1() - MAX_VEICOLI1*BOUNDV1) >= (eventHandler.getNumberV2() - MAX_VEICOLI2*BOUNDV2)){
+                    eventHandler.setPriorityClassV1();
+                } else eventHandler.setPriorityClassV2();
+
+            }
+
+
+
             if(eventHandler.getNumberV1()>MAX_VEICOLI1){
-                //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
-                System.out.println("superato il limite per i veicoli 1");
+                System.out.println("superato il limite per i veicoli 1: " + eventHandler.getSuperatoMaxVeicoli1());
+
             }
 
             if(eventHandler.getNumberV2()>MAX_VEICOLI2){
-                //todo incrementare un contatore per segnare il numero di volte in cui viene superato il limite
-                System.out.println("superato il limite per i veicoli 2");
+                System.out.println("superato il limite per i veicoli 2: " + eventHandler.getSuperatoMaxVeicoli2());
             }
 
             //prende l'indice del primo evento nella lista
@@ -299,17 +310,36 @@ public class ControllerSistema {
 
         while (checkWhile()) {
 
-            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*0.5)){
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
+            }
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
                 eventHandler.setPriorityClassV1();
                 //System.out.println("priorità veicoli 1");
             }
-            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*0.5)){
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
                 eventHandler.setPriorityClassV2();
                 //System.out.println("priorità veicoli 2");
             }
 
-            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
-                eventHandler.incrementSuperatoMax();
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
+                if ( (eventHandler.getNumberV1() - MAX_VEICOLI1*BOUNDV1) >= (eventHandler.getNumberV2() - MAX_VEICOLI2*BOUNDV2)){
+                    eventHandler.setPriorityClassV1();
+                    //System.out.println("priorità veicoli 1 CONFRONTO");
+                } else eventHandler.setPriorityClassV2();
+                //System.out.println("priorità veicoli 2 CONFRONTO");
+
+            }
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1){
+                System.out.println("superato il limite per i veicoli 1: " + eventHandler.getSuperatoMaxVeicoli1());
+
+            }
+
+            if(eventHandler.getNumberV2()>MAX_VEICOLI2){
+                System.out.println("superato il limite per i veicoli 2: " + eventHandler.getSuperatoMaxVeicoli2());
             }
 
             eventList = this.eventHandler.getEventsSistema();

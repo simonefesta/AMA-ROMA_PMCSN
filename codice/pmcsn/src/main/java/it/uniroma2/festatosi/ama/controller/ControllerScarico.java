@@ -53,7 +53,7 @@ public class ControllerScarico implements Controller{
 
 
         datiScarico = DataExtractor.initializeFile(rngs.getSeed(),this.getClass().getSimpleName()); //fornisco il SEED al file delle statistiche, oltre che il nome del centro
-        datiScaricoBatch=DataExtractor.initializeFileBatch(rngs.getSeed(), this.getClass().getSimpleName());
+        datiScaricoBatch=DataExtractor.initializeFileBatch(rngs.getSeed(), this.getClass().getSimpleName()+"Batch");
 
         /*inizializza la lista degli eventi dello scarico*/
         List<EventListEntry> eventListScarico = new ArrayList<>(SERVERS_SCARICO + 2);
