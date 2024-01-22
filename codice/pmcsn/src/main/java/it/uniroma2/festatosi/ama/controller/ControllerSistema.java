@@ -95,6 +95,7 @@ public class ControllerSistema {
                 baseSimulation(replicationIndex);
                 break;
             case 1:
+            case 3:
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi esponenziali.");
                 infiniteSimulation(0);  //batch con servizi esponenziali
                 break;
@@ -102,15 +103,16 @@ public class ControllerSistema {
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi gaussiani.");
                 infiniteSimulation(1);  //batch con servizi normali
                 break;
-            case 3:
+            case 4:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
                 betterBaseSimulation(replicationIndex);
                 break;
-            case 4:
+            case 5:
+            case 7:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi esponenziali.");
                 betterInfiniteSimulation(0);
                 break;
-            case 5:
+            case 6:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi gaussiani.");
                 betterInfiniteSimulation(1);
                 break;
