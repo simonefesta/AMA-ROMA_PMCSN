@@ -114,8 +114,8 @@ public class Constants {
     /*
         Batch Means
      */
-    public static final int B=512; //numero di job nel singolo batch
-    public static final int K=8; //numero di batch
+    public static final int B=1080; //numero di job nel singolo batch
+    public static final int K=96; //numero di batch
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05
 
