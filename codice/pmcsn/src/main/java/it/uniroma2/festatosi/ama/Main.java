@@ -2,11 +2,11 @@ package it.uniroma2.festatosi.ama;
 
 import it.uniroma2.festatosi.ama.controller.ControllerSistema;
 import it.uniroma2.festatosi.ama.controller.EventHandler;
+import it.uniroma2.festatosi.ama.model.Constants;
 import it.uniroma2.festatosi.ama.utils.ReplicationHelper;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
-import static it.uniroma2.festatosi.ama.model.Constants.REPLICATIONS;
-import static it.uniroma2.festatosi.ama.model.Constants.SEED;
+import static it.uniroma2.festatosi.ama.model.Constants.*;
 import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.initializeReplicationsFile;
 
 
@@ -19,19 +19,21 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
-        runSimulation(1);
+        runSimulation(3);
     }
 
     /**
      *  @param simulationType   = 0; simulazione finita, servizi gaussiani troncati.
      *                          = 1; simulazione infinita, servizi esponenziali.
      *                          = 2; simulazione infinita con servizi gaussiani troncati.
-     *                          = 3; simulazione finita, modello migliorativo, servizi gaussiani troncati.
-     *                          = 4; simulazione infinita, modello migliorativo, servizi esponenziali.
-     *                          = 5; simulazione infinita, modello migliorativo, servizi gaussiani troncati.
+     *                          = 3; simulazione infinita, servizi esponenziali, analisi bottleneck.
+     *                          = 4; simulazione finita, modello migliorativo, servizi gaussiani troncati.
+     *                          = 5; simulazione infinita, modello migliorativo, servizi esponenziali.
+     *                          = 6; simulazione infinita, modello migliorativo, servizi gaussiani troncati.
+     *                          = 7; simulazione infinita, servizi esponenziali, analisi bottleneck.
      */
     public static void runSimulation(int simulationType) throws Exception {
-        if (simulationType == 0 || simulationType == 3) {
+        if (simulationType == 0 || simulationType == 4) {
 
             initializeReplicationsFile(); //inizializza file per memorizzazione delle statistiche
 
@@ -40,7 +42,12 @@ public class Main {
                 sistema.simulation(simulationType, i);
             }
             ReplicationHelper.printFinalStatistics();
-        } else {
+        } else if(simulationType == 3 || simulationType == 7){
+            bottleneckAnalysis();
+            ControllerSistema sistema = new ControllerSistema();
+            sistema.simulation(simulationType, 0);
+        }
+        else{
             ControllerSistema sistema = new ControllerSistema();
             sistema.simulation(simulationType, 0);
         }

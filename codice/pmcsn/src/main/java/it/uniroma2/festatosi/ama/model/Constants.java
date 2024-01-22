@@ -36,13 +36,13 @@ public class Constants {
     public static double STOP_INFINITE= Double.MAX_VALUE;
     /*\*100 si toglie nel momento in cui orizzonte finito*/
     public static double START   = 0.0;
-    public static int    SERVERS_SCARICO = 1;
-    public static int    SERVERS_ACCETTAZIONE = 1;
-    public static int    SERVERS_GOMMISTA = 1;
-    public static int    SERVERS_CARROZZERIA = 1;
+    public static int    SERVERS_SCARICO = 4;
+    public static int    SERVERS_ACCETTAZIONE = 4;
+    public static int    SERVERS_GOMMISTA = 3;
+    public static int    SERVERS_CARROZZERIA = 3;
     public static int    SERVERS_ELETTRAUTO = 1;
-    public static int    SERVERS_CARPENTERIA = 1;
-    public static int    SERVERS_MECCANICA = 1;
+    public static int    SERVERS_CARPENTERIA = 3;
+    public static int    SERVERS_MECCANICA = 3;
     public static int    SERVERS_CHECKOUT = 1;
     public static int[] SERVERS_OFFICINA = {SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
             SERVERS_CARPENTERIA, SERVERS_MECCANICA};
@@ -118,5 +118,18 @@ public class Constants {
     public static final int K=96; //numero di batch
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05
+
+    public static void bottleneckAnalysis(){
+        SERVERS_SCARICO = 1;
+        SERVERS_ACCETTAZIONE = 1;
+        SERVERS_GOMMISTA = 1;
+        SERVERS_CARROZZERIA = 1;
+        SERVERS_ELETTRAUTO = 1;
+        SERVERS_CARPENTERIA = 1;
+        SERVERS_MECCANICA = 1;
+        SERVERS_CHECKOUT = 1;
+        SERVERS_OFFICINA = new int[]{SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
+                SERVERS_CARPENTERIA, SERVERS_MECCANICA};
+    }
 
 }
