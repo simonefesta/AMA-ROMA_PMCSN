@@ -12,7 +12,7 @@ public class Constants {
 
     public static final long SEED = 123456789L;
 
-    public static final long REPLICATIONS = 64;
+    public static final long REPLICATIONS = 96;
 
 
     // ---- ARRIVAL RATES [req/sec]----

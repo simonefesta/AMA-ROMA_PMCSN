@@ -19,7 +19,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
-        runSimulation(5);
+        runSimulation(0);
     }
 
     /**
