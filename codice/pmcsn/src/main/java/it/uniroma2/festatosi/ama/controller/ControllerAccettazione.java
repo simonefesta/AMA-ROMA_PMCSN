@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+
 import static it.uniroma2.festatosi.ama.model.Constants.*;
 import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationAccettazione;
 import static it.uniroma2.festatosi.ama.utils.ReplicationHelper.replicationStatisticsAccettazione;
@@ -45,7 +46,7 @@ public class ControllerAccettazione implements Controller {
     private int jobInBatch=0;
     private double batchDuration=0;
     private int batchNumber=1;
-    private final Statistics statAccettazione = new Statistics();;
+    private final Statistics statAccettazione = new Statistics();
 
     public ControllerAccettazione() throws Exception {
 
@@ -128,7 +129,7 @@ public class ControllerAccettazione implements Controller {
 
 
 
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV1);
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
@@ -486,7 +487,7 @@ public class ControllerAccettazione implements Controller {
 
 
 
-            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV1);
+            DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.

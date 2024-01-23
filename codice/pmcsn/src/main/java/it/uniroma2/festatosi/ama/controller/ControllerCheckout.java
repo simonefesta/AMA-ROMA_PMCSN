@@ -66,7 +66,7 @@ public class ControllerCheckout implements Controller{
 
         this.eventListCheckout.set(0,new EventListEntry(this.time.getCurrent(),1));
 
-        //viene settata la lista di eventi nell'handler
+        //viene settata la lista di eventi nell' handler
         this.eventHandler.setEventsCheckout(eventListCheckout);
     }
 

@@ -12,7 +12,7 @@ public class Constants {
 
     public static final long SEED = 123456789L;
 
-    public static final long REPLICATIONS = 96;
+    public static final long REPLICATIONS = 96; //DEVE ESSERE <=K, in quanto la stampa delle replicazioni si basa su quella dei batch
 
 
     // ---- ARRIVAL RATES [req/sec]----
