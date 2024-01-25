@@ -19,7 +19,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         Rngs rngs = new Rngs();
         rngs.plantSeeds(SEED);
-        runSimulation(2);
+        runSimulation(5);
     }
 
     /**
@@ -45,7 +45,7 @@ public class Main {
             sistema.simulation(simulationType, 0);
         }
         System.out.println("Numero di volte in cui è stato superato il limite di veicoli nel sistema: "+ EventHandler.getInstance().getSuperatoMax());
-        System.out.println("Per i veicoli1 : "+ EventHandler.getInstance().getSuperatoMaxVeicoli1() + " e veicoli2 " + EventHandler.getInstance().getSuperatoMaxVeicoli2());
+        System.out.println("Per i veicoli di tipo 1: "+ EventHandler.getInstance().getSuperatoMaxVeicoli1() + " e per i veicoli di tipo 2:  " + EventHandler.getInstance().getSuperatoMaxVeicoli2());
     }
 
 }
