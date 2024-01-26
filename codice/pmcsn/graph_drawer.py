@@ -29,8 +29,8 @@ def draw(valori_asse_x,valori_asse_y, nome_asse_x, nome_asse_y,seed,cartella,nom
     plt.title("seed: "+seed)
     plt.grid(True)
     if "Sistema" in titolo:
-        plt.axhline(y=32, color='red', linestyle='--', label='Qos veicoli piccoli')
-        plt.axhline(y=70, color='violet', linestyle='--', label='Qos veicoli grandi')
+        plt.axhline(y=32, color='red', linestyle='--', label='Qos veicoli grandi')
+        plt.axhline(y=70, color='violet', linestyle='--', label='Qos veicoli piccoli')
     plt.legend()
  
     # Specifico come andrò a salvare il tutto
