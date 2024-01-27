@@ -27,7 +27,7 @@ public class Statistics {
     private final double[] batchTempoSistema;
     private final double[] batchUtilizzazione;
 
-    private static Statistics instance;
+
     // Costruttore privato per evitare inizializzazione diretta
     public Statistics() {
         meanDelay = 0;
@@ -40,17 +40,6 @@ public class Statistics {
     }
 
 
-    /*// Metodo per ottenere l'istanza del singleton
-    public static Statistics getInstance() {
-        if (instance == null) {
-            instance = new Statistics();
-        }
-        return instance;
-    }*/
-
-    /*
-      Set e Get di E[Tq] del singolo batch
-     */
     public double getMeanDelay() { //ritorna E[Tq] del singolo batch
         return meanDelay;
     }

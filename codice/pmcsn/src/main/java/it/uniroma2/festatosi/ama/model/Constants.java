@@ -12,9 +12,7 @@ public class Constants {
 
     public static final long SEED = 123456789L;
 
-
-
-
+    public static final long REPLICATIONS = 96; //DEVE ESSERE <=K, in quanto la stampa delle replicazioni si basa su quella dei batch
 
 
     // ---- ARRIVAL RATES [req/sec]----
@@ -32,7 +30,7 @@ public class Constants {
 
     /*public static final double[][] officina_SR = {{1500, 1800, 3600},{1500, 1800, 3600},{1500, 1800, 3600},
             {1500, 1800, 3600},{1500, 1800, 3600}};// media lowerBound e upperBound per i servizi*/
-    public static final double checkout_SR = 15*60;//20*60;
+    public static final double checkout_SR = 20 *60;//20*60;
 
     public static double STOP_FINITE = 86400; /*  terminazione lavoro giornaliero (24 ore in secondi) */
     public static double STOP_INFINITE= Double.MAX_VALUE;
@@ -69,7 +67,7 @@ public class Constants {
     public static final double P2 = 0.3;
 
     // probabilità difetto tipologia "carrozzeria"
-    public static final double P3 = 0.09;
+    public static final double P3 = 0.1;
 
     // ---- SKIPP PROB ----
     // probabilità difetto tipologia "elettrauto"
@@ -93,7 +91,12 @@ public class Constants {
 
     // numero di veicoli per ogni tipo
     public static final int VEICOLI1 = 103; //veicoli piccoli #40
+
+    public static final double  BOUNDV1 =  0.6;
+    public static final double  BOUNDV2 =  0.5;
+    public static final int MAX_VEICOLI1 = 70; //veicoli piccoli nel sistema al massimo
     public static final int VEICOLI2 = 79; //veicoli grandi #59
+    public static final int MAX_VEICOLI2 = 32; //veicoli grandi nel sistema al massimo
 
     public static File datiSistema;
     public static File datiSistemaBatch;

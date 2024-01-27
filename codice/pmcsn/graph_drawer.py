@@ -28,8 +28,11 @@ def draw(valori_asse_x,valori_asse_y, nome_asse_x, nome_asse_y,seed,cartella,nom
     plt.suptitle("Evoluzione della popolazione per: " + titolo)
     plt.title("seed: "+seed)
     plt.grid(True)
+    if "Sistema" in titolo:
+        plt.axhline(y=32, color='red', linestyle='--', label='Qos veicoli grandi')
+        plt.axhline(y=70, color='violet', linestyle='--', label='Qos veicoli piccoli')
     plt.legend()
-   
+ 
     # Specifico come andrò a salvare il tutto
     percorso_grafico = os.path.join(cartella, "graph_"+nome_centro+"_"+seed+".png")
     plt.savefig(percorso_grafico)
@@ -49,7 +52,7 @@ def elabora_files_csv(directory_corrente):
 
                 percorso_file = os.path.join(cartella, filename)
 
-                if filename.endswith(".csv") and os.path.isfile(percorso_file):
+                if filename.endswith(".csv") and os.path.isfile(percorso_file) and ("Replication" not in percorso_file):
 
                     #inizializzo i valori di seguito, per ogni csv, nei primi due vettori metteremo i valori da plottare, gli ultimi 4 formano la legenda
                     valori_asse_x = []  

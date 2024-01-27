@@ -82,15 +82,16 @@ public class ControllerSistema {
         this.eventListSistema.add(7, new EventListEntry(0,0));
         this.sum.add(7, new MsqSum());
 
-        //viene settata la lista di eventi nell'handler
+        //viene settata la lista di eventi nell' handler
         this.eventHandler.setEventsSistema(eventListSistema);
     }
 
-    public void simulation(int type) throws Exception {
+    public void simulation(int type, int replicationIndex) throws Exception {
         switch (type){
             case 0:
                 System.out.println("\nAvvio simulazione transiente, servizi gaussiani.");
-                baseSimulation();
+                baseSimulation(replicationIndex);
+                this.eventHandler.reset();
                 break;
             case 1:
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi esponenziali.");
@@ -100,12 +101,26 @@ public class ControllerSistema {
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi gaussiani.");
                 infiniteSimulation(1);  //batch con servizi normali
                 break;
+            case 3:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
+                betterBaseSimulation(replicationIndex);
+                this.eventHandler.reset();
+                break;
+            case 4:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi esponenziali.");
+                betterInfiniteSimulation(0);
+                break;
+            case 5:
+                System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi gaussiani.");
+                betterInfiniteSimulation(1);
+                break;
             default:
                 throw new Exception("Type deve essere 0, 1 o 2");
         }
     }
 
-    public void baseSimulation() throws Exception {
+    public void baseSimulation(int replicationIndex) throws Exception {
+
         int e;
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -113,6 +128,12 @@ public class ControllerSistema {
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
         while(getNextEvent(eventList)!=-1) {
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
+            }
+
 
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
@@ -126,7 +147,7 @@ public class ControllerSistema {
             this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
-            if (e < 0 || e > 7) {
+            if (e > 7) {
                 throw new Exception("Errore nessun evento tra i precedenti");
             }
 
@@ -136,26 +157,14 @@ public class ControllerSistema {
         }
 
         for(Controller controller: controllerList){
-            controller.printStats();
+            controller.printStats(replicationIndex);
         }
-        /*((ControllerScarico) controllerList.get(0)).printStats(); //scarico
-        ((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
-        for (int i = 0; i < SERVERS_OFFICINA.length; i++) {              //officine
-            ((ControllerOfficine) controllerList.get(i+2)).printStats();
-        }
-        ((ControllerCheckout) controllerList.get(7)).printStats();         //checkout*/
-
-
-        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
-        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
-        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
-        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
-        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
-        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
-        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+        eventHandler.setArr(0);
+
+
+
     }
 
 
@@ -164,8 +173,6 @@ public class ControllerSistema {
         MsqT time=new MsqT();
         time.setCurrent(START);
         time.setNext(START);
-        double batchDuration;
-        int numVeicoliSys;
 
 
         //prende la lista di eventi per il sistema
@@ -175,7 +182,12 @@ public class ControllerSistema {
         */
 
         while (checkWhile()) {
-            numVeicoliSys=eventHandler.getNumber();
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
+            }
+
             eventList = this.eventHandler.getEventsSistema();
 
             //prende l'indice del primo evento nella lista
@@ -195,95 +207,19 @@ public class ControllerSistema {
             }
 
             controllerList.get(e).infiniteSimulation(typeOfService);
-
-            /*if(getJobInBatch()%B==0 && numVeicoliSys<eventHandler.getNumber()){
-
-                batchDuration= this.time.getCurrent()-this.time.getBatch();
-                System.out.println("\nbatch duration "+ batchDuration + " con " + getJobInBatch() + " job");
-                ((ControllerAccettazione) controllerList.get(1)).getStatistics(batchDuration,getNBatch());
-                System.out.println("batch "+getNBatch());
-
-                System.out.println("job in batch "+getJobInBatch() +"\n");
-                //todo media e varianza
-
-                incrementNBatch();
-
-
-
-
-
-                this.time.setBatch(this.time.getCurrent());
-            }*/
-            //System.out.println("");
-
-           // eventList = eventHandler.getEventsSistema();
             this.time.setCurrent(this.time.getNext());
         }
 
         System.out.println("\n\n*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
 
-        printFinalStas();
-
-        /*Rvms rvms = new Rvms();
-        double criticalValue = rvms.idfStudent(K-1,1- alpha/2);*/
-
-        //Statistics stat = Statistics.getInstance();       //finiti i batch
-        /*System.out.println("*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
-        System.out.print("Statistiche per E[Tq] ");
-        stat.setDevStd(stat.getBatchTempoCoda(), 0);     // calcolo la devstd per Etq
-        System.out.println("Critical endpoints " + stat.getMeanDelay() + " +/- " + criticalValue * stat.getDevStd(0)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Nq] ");
-        stat.setDevStd(stat.getBatchPopolazioneCodaArray(),1);     // calcolo la devstd per Enq
-        System.out.println("Critical endpoints " + stat.getPopMediaCoda() + " +/- " + criticalValue * stat.getDevStd(1)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per rho ");
-        stat.setDevStd(stat.getBatchUtilizzazione(),2);     // calcolo la devstd per Enq
-        System.out.println("Critical endpoints " + stat.getMeanUtilization() + " +/- " + criticalValue * stat.getDevStd(2)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Ts] ");
-        stat.setDevStd(stat.getBatchTempoSistema(),3);     // calcolo la devstd per Ens
-        System.out.println("Critical endpoints " + stat.getMeanWait() + " +/- " + criticalValue * stat.getDevStd(3)/(Math.sqrt(K-1)));
-        System.out.print("Statistiche per E[Ns] ");
-        stat.setDevStd(stat.getBatchPopolazioneSistema(),4);     // calcolo la devstd per Ets
-        System.out.println("Critical endpoints " + stat.getPopMediaSistema() + " +/- " + criticalValue * stat.getDevStd(4)/(Math.sqrt(K-1)));*/
-
-
-       /* System.out.println("MeanDelay Etq");
-        for(double mean : stat.getBatchMeanDelayArray()){
-            System.out.print(mean+" ");
-        }*/
-
-
-
-        // STAMPA STATISTICHE, PER ORA DISABILITATO
-        //((ControllerScarico) controllerList.get(0)).printStats(); //scarico
-        //((ControllerAccettazione) controllerList.get(1)).printStats(); //accettazione
-       /* for (int i = 0; i < SERVERS_OFFICINA.length; i++) {         //officine
-            ((ControllerOfficine) controllerList.get(i+2)).printStats(); //checkout
-        }
-        ((ControllerCheckout) controllerList.get(7)).printStats();*/
-
-
-        /*System.out.println("Popolazione: "+ eventHandler.getNumber());
-        System.out.println("Gommista " + eventHandler.getInternalEventsGommista().size());
-        System.out.println("Carrozzeria "+ eventHandler.getInternalEventsCarrozzeria().size());
-        System.out.println("Elettrauti " + eventHandler.getInternalEventsElettrauto().size());
-        System.out.println("Carpenteria "+ eventHandler.getInternalEventsCarpenteria().size());
-        System.out.println("Meccanica "+ +eventHandler.getInternalEventsMeccanica().size());
-        System.out.println("Scarico "+ eventHandler.getInternalEventsScarico().size());
-        System.out.println("Checkout " + eventHandler.getInternalEventsCheckout().size());*/
-
+        printFinalStats();
         System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
-
-
     }
 
-    private void printFinalStas() {
+    private void printFinalStats() {
         for(Controller controller:controllerList){
             controller.printFinalStats();
         }
-        /*//stampo statistiche finali scarico
-        ((ControllerScarico)controllerList.get(0)).printFinalStats();
-        //stampo statistiche finali accettazione
-        ((ControllerAccettazione)controllerList.get(1)).printFinalStats();*/
     }
 
     private boolean checkWhile() {
@@ -293,20 +229,150 @@ public class ControllerSistema {
             }
         }
         return false;
-        /*ControllerScarico scarico=(ControllerScarico) controllerList.get(0);
-        ControllerAccettazione accettazione=(ControllerAccettazione)controllerList.get(1);
-        for(int i=2; i<controllerList.size()-1;i++){
-            ControllerOfficine officina=(ControllerOfficine) controllerList.get(i);
-            if(officina.getJobInBatch()<=B*K){
-                return true;
+    }
+
+    public void betterBaseSimulation(int replicationIndex) throws Exception {
+        int e;
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+         */
+        while(getNextEvent(eventList)!=-1) {
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
             }
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
+                eventHandler.setPriorityClassV1();
+                System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
+                eventHandler.setPriorityClassV2();
+                System.out.println("priorità veicoli 2");
+            }
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
+                if ( (eventHandler.getNumberV1() - MAX_VEICOLI1*BOUNDV1) >= (eventHandler.getNumberV2() - MAX_VEICOLI2*BOUNDV2)){
+                    eventHandler.setPriorityClassV1();
+                } else eventHandler.setPriorityClassV2();
+
+            }
+
+
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1){
+                System.out.println("superato il limite per i veicoli 1: " + eventHandler.getSuperatoMaxVeicoli1());
+
+            }
+
+            if(eventHandler.getNumberV2()>MAX_VEICOLI2){
+                System.out.println("superato il limite per i veicoli 2: " + eventHandler.getSuperatoMaxVeicoli2());
+            }
+
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+            // System.out.println("servito "+e);
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e < 0 || e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            controllerList.get(e).betterBaseSimulation();
+
+            eventList=eventHandler.getEventsSistema();
         }
-        ControllerCheckout checkout=(ControllerCheckout) controllerList.get(7);
-        if(accettazione.getJobInBatch()<=B*K){
-            return true;
-        }else if(scarico.getJobInBatch()<=B*K){
-            return true;
-        } else return checkout.getJobInBatch() <= B * K;*/
+
+        for(Controller controller: controllerList){
+            controller.printStats(replicationIndex);
+        }
+
+        System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+    }
+
+
+    public void betterInfiniteSimulation(int typeOfService) throws Exception {
+        int e;
+        MsqT time=new MsqT();
+        time.setCurrent(START);
+        time.setNext(START);
+
+
+        //prende la lista di eventi per il sistema
+        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        /*
+         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
+         */
+
+        while (checkWhile()) {
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1 || eventHandler.getNumberV2()>MAX_VEICOLI2){
+                eventHandler.incrementSuperatoMax();
+                if (eventHandler.getNumberV1()>MAX_VEICOLI1) eventHandler.incrementSuperatoMaxVeicoli1();
+                else eventHandler.incrementSuperatoMaxVeicoli2();
+            }
+            if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
+                eventHandler.setPriorityClassV1();
+                //System.out.println("priorità veicoli 1");
+            }
+            if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
+                eventHandler.setPriorityClassV2();
+                //System.out.println("priorità veicoli 2");
+            }
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
+                if ( (eventHandler.getNumberV1() - MAX_VEICOLI1*BOUNDV1) >= (eventHandler.getNumberV2() - MAX_VEICOLI2*BOUNDV2)){
+                    eventHandler.setPriorityClassV1();
+                    //System.out.println("priorità veicoli 1 CONFRONTO");
+                } else eventHandler.setPriorityClassV2();
+                //System.out.println("priorità veicoli 2 CONFRONTO");
+
+            }
+
+            if(eventHandler.getNumberV1()>MAX_VEICOLI1){
+                System.out.println("superato il limite per i veicoli 1: " + eventHandler.getSuperatoMaxVeicoli1());
+
+            }
+
+            if(eventHandler.getNumberV2()>MAX_VEICOLI2){
+                System.out.println("superato il limite per i veicoli 2: " + eventHandler.getSuperatoMaxVeicoli2());
+            }
+
+            eventList = this.eventHandler.getEventsSistema();
+
+            //prende l'indice del primo evento nella lista
+            e = getNextEvent(eventList);
+
+            //imposta il tempo del prossimo evento
+            this.time.setNext(eventList.get(e).getT());
+            //System.out.println(" time event is " + eventList.get(e).getT());
+            //si calcola l'area dell'integrale
+            this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
+            //imposta il tempo corrente a quello dell'evento corrente
+            //this.time.setCurrent(this.time.getNext());
+
+            //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
+            if (e < 0 || e > 7) {
+                throw new Exception("Errore nessun evento tra i precedenti");
+            }
+
+            controllerList.get(e).betterInfiniteSimulation(typeOfService);
+            this.time.setCurrent(this.time.getNext());
+        }
+
+        System.out.println("\n\n*** STATISTICHE FINALI con confidenza " + (1- alpha)*100 +  "%");
+
+        printFinalStats();
+        System.out.println("\nArrivi batch per "+ B*K +" = B*K job, si hanno "+ eventHandler.getArr());
     }
 
     /**
