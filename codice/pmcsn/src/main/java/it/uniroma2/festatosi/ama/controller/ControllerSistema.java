@@ -4,7 +4,6 @@ import it.uniroma2.festatosi.ama.model.EventListEntry;
 import it.uniroma2.festatosi.ama.model.MsqSum;
 import it.uniroma2.festatosi.ama.model.MsqT;
 
-import it.uniroma2.festatosi.ama.utils.ReplicationHelper;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 
 
@@ -93,6 +92,7 @@ public class ControllerSistema {
             case 0:
                 System.out.println("\nAvvio simulazione transiente, servizi gaussiani.");
                 baseSimulation(replicationIndex);
+                this.eventHandler.reset();
                 break;
             case 1:
             case 3:
@@ -106,6 +106,7 @@ public class ControllerSistema {
             case 4:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
                 betterBaseSimulation(replicationIndex);
+                this.eventHandler.reset();
                 break;
             case 5:
             case 7:
@@ -122,6 +123,7 @@ public class ControllerSistema {
     }
 
     public void baseSimulation(int replicationIndex) throws Exception {
+
         int e;
         //prende la lista di eventi per il sistema
         List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
@@ -164,6 +166,9 @@ public class ControllerSistema {
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
         System.out.println("count arrivi "+ ControllerSistema.counter);
         eventHandler.setArr(0);
+
+
+
     }
 
 

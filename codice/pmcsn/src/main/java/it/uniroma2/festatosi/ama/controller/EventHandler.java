@@ -77,6 +77,26 @@ public class EventHandler {
         return instance;
     }
 
+    public void reset() {
+        this.eventsAccettazione.clear();
+        this.eventsScarico.clear();
+        this.eventsGommista.clear();
+        this.eventsCarrozzeria.clear();
+        this.eventsElettrauto.clear();
+        this.eventsCarpenteria.clear();
+        this.eventsMeccanica.clear();
+        this.eventsCheckout.clear();
+        this.eventsSistema.clear();
+
+        this.internalEventsGommista.clear();
+        this.internalEventsCarrozzeria.clear();
+        this.internalEventsElettrauto.clear();
+        this.internalEventsCarpenteria.clear();
+        this.internalEventsMeccanica.clear();
+        this.internalEventsCheckout.clear();
+        this.internalEventsScarico.clear();
+    }
+
     public List<EventListEntry> getEventsAccettazione() {
         return eventsAccettazione;
     }

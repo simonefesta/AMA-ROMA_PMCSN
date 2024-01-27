@@ -12,7 +12,7 @@ public class Constants {
 
     public static final long SEED = 123456789L;
 
-    public static final long REPLICATIONS = 1;
+    public static final long REPLICATIONS = 96; //DEVE ESSERE <=K, in quanto la stampa delle replicazioni si basa su quella dei batch
 
 
     // ---- ARRIVAL RATES [req/sec]----
@@ -93,7 +93,7 @@ public class Constants {
     public static final int VEICOLI1 = 103; //veicoli piccoli #40
 
     public static final double  BOUNDV1 =  0.6;
-    public static final double  BOUNDV2 =  0.6;
+    public static final double  BOUNDV2 =  0.5;
     public static final int MAX_VEICOLI1 = 70; //veicoli piccoli nel sistema al massimo
     public static final int VEICOLI2 = 79; //veicoli grandi #59
     public static final int MAX_VEICOLI2 = 32; //veicoli grandi nel sistema al massimo
