@@ -119,4 +119,17 @@ public class Constants {
 
     public static final double alpha = 0.05;  //confidenza, tipicamente 0.05
 
+    public static void bottleneckAnalysis(){
+        SERVERS_SCARICO = 1;
+        SERVERS_ACCETTAZIONE = 1;
+        SERVERS_GOMMISTA = 1;
+        SERVERS_CARROZZERIA = 1;
+        SERVERS_ELETTRAUTO = 1;
+        SERVERS_CARPENTERIA = 1;
+        SERVERS_MECCANICA = 1;
+        SERVERS_CHECKOUT = 1;
+        SERVERS_OFFICINA = new int[]{SERVERS_GOMMISTA, SERVERS_CARROZZERIA, SERVERS_ELETTRAUTO,
+                SERVERS_CARPENTERIA, SERVERS_MECCANICA};
+    }
+
 }

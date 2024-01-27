@@ -18,6 +18,7 @@ import static it.uniroma2.festatosi.ama.model.Constants.*;
  */
 public class ControllerSistema {
     long number =0;                 /*number in the node*/
+    public static long counter;
     int e;                          /*next event index*/
     int s;                          /*server index*/
     private long jobServed=0;           /*contatore jobs processati*/ //TODO incrementarlo ogni volta che un evento esce dal sistema
@@ -94,6 +95,7 @@ public class ControllerSistema {
                 this.eventHandler.reset();
                 break;
             case 1:
+            case 3:
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi esponenziali.");
                 infiniteSimulation(0);  //batch con servizi esponenziali
                 break;
@@ -101,16 +103,17 @@ public class ControllerSistema {
                 System.out.println("\nAvvio simulazione orizzonte infinito, servizi gaussiani.");
                 infiniteSimulation(1);  //batch con servizi normali
                 break;
-            case 3:
+            case 4:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA transiente, servizi gaussiani.");
                 betterBaseSimulation(replicationIndex);
                 this.eventHandler.reset();
                 break;
-            case 4:
+            case 5:
+            case 7:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi esponenziali.");
                 betterInfiniteSimulation(0);
                 break;
-            case 5:
+            case 6:
                 System.out.println("\nAvvio simulazione MIGLIORATIVA infinita, servizi gaussiani.");
                 betterInfiniteSimulation(1);
                 break;
@@ -161,6 +164,7 @@ public class ControllerSistema {
         }
 
         System.out.println("arrivi nelle 24 ore "+eventHandler.getArr());
+        System.out.println("count arrivi "+ ControllerSistema.counter);
         eventHandler.setArr(0);
 
 

@@ -44,6 +44,7 @@ public class EventHandler {
 
     private int superatoMaxVeicoli1 = 0;
     private int superatoMaxVeicoli2 = 0;
+    private int totArrival=0;
 
     private EventHandler() {
         /*event list per i vari msq*/
@@ -360,5 +361,13 @@ public class EventHandler {
 
     public void incrementSuperatoMaxVeicoli2() {
         this.superatoMaxVeicoli2++;
+    }
+
+    public int getTotArrival() {
+        return this.totArrival;
+    }
+
+    public void incrementTotArrival() {
+        this.totArrival++;
     }
 }
