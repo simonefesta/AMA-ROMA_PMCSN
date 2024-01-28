@@ -69,9 +69,6 @@ public class ControllerOfficine implements Controller{
             this.sum.add(s, new MsqSum());
         }
 
-
-        //this.eventListOfficina.set(0,new EventListEntry(this.time.getCurrent(), 0));
-
         //viene settata la lista di eventi nell'handler
         this.eventHandler.setEventsOfficina(this.id, eventListOfficina);
     }
@@ -119,7 +116,6 @@ public class ControllerOfficine implements Controller{
 
         //imposta il tempo del prossimo evento
         this.time.setNext(eventList.get(e).getT());
-        //System.out.println(this.name + " next event " + this.time.getCurrent());
         //si calcola l'area dell'integrale
         this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
         //imposta il tempo corrente a quello dell'evento corrente
@@ -208,7 +204,6 @@ public class ControllerOfficine implements Controller{
                     eventHandler.getEventsSistema().get(0).setT(event.getT());
                 }
                 eventHandler.getEventsSistema().get(0).setX(1);
-                //System.out.println("inviato scarico " + this.name);
 
                 if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                     //se ci sono ottengo un nuovo tempo di servizio
@@ -266,14 +261,12 @@ public class ControllerOfficine implements Controller{
 
         //imposta il tempo del prossimo evento
         this.time.setNext(eventList.get(e).getT());
-        //System.out.println(this.name + " next event " + this.time.getCurrent());
         //si calcola l'area dell'integrale
         this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
         this.area1=this.area1+(this.time.getNext()-this.time.getCurrent())*this.numberV1;
         this.area2=this.area2+(this.time.getNext()-this.time.getCurrent())*this.numberV2;
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
-       // System.out.println(this.name + " current " + this.time.getCurrent());
 
 
         if (e == 0) { // controllo se l'evento è un arrivo
@@ -283,10 +276,6 @@ public class ControllerOfficine implements Controller{
             int vType = event.getVehicleType();
             eventList.set(0, new EventListEntry(event.getT(), event.getX(), vType));
 
-            //this.time.setCurrent(event.getT());
-
-            //System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
-            
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
 
@@ -302,8 +291,6 @@ public class ControllerOfficine implements Controller{
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
-            //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
-            
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
 
@@ -336,7 +323,6 @@ public class ControllerOfficine implements Controller{
                 this.eventHandler.setEventsOfficina(this.id, eventList);
             } else {
                 queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
-                //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
             }
             if (internalEventsOfficina.isEmpty()) {
                 this.eventListOfficina.get(0).setX(0);
@@ -427,7 +413,6 @@ public class ControllerOfficine implements Controller{
 
         //imposta il tempo del prossimo evento
         this.time.setNext(eventList.get(e).getT());
-        //System.out.println(this.name + " next event " + this.time.getCurrent());
         //si calcola l'area dell'integrale
         this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
         //imposta il tempo corrente a quello dell'evento corrente
@@ -513,7 +498,6 @@ public class ControllerOfficine implements Controller{
                 eventHandler.getEventsSistema().get(0).setT(event.getT());
             }
             eventHandler.getEventsSistema().get(0).setX(1);
-            //System.out.println("inviato scarico " + this.name);
 
             if (this.number >= SERVERS_OFFICINA[this.id]) { //controllo se ci sono altri eventi da gestire
                 int eventIndex= eventHandler.getNextEventFromQueue(queueOfficina);
@@ -567,14 +551,12 @@ public class ControllerOfficine implements Controller{
 
         //imposta il tempo del prossimo evento
         this.time.setNext(eventList.get(e).getT());
-        //System.out.println(this.name + " next event " + this.time.getCurrent());
         //si calcola l'area dell'integrale
         this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
         this.area1=this.area1+(this.time.getNext()-this.time.getCurrent())*this.numberV1;
         this.area2=this.area2+(this.time.getNext()-this.time.getCurrent())*this.numberV2;
         //imposta il tempo corrente a quello dell'evento corrente
         this.time.setCurrent(this.time.getNext());
-        // System.out.println(this.name + " current " + this.time.getCurrent());
 
 
         if (e == 0) { // controllo se l'evento è un arrivo
@@ -583,10 +565,6 @@ public class ControllerOfficine implements Controller{
             internalEventsOfficina.remove(0);
             int vType = event.getVehicleType();
             eventList.set(0, new EventListEntry(event.getT(), event.getX(), vType));
-
-            //this.time.setCurrent(event.getT());
-
-            //System.out.println(this.name + " time is " + event.getT() + " while current is " + this.time.getCurrent());
 
             this.jobInBatch++;
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
@@ -599,8 +577,6 @@ public class ControllerOfficine implements Controller{
 
             DataExtractor.writeSingleStat(datiOfficina, event.getT(), this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
-
-            //System.out.println(this.name + " Arrivo a " + event.getT() + " popolazione " + this.number);
 
             if(this.jobInBatch%B==0 && this.jobInBatch<=B*K){
                 this.batchDuration= this.time.getCurrent()-this.time.getBatch();
@@ -634,7 +610,6 @@ public class ControllerOfficine implements Controller{
                 this.eventHandler.setEventsOfficina(this.id, eventList);
             } else {
                 queueOfficina.add(eventList.get(0)); //se server saturi, rimane in attesa
-                //System.out.println(this.name + " in attesa di essere servito at " + event.getT());
             }
             if (internalEventsOfficina.isEmpty()) {
                 this.eventListOfficina.get(0).setX(0);
@@ -748,15 +723,7 @@ public class ControllerOfficine implements Controller{
         for(int i = 1; i <= SERVERS_OFFICINA[this.id]; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
             utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
-            //System.out.println(i+"\t");
-             //System.out.println("get service" + this.sumList[i].getService() + "\n");
-             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-             //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-             //System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
             System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
-
         }
         Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchTempoCoda(Etq, replicationIndex);
         Objects.requireNonNull(getReplicationStatistics(this.name)).setBatchPopolazioneSistema(Ens, replicationIndex);
@@ -772,7 +739,6 @@ public class ControllerOfficine implements Controller{
 
         System.out.println("\n\n" + this.name + ", batch: " + batchNumber);
         double meanUtilization;
-        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ens1 = this.area1/(this.batchDuration);
         double Ens2 = this.area2/(this.batchDuration);

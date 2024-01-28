@@ -64,11 +64,9 @@ public class RandomDistribution {
         switch (queueType) {
             case 0: //arrivo allo scarico
                 arrivalScarico = Exponential(1.0/(LAMBDA*P1));
-               // System.out.println("Arrival sc "+arrivalScarico);
                 return arrivalScarico;
             case 1: //arrivo alla accettazione
                 arrivalAccettazione = Exponential(1.0/(LAMBDA*Q1));
-              //  System.out.println("Arrival ac "+arrivalAccettazione);
                 return arrivalAccettazione;
             default:
                 throw new Exception("Arrivo non definito");
@@ -81,7 +79,6 @@ public class RandomDistribution {
         /*se il numero random scelto è minore di 0.5 o i veicoli del secondo tipo sono tutti presenti nel sistema,
          * entra un veicolo del primo tipo
          */
-        //System.out.println("v1 "+eventHandler.getNumberV1()+"v2 "+eventHandler.getNumberV2());
         if((rnd<=(double)VEICOLI1/(VEICOLI1+VEICOLI2) && eventHandler.getNumberV1()< VEICOLI1)
                 || (eventHandler.getNumberV2()==VEICOLI2 && eventHandler.getNumberV1()< VEICOLI1)){
             eventHandler.incrementNumberV1();

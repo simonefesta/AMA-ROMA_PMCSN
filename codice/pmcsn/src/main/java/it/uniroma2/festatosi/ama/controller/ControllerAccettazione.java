@@ -136,10 +136,8 @@ public class ControllerAccettazione implements Controller {
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
-                //eventHandler.getEventsSistema().get(0).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
-                //return;
             }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi per servire il job che sto analizzando
@@ -190,23 +188,18 @@ public class ControllerAccettazione implements Controller {
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
-                    //System.out.println("Goto gommista");
                 }
                 else if(rndRouting<=(P2+P3)){
                     off=1;
-                    //System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
                     off=2;
-                    //System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
                     off=3;
-                    //System.out.println("goto carpentiere");
                 }
                 else{
                     off=4;
-                    //System.out.println("goto meccanico");
                 }
 
                 //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
@@ -218,8 +211,6 @@ public class ControllerAccettazione implements Controller {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                //System.out.println("abbandono");
-                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
 
@@ -300,7 +291,7 @@ public class ControllerAccettazione implements Controller {
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
-                return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
+                return;
             }
 
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
@@ -316,11 +307,7 @@ public class ControllerAccettazione implements Controller {
             counter++;
             ControllerSistema.counter++;
 
-            //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
-
-
-            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
 
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(), eventHandler.getNumberV1(), eventHandler.getNumberV2());
@@ -362,9 +349,6 @@ public class ControllerAccettazione implements Controller {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
-            //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-
 
             this.s=e; //il server con index e è quello che si libera
 
@@ -381,23 +365,18 @@ public class ControllerAccettazione implements Controller {
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
-                    //System.out.println("Goto gommista");
                 }
                 else if(rndRouting<=(P2+P3)){
                     off=1;
-                    //System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
                     off=2;
-                    //System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
                     off=3;
-                    //System.out.println("goto carpentiere");
                 }
                 else{
                     off=4;
-                    //System.out.println("goto meccanico");
                 }
 
                 //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
@@ -409,8 +388,6 @@ public class ControllerAccettazione implements Controller {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                //System.out.println("abbandono");
-                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
 
@@ -436,9 +413,6 @@ public class ControllerAccettazione implements Controller {
                 //aggiorna la lista
                 this.eventHandler.setEventsAccettazione(eventList);
             }
-
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
 
         }
 
@@ -481,7 +455,7 @@ public class ControllerAccettazione implements Controller {
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
-                return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
+                return;
             }
             this.number++; //poiché sto processando un arrivo, la popolazione aumenta
 
@@ -500,10 +474,8 @@ public class ControllerAccettazione implements Controller {
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(),eventHandler.getNumberV1(),eventHandler.getNumberV2());
 
             if(eventList.get(0).getT()> STOP_FINITE){ // Se il tempo del prossimo arrivo (generato prima) eccede il tempo di chiusura delle porte, non lo servirò.
-                //eventHandler.getEventsSistema().get(0).setX(0);
                 eventList.get(0).setX(0); //chiusura delle porte
                 this.eventHandler.setEventsAccettazione(eventList);
-                //return;
             }
 
             if(this.number<=SERVERS_ACCETTAZIONE){ //controllo se ci sono server liberi per servire il job che sto analizzando
@@ -554,23 +526,18 @@ public class ControllerAccettazione implements Controller {
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
-                    //System.out.println("Goto gommista");
                 }
                 else if(rndRouting<=(P2+P3)){
                     off=1;
-                    //System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
                     off=2;
-                    //System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
                     off=3;
-                    //System.out.println("goto carpentiere");
                 }
                 else{
                     off=4;
-                    //System.out.println("goto meccanico");
                 }
 
                 //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
@@ -582,8 +549,6 @@ public class ControllerAccettazione implements Controller {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                //System.out.println("abbandono");
-                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
 
@@ -608,9 +573,6 @@ public class ControllerAccettazione implements Controller {
                 //aggiorna la lista
                 this.eventHandler.setEventsAccettazione(eventList);
             }
-
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
 
         }
 
@@ -659,7 +621,7 @@ public class ControllerAccettazione implements Controller {
             if(vType==Integer.MAX_VALUE) { // se il veicolo è pari a max_value vuol dire che non possono esserci arrivi
                 eventList.get(0).setX(0);
                 eventHandler.setEventsAccettazione(eventList);
-                return; //non c'è più il ciclo la funzione viene chiamata dall'esterno, se non può essere arrivato nessun veicolo aggiorno arrivo e ritorno
+                return;
             }
 
             BatchSimulation.incrementJobInBatch(); //arriva un job, incremento il numero di job nel batch corrente
@@ -672,11 +634,7 @@ public class ControllerAccettazione implements Controller {
             if(vType==1) this.numberV1++;
             else this.numberV2++;
 
-            //System.out.println("[acc] popolazione " + this.number + " at time " + this.time.getCurrent() +" numero job in batch " + BatchSimulation.getJobInBatch() + " numero batch " + BatchSimulation.getNBatch() );
             EventListEntry event=new EventListEntry(eventList.get(0).getT(), 1, vType);
-
-
-            //System.out.println("[Accettazione entrata] TIME: "+ this.time.getCurrent() + " popolazione attuale " + this.number +"\n");
 
             DataExtractor.writeSingleStat(datiAccettazione,this.time.getCurrent(),this.number,this.numberV1,this.numberV2);
             DataExtractor.writeSingleStat(datiSistema,this.time.getCurrent(),eventHandler.getNumber(), eventHandler.getNumberV1(), eventHandler.getNumberV2());
@@ -718,9 +676,6 @@ public class ControllerAccettazione implements Controller {
             this.number--;
             //aumenta il numero di job serviti
             this.jobServed++;
-            //System.out.println("job served " +this.jobServed + " at time " + this.time.getCurrent());
-            //System.out.println("[Accettazione uscita] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-
 
             this.s=e; //il server con index e è quello che si libera
 
@@ -737,23 +692,18 @@ public class ControllerAccettazione implements Controller {
             if(rndRouting<=(P2+P3+P4+P5+P6)) {
                 if(rndRouting<=P2){
                     off=0;
-                    //System.out.println("Goto gommista");
                 }
                 else if(rndRouting<=(P2+P3)){
                     off=1;
-                    //System.out.println("Goto carrozziere");
                 }
                 else if(rndRouting<=(P2+P3+P4)){
                     off=2;
-                    //System.out.println("goto elettrauto");
                 }
                 else if(rndRouting<=(P2+P3+P4+P5)){
                     off=3;
-                    //System.out.println("goto carpentiere");
                 }
                 else{
                     off=4;
-                    //System.out.println("goto meccanico");
                 }
 
                 //Qui indirizziamo sulle varie officine, con i tempi di uscita (cioè quelli di entrata per le officine)
@@ -765,8 +715,6 @@ public class ControllerAccettazione implements Controller {
                 eventHandler.getEventsOfficina(off).get(0).setX(1);
             } else{
                 eventHandler.decrementVType(event.getVehicleType());
-                //System.out.println("abbandono");
-                //TODO abbandono, diminuire il numero di veicoli disponibili di quel tipo e incrementare abbandono
             }
 
 
@@ -793,9 +741,6 @@ public class ControllerAccettazione implements Controller {
                 //aggiorna la lista
                 this.eventHandler.setEventsAccettazione(eventList);
             }
-
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
 
         }
 
@@ -846,14 +791,7 @@ public class ControllerAccettazione implements Controller {
         for(int i = 1; i <= SERVERS_ACCETTAZIONE; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
             utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
-            //System.out.println(i+"\t");
-            //System.out.println("get service" + this.sumList[i].getService() + "\n");
-            //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            //System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
             System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
 
         }
         DataExtractor.writeReplicationStat(replicationAccettazione,Ets, Ens, Etq, Enq);
@@ -869,7 +807,6 @@ public class ControllerAccettazione implements Controller {
 
         System.out.println(" \n\nAccettazione, batch: " + batchNumber);
         double meanUtilization;
-        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ens1 = this.area1/(this.batchDuration);
         double Ens2 = this.area2/(this.batchDuration);

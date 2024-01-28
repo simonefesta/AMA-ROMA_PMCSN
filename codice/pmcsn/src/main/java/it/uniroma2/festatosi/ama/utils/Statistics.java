@@ -93,7 +93,7 @@ public class Statistics {
         for (double elemento : batchMedia) {
             media += elemento;
         }
-        media /= K/*batchMedia.length*/;
+        media /= K;
         if (type == 0) setMeanDelay(media);     // type 0: media E[Tq]
         else if (type == 1) setPopMediaCoda(media); //type 1: media E[Nq]
         else if (type == 2) setMeanUtilization(media);
@@ -109,7 +109,7 @@ public class Statistics {
 
         // Calcola la varianza
 
-        double devStd = Math.sqrt(sommaQuadratiDifferenze / K)/*batchMedia.length*/;
+        double devStd = Math.sqrt(sommaQuadratiDifferenze / K);
 
         if (type == 0) devEtq = devStd;
         else if (type == 1) devEnq = devStd;

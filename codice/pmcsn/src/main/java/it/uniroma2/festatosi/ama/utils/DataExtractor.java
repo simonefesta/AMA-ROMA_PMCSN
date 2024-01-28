@@ -23,7 +23,6 @@ public class DataExtractor{
         }
 
         File fileInTarget = new File(targetDirectory, fileName);
-        //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
             writer.write("seed " + seed + ";" + "Tempo" + ";" + "Popolazione" + ";" + "PopolazioneVeicoliPiccoli" +";" + "PopolazioneVeicoliGrandi"+ ";" + name + "\n");
@@ -50,7 +49,6 @@ public class DataExtractor{
         }
 
         File fileInTarget = new File(targetDirectory, fileName);
-        //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
             writer.write("seed " + seed + ";" + "Batch" + ";" + "Popolazione" + ";" + "PopolazioneVeicoliPiccoli" +";" + "PopolazioneVeicoliGrandi"+ ";" + name + "\n");
@@ -77,7 +75,6 @@ public class DataExtractor{
         }
 
         File fileInTarget = new File(targetDirectory, fileName);
-        //System.out.println("CREO :" + fileName + " ");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileInTarget))) {
             writer.write("Ets" + ";" + "Ens" + ";" + "Etq" +";" + "Enq"+ "\n");
@@ -118,7 +115,7 @@ public class DataExtractor{
      *
      * Usata per vedere valori di autolag, per adesso è abbastanza statica.
      */
-    public static String convertCsvToTxt(/*String inputCsvPath, String outputTxtPath*/) throws IOException {
+    public static String convertCsvToTxt() throws IOException {
         String inputCsvPath = "target/graphs/123456789/ControllerAccettazioneBatch.csv";
         String outputTxtPath = "target/graphs/123456789/AutocorrelazioneAccettazioneBatch.txt";
         try (BufferedReader br = new BufferedReader(new FileReader(inputCsvPath));

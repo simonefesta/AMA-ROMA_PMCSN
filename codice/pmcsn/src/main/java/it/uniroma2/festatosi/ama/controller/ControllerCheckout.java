@@ -124,7 +124,6 @@ public class ControllerCheckout implements Controller{
 
             if(this.number<=SERVERS_CHECKOUT){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(2); //ottengo tempo di servizio
-                //this.rnd.decrementVehicle(vType);
 
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
@@ -139,9 +138,8 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
-                //System.out.println("messo in coda "+queueCheckout.size());
             }
-            if(internalEventsCheckout.size()==0){
+            if(internalEventsCheckout.isEmpty()){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
             }
         }
@@ -156,11 +154,10 @@ public class ControllerCheckout implements Controller{
             EventListEntry event=eventList.get(s);
 
             if(event.getVehicleType()==1) {
-                                           this.numberV1--;
-
+                this.numberV1--;
             }
             else {
-                    this.numberV2--;
+                this.numberV2--;
             }
 
             eventHandler.decrementVType(event.getVehicleType());
@@ -196,7 +193,6 @@ public class ControllerCheckout implements Controller{
                 queueCheckout.remove(0);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
-                //System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
@@ -207,8 +203,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
 
 
@@ -258,8 +252,7 @@ public class ControllerCheckout implements Controller{
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-            //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
-            
+
             this.jobInBatch++;
             
             this.number++; //se è un arrivo incremento il numero di jobs nel sistema
@@ -306,7 +299,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
-                //System.out.println("messo in coda "+queueCheckout.size());
             }
             if(internalEventsCheckout.isEmpty()){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
@@ -349,7 +341,6 @@ public class ControllerCheckout implements Controller{
                 double service;
                 if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 else service = this.rnd.getService(2);
-                //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -361,7 +352,6 @@ public class ControllerCheckout implements Controller{
                 queueCheckout.remove(0);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
-                //System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
@@ -372,8 +362,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
 
 
@@ -449,7 +437,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
-                //System.out.println("messo in coda "+queueCheckout.size());
             }
             if(internalEventsCheckout.size()==0){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
@@ -495,7 +482,6 @@ public class ControllerCheckout implements Controller{
                 int eventIndex= eventHandler.getNextEventFromQueue(queueCheckout);
                 //se ci sono ottengo un nuovo tempo di servizio
                 double service=this.rnd.getService(2);
-                //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -508,8 +494,6 @@ public class ControllerCheckout implements Controller{
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
 
-                //System.out.println("preso coda");
-
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
@@ -520,8 +504,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
 
 
@@ -542,7 +524,6 @@ public class ControllerCheckout implements Controller{
          */
 
 
-        //while(eventHandler.getInternalEventsCheckout().size()>0 || this.number>0){
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_CHECKOUT);
         //imposta il tempo del prossimo evento
@@ -565,7 +546,6 @@ public class ControllerCheckout implements Controller{
             internalEventsCheckout.remove(0);
             int vType=event.getVehicleType();
             eventList.set(0,new EventListEntry(event.getT(), event.getX(), vType));
-            //System.out.println("[Checkout] TIME: "+ this.time.getCurrent() + " popolazione decrementa " + this.number +"\n");
 
             this.jobInBatch++;
 
@@ -610,7 +590,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }else{
                 queueCheckout.add(eventList.get(0));
-                //System.out.println("messo in coda "+queueCheckout.size());
             }
             if(internalEventsCheckout.isEmpty()){
                 this.eventHandler.getEventsCheckout().get(0).setX(0);
@@ -654,7 +633,6 @@ public class ControllerCheckout implements Controller{
                 double service;
                 if (typeOfService == 0) service = this.rnd.getServiceBatch(2); //ottengo tempo di servizio
                 else service = this.rnd.getService(2);
-                //this.rnd.decrementVehicle(queueCheckout.get(0).getVehicleType());
 
                 //incremento tempo di servizio totale ed eventi totali gestiti
                 sum.get(s).incrementService(service);
@@ -666,7 +644,6 @@ public class ControllerCheckout implements Controller{
                 queueCheckout.remove(eventIndex);
                 //aggiorna la lista degli eventi di checkout
                 this.eventHandler.setEventsCheckout(eventList);
-                //System.out.println("preso coda");
             }else{
                 //se non ci sono altri eventi da gestire viene messo il server come idle (x=0)
                 eventList.get(e).setX(0);
@@ -677,8 +654,6 @@ public class ControllerCheckout implements Controller{
                 this.eventHandler.setEventsCheckout(eventList);
             }
 
-
-            //TODO gestione inserimento dell'uscita da questo centro in quello successivo
         }
 
 
@@ -732,15 +707,7 @@ public class ControllerCheckout implements Controller{
         for(int i = 1; i <= SERVERS_CHECKOUT; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
             utilizzazione+=this.sum.get(i).getService() / (SERVERS_CHECKOUT*this.time.getCurrent());
-            //System.out.println(i+"\t");
-            //System.out.println("get service" + this.sumList[i].getService() + "\n");
-            //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            //System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
             System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
-
         }
         replicationStatisticsCheckout.setBatchTempoCoda(Etq, replicationIndex);
         replicationStatisticsCheckout.setBatchPopolazioneSistema(Ens, replicationIndex);

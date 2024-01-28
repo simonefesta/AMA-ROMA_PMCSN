@@ -2,7 +2,6 @@ package it.uniroma2.festatosi.ama;
 
 import it.uniroma2.festatosi.ama.controller.ControllerSistema;
 import it.uniroma2.festatosi.ama.controller.EventHandler;
-import it.uniroma2.festatosi.ama.model.Constants;
 import it.uniroma2.festatosi.ama.utils.ReplicationHelper;
 import it.uniroma2.festatosi.ama.utils.Rngs;
 

@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static it.uniroma2.festatosi.ama.model.Constants.*;
-/*TODO: questa classe ha una event list che segna i tempi minimi di tutti gli eventi nelle varie code e al time-stamp successivo fa procedere la coda di interesse*/
+
 /**
  * Rappresenta la msq per il sistema
  */
@@ -21,7 +21,7 @@ public class ControllerSistema {
     public static long counter;
     int e;                          /*next event index*/
     int s;                          /*server index*/
-    private long jobServed=0;           /*contatore jobs processati*/ //TODO incrementarlo ogni volta che un evento esce dal sistema
+    private long jobServed=0;           /*contatore jobs processati*/
     private double area=0.0;        /*time integrated number in the node*/
 
     private final EventHandler eventHandler;  /*istanza dell'EventHandler per ottenere le info sugli eventi*/
@@ -118,7 +118,7 @@ public class ControllerSistema {
                 betterInfiniteSimulation(1);
                 break;
             default:
-                throw new Exception("Type deve essere 0, 1 o 2");
+                throw new Exception("Type deve essere compreso tra 0 e 6");
         }
     }
 
@@ -141,7 +141,6 @@ public class ControllerSistema {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-           // System.out.println("servito "+e);
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -167,8 +166,6 @@ public class ControllerSistema {
         System.out.println("count arrivi "+ ControllerSistema.counter);
         eventHandler.setArr(0);
 
-
-
     }
 
 
@@ -180,7 +177,7 @@ public class ControllerSistema {
 
 
         //prende la lista di eventi per il sistema
-        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        List<EventListEntry> eventList;
         /*
         * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
         */
@@ -197,13 +194,11 @@ public class ControllerSistema {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-           //imposta il tempo del prossimo evento
+            //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
-            //System.out.println(" time event is " + eventList.get(e).getT());
             //si calcola l'area dell'integrale
             this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
             //imposta il tempo corrente a quello dell'evento corrente
-            //this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
             if (e < 0 || e > 7) {
@@ -250,11 +245,11 @@ public class ControllerSistema {
             }
             if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
                 eventHandler.setPriorityClassV1();
-                System.out.println("priorità veicoli 1");
+                
             }
             if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
                 eventHandler.setPriorityClassV2();
-                System.out.println("priorità veicoli 2");
+                
             }
 
             if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
@@ -278,7 +273,7 @@ public class ControllerSistema {
             //prende l'indice del primo evento nella lista
             e = getNextEvent(eventList);
 
-            // System.out.println("servito "+e);
+            
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
             //si calcola l'area dell'integrale
@@ -312,7 +307,7 @@ public class ControllerSistema {
 
 
         //prende la lista di eventi per il sistema
-        List<EventListEntry> eventList = this.eventHandler.getEventsSistema();
+        List<EventListEntry> eventList;
         /*
          * il ciclo continua finché non tutti i nodi sono idle e il tempo supera lo stop time
          */
@@ -326,19 +321,19 @@ public class ControllerSistema {
             }
             if(eventHandler.getNumberV1()>=(MAX_VEICOLI1*BOUNDV1)){
                 eventHandler.setPriorityClassV1();
-                //System.out.println("priorità veicoli 1");
+                //
             }
             if(eventHandler.getNumberV2()>=(MAX_VEICOLI2*BOUNDV2)){
                 eventHandler.setPriorityClassV2();
-                //System.out.println("priorità veicoli 2");
+                //
             }
 
             if(eventHandler.getNumberV1()>MAX_VEICOLI1*BOUNDV1 && eventHandler.getNumberV2()>MAX_VEICOLI2*BOUNDV2){
                 if ( (eventHandler.getNumberV1() - MAX_VEICOLI1*BOUNDV1) >= (eventHandler.getNumberV2() - MAX_VEICOLI2*BOUNDV2)){
                     eventHandler.setPriorityClassV1();
-                    //System.out.println("priorità veicoli 1 CONFRONTO");
+                    
                 } else eventHandler.setPriorityClassV2();
-                //System.out.println("priorità veicoli 2 CONFRONTO");
+                
 
             }
 
@@ -358,11 +353,10 @@ public class ControllerSistema {
 
             //imposta il tempo del prossimo evento
             this.time.setNext(eventList.get(e).getT());
-            //System.out.println(" time event is " + eventList.get(e).getT());
+            
             //si calcola l'area dell'integrale
             this.area = this.area + (this.time.getNext() - this.time.getCurrent()) * this.number;
             //imposta il tempo corrente a quello dell'evento corrente
-            //this.time.setCurrent(this.time.getNext());
 
             //Se l'indice calcolato è maggiore di 7 ritorna errore, nel sistema ci sono 7 code
             if (e < 0 || e > 7) {
@@ -414,15 +408,6 @@ public class ControllerSistema {
         System.out.println("    server     utilization     avg service        share\n");
         for(int i = 1; i <= NODES_SISTEMA; i++) {
             System.out.println(i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
-             //System.out.println(i+"\t");
-             //System.out.println("get service" + this.sumList[i].getService() + "\n");
-             //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-             //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-             //System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            //System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
-
         }
         System.out.println("\n");
     }

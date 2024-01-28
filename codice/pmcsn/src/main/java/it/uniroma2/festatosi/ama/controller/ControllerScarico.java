@@ -141,7 +141,7 @@ public class ControllerScarico implements Controller{
             ControllerSistema.counter++;
 
             if(vType==1) {
-                            this.numberV1++;
+                this.numberV1++;
             }
             else {
                 this.numberV2++;
@@ -152,7 +152,6 @@ public class ControllerScarico implements Controller{
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(1); //ottengo tempo di servizio
-                //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -277,12 +276,6 @@ public class ControllerScarico implements Controller{
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
-        /*System.out.println("scarico evlist");
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println("scarico "+ev.getT()+" "+ev.getX());
-        }*/
-
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
         //imposta il tempo del prossimo evento
@@ -295,7 +288,6 @@ public class ControllerScarico implements Controller{
         this.time.setCurrent(this.time.getNext());
 
         if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
-            //System.out.println("e scarico: "+e);
             int vType;
             EventListEntry event;
             if(e==0) { //arrivo dall'esterno
@@ -322,7 +314,6 @@ public class ControllerScarico implements Controller{
             }else{ //arrivo dall'interno del sistema
                 event=internalEventsScarico.get(0);
                 internalEventsScarico.remove(0);
-                //System.out.println("interno");
                 vType=event.getVehicleType();
                 if(internalEventsScarico.isEmpty()){
                     eventList.get(eventList.size()-1).setX(0);
@@ -362,7 +353,6 @@ public class ControllerScarico implements Controller{
                 if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
                 else service = this.rnd.getService(1);
 
-                //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -426,9 +416,6 @@ public class ControllerScarico implements Controller{
                 eventHandler.getEventsSistema().get(7).setT(event.getT());
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
-
-            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
-
 
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 //se ci sono ottengo un nuovo tempo di servizio
@@ -538,7 +525,6 @@ public class ControllerScarico implements Controller{
 
             if(this.number<=SERVERS_SCARICO){ //controllo se ci sono server liberi
                 double service=this.rnd.getService(1); //ottengo tempo di servizio
-                //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -664,12 +650,6 @@ public class ControllerScarico implements Controller{
             eventList.get(eventList.size()-1).setT(internalEventsScarico.get(0).getT());
         }
 
-        /*System.out.println("scarico evlist");
-        for (EventListEntry ev:
-             eventList) {
-            System.out.println("scarico "+ev.getT()+" "+ev.getX());
-        }*/
-
         //prende l'indice del primo evento nella lista
         e=EventListEntry.getNextEvent(eventList, SERVERS_SCARICO+1);
         //imposta il tempo del prossimo evento
@@ -682,7 +662,6 @@ public class ControllerScarico implements Controller{
         this.time.setCurrent(this.time.getNext());
 
         if(e==0 || e==eventList.size()-1){ // controllo se l'evento è un arrivo
-            //System.out.println("e scarico: "+e);
             int vType;
             EventListEntry event;
             if(e==0) { //arrivo dall'esterno
@@ -709,7 +688,6 @@ public class ControllerScarico implements Controller{
             }else{ //arrivo dall'interno del sistema
                 event=internalEventsScarico.get(0);
                 internalEventsScarico.remove(0);
-                //System.out.println("interno");
                 vType=event.getVehicleType();
                 if(internalEventsScarico.isEmpty()){
                     eventList.get(eventList.size()-1).setX(0);
@@ -745,7 +723,6 @@ public class ControllerScarico implements Controller{
                 if (typeOfService == 0) service=this.rnd.getServiceBatch(1); //ottengo tempo di servizio
                 else service = this.rnd.getService(1);
 
-                //this.rnd.decrementVehicle(vType);
                 this.s=findOneServerIdle(eventList); //ottengo l'indice di un server libero
                 //incrementa i tempi di servizio e il numero di job serviti
                 sum.get(s).incrementService(service);
@@ -810,9 +787,6 @@ public class ControllerScarico implements Controller{
                 eventHandler.getEventsSistema().get(7).setX(1);
             }
 
-            //DataExtractor.writeSingleStat(datiSistema,event.getT(),eventHandler.getNumber());
-
-
             if(this.number>=SERVERS_SCARICO){ //controllo se ci sono altri eventi da gestire
                 int eventIndex= eventHandler.getNextEventFromQueue(queueScarico);
                 //se ci sono ottengo un nuovo tempo di servizio
@@ -869,7 +843,6 @@ public class ControllerScarico implements Controller{
 
         System.out.println("\n\nScarico, batch: " + batchNumber);
         double meanUtilization;
-        //System.out.println("Area ovvero Popolazione TOT: " + this.area + " ; job serviti: " + this.jobServed + " ; batch time " + batchTime);
         double Ens = this.area/(this.batchDuration);
         double Ens1 = this.area1/(this.batchDuration);
         double Ens2 = this.area2/(this.batchDuration);
@@ -935,15 +908,6 @@ public class ControllerScarico implements Controller{
         for(int i = 1; i <= SERVERS_SCARICO; i++) {
             System.out.println("\t"+i + "\t" + this.sum.get(i).getService() / this.time.getCurrent() + "\t" + this.sum.get(i).getService() / this.sum.get(i).getServed() + "\t" + ((double)this.sum.get(i).getServed() / this.jobServed));
             utilizzazione+=this.sum.get(i).getService() / (SERVERS_ACCETTAZIONE*this.time.getCurrent());
-            //System.out.println(i+"\t");
-            //System.out.println("get service" + this.sumList[i].getService() + "\n");
-            //System.out.println("getCurrent" + this.time.getCurrent() + "\n");
-            //System.out.println("getserved"+this.sumList[i].getServed() + "\n");
-            //System.out.println("jobServiti"+this.jobServiti + "\n");
-            //System.out.println(i + "\t" + sumList[i].getService() / this.time.getCurrent() + "\t" + this.sumList[i].getService() / this.sumList[i].getServed() + "\t" + this.sumList[i].getServed() / this.jobServiti);
-            //System.out.println("\n");
-            //System.out.println("jobServiti"+this.num_job_feedback + "\n");
-
         }
         replicationStatisticsScarico.setBatchTempoCoda(Etq, replicationIndex);
         replicationStatisticsScarico.setBatchPopolazioneSistema(Ens, replicationIndex);
